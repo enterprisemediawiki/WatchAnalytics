@@ -21,6 +21,4 @@ Determines how strong a watcher a user is. If no user is specified, lists users 
 
 ## Coding Considerations
 
-### Possible Hooks to use:
-* Manual:Hooks/AlternateUserMailer (MW 1.19+)
-* Manual:Hooks/AbortEmailNotification (MW 1.20+)
+None so far
