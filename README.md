@@ -21,4 +21,17 @@ Determines how strong a watcher a user is. If no user is specified, lists users 
 
 ## Coding Considerations
 
-None so far
+### Extensions to research
+* Extension:Watchers
+* Extension:WhoIsWatching
+* Extension:WhoIsWatchingTabbed
+* Extension:WatchLog
+* Extension:WatchEmailOptional
+* Extension:CollaborativeWatchlist
+* Extension:WatchRight
+* Extension:WhosOnline
+* Extension:Contribution Scores
+* Extension:Contributions
+* Extension:Contributors
+* Extension:Editcount
+* Category:User activity extensions
