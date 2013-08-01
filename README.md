@@ -18,6 +18,9 @@ Determines how strong a watcher a user is. If no user is specified, lists users 
 * Number of pending articles user should verify
 * Use of "view history" to examine changes? This could be hard. Requires new database table?
 * Has edits after other peoples' edits?
+* Seniority of the person
+ * All other things being equal, a senior employee watching is better than a new hire, is better than an intern
+* Also could break down by organization, so you could see how well Quality Assurance is watching versus how R&D is watching. Or how well management is watching versus accounting.
 
 ## Coding Considerations
 
