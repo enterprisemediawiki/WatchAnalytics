@@ -12,13 +12,14 @@ class WatchStrengthHooks {
 	 * @see http://www.mediawiki.org/wiki/Manual:Hooks/PersonalUrls
 	 * @param &$personal_urls Array of URLs to append to.
 	 * @param &$title Title of page being visited.
-	 * @param SkinTemplate $sk
+	 * @param SkinTemplate $sk (not available yet in earlier versions of MW)
 	 * @return bool true in all cases
 	 */
-	static function onPersonalUrls( &$personal_urls, &$title, $sk ) {
+	static function onPersonalUrls( &$personal_urls, &$title /*,$sk*/ ) {
 		
-		$user = $sk->getUser();
-		
+		global $wgUser;
+		$user = $wgUser;
+				
 		if ( $user->isAnon() ) {
 			return true;
 		}
@@ -26,33 +27,15 @@ class WatchStrengthHooks {
 		$watcher = new WatchStrengthUser( $user );
 		$watcher->getPendingWatches();
 		
-		$text = $sk->msg( 'watchstrength-personal-url' )->text() . $watcher->countPendingChanges() . ')';
+		// when $sk (third arg) available, replace wfMessage with $sk->msg()
+		$text = wfMessage( 'watchstrength-personal-url' )->params( $watcher->countPendingChanges() )->text();		
 		
-		$url = SpecialPage::getTitleFor( 'Watchlist' )->getLocalURL();
-		
-		
+		$personal_urls['watchlist']['text'] = $text;
 		if ( $watcher->countPendingChanges() == 0 ) {
-			$linkClasses = array( 'mw-watchstrength-watchlist-badge' );
+			$personal_urls['watchlist']['class'] = array( 'mw-watchstrength-watchlist-badge' );
 		} else {
-			$linkClasses = array( 'mw-watchstrength-watchlist-pending', 'mw-watchstrength-watchlist-badge' );
+			$personal_urls['watchlist']['class'] = array( 'mw-watchstrength-watchlist-pending', 'mw-watchstrength-watchlist-badge' );
 		}
-		$newWatchlistLink = array(
-			'href' => $url,
-			'text' => $text,
-			'active' => ( $url == $title->getLocalUrl() ),
-			'class' => $linkClasses,
-		);
-
-
-		$personal_urls['watchlist'] = $newWatchlistLink;
-		/*	
-		// If the user has new messages, display a talk page alert
-		if ( $wgEchoNewMsgAlert && $user->getOption( 'echo-show-alert' ) && $user->getNewtalk() ) {
-			$personal_urls['mytalk']['text'] = $sk->msg( 'echo-new-messages' )->text();
-			$personal_urls['mytalk']['class'] = array( 'mw-echo-alert' );
-			$sk->getOutput()->addModuleStyles( 'ext.echo.alert' );
-		}
-		*/
 
 		return true;
 	}
