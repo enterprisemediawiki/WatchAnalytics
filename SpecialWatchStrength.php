@@ -175,7 +175,7 @@ class WatchStrengthPager extends TablePager {
 		global $wgRequest;
 
 		$sortField = $wgRequest->getVal( 'sort' );
-		if ( $this->isFieldSortable( $sortField ) ) {
+		if ( isset( $sortField ) && $this->isFieldSortable( $sortField ) ) {
 			return $sortField;
 		}
 		else {
@@ -240,6 +240,7 @@ class WatchStrengthPager extends TablePager {
 		$options = array(
 			'GROUP BY' => 'w.wl_user'
 		);
+
 
 		// if ( isset($order) ) {
 		// 	$options['ORDER BY'] = $order;
@@ -420,7 +421,7 @@ class WatchStrengthPager extends TablePager {
 	}
 
 	function getDefaultSort () {
-		return 'average_pending_minutes';
+		return 'num_pending';
 	}
 
 }
