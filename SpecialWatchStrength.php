@@ -171,7 +171,17 @@ class WatchStrengthPager extends TablePager {
 	// }
 
 	function getIndexField() {
-		return 'user_name';
+
+		global $wgRequest;
+
+		$sortField = $wgRequest->getVal( 'sort' );
+		if ( $this->isFieldSortable( $sortField ) ) {
+			return $sortField;
+		}
+		else {
+			return $this->getDefaultSort();
+		}
+
 	}
 	
 	// function getExtraSortFields() {
