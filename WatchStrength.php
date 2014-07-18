@@ -54,63 +54,66 @@ $wgAutoloadClasses['WatchStrengthUser'] = __DIR__ . '/WatchStrengthUser.php';
 // add watchlist notification system
 $wgHooks['PersonalUrls'][] = 'WatchStrengthHooks::onPersonalUrls';
 
+// $wgHooks['ResourceLoaderRegisterModules'][] = 'WatchStrengthHooks::onResourceLoaderRegisterModules';
+
+
 // Extension initialization
 // $wgExtensionFunctions[] = 'WatchStrengthHooks::initWatchStrengthExtension';
 
-// $WatchStrengthResourceTemplate = array(
-// 	'localBasePath' => __DIR__ . '/modules',
-// 	'remoteExtPath' => 'WatchStrength/modules',
-// );
+$watchStrengthResourceTemplate = array(
+	'localBasePath' => __DIR__ . '/modules',
+	'remoteExtPath' => 'WatchStrength/modules',
+);
 
 
-// $wgResourceModules += array(
+$wgResourceModules += array(
 
-// 	// ext.echo.base is used by mobile notifications as well, so be sure not to add any
-// 	// dependencies that do not target mobile.
-// 	'ext.echo.base' => $watchStrengthResourceTemplate + array(
-// 		'styles' => 'base/ext.echo.base.css',
-// 		'scripts' => 'base/ext.echo.base.js',
-// 		'messages' => array(
-// 			'echo-error-preference',
-// 			'echo-error-token',
-// 		),
-// 		'targets' => array( 'desktop', 'mobile' ),
-// 	),
-// 	'ext.echo.desktop' => $watchStrengthResourceTemplate + array(
-// 		'scripts' => 'desktop/ext.echo.desktop.js',
-// 		'dependencies' => array(
-// 			'ext.echo.base',
-// 			'mediawiki.api',
-// 			'mediawiki.Uri',
-// 			'mediawiki.jqueryMsg',
-// 			'mediawiki.user',
-// 		),
-// 	),
-// 	'ext.echo.overlay' => $watchStrengthResourceTemplate + array(
-// 		'scripts' => array(
-// 			'overlay/ext.echo.overlay.js',
-// 		),
-// 		'styles' => 'overlay/ext.echo.overlay.css',
-// 		'skinStyles' => array(
-// 			'modern' => 'overlay/ext.echo.overlay.modern.css',
-// 			'monobook' => 'overlay/ext.echo.overlay.monobook.css',
-// 		),
-// 		'dependencies' => array(
-// 			'ext.echo.desktop',
-// 			'mediawiki.util',
-// 			'mediawiki.language',
-// 		),
-// 		'messages' => array(
-// 			'echo-overlay-title',
-// 			'echo-overlay-title-overflow',
-// 			'echo-overlay-link',
-// 			'echo-none',
-// 			'echo-mark-all-as-read',
-// 			'echo-more-info',
-// 			'echo-feedback',
-// 		),
-// 	),
-// );
+	// ext.echo.base is used by mobile notifications as well, so be sure not to add any
+	// dependencies that do not target mobile.
+	'ext.echo.base' => $watchStrengthResourceTemplate + array(
+		'styles' => 'base/ext.echo.base.css',
+		'scripts' => 'base/ext.echo.base.js',
+		'messages' => array(
+			'echo-error-preference',
+			'echo-error-token',
+		),
+		'targets' => array( 'desktop', 'mobile' ),
+	),
+	'ext.echo.desktop' => $watchStrengthResourceTemplate + array(
+		'scripts' => 'desktop/ext.echo.desktop.js',
+		'dependencies' => array(
+			'ext.echo.base',
+			'mediawiki.api',
+			'mediawiki.Uri',
+			'mediawiki.jqueryMsg',
+			'mediawiki.user',
+		),
+	),
+	'ext.echo.overlay' => $watchStrengthResourceTemplate + array(
+		'scripts' => array(
+			'overlay/ext.echo.overlay.js',
+		),
+		'styles' => 'overlay/ext.echo.overlay.css',
+		'skinStyles' => array(
+			'modern' => 'overlay/ext.echo.overlay.modern.css',
+			'monobook' => 'overlay/ext.echo.overlay.monobook.css',
+		),
+		'dependencies' => array(
+			'ext.echo.desktop',
+			'mediawiki.util',
+			'mediawiki.language',
+		),
+		'messages' => array(
+			'echo-overlay-title',
+			'echo-overlay-title-overflow',
+			'echo-overlay-link',
+			'echo-none',
+			'echo-mark-all-as-read',
+			'echo-more-info',
+			'echo-feedback',
+		),
+	),
+);
 /*
 	// ext.WatchStrength.base is used by mobile notifications as well, so be sure not to add any
 	// dependencies that do not target mobile.

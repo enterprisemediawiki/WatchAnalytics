@@ -17,6 +17,10 @@ class WatchStrengthHooks {
 	 */
 	static function onPersonalUrls( &$personal_urls, &$title /*,$sk*/ ) {
 		
+		global $wgOut;
+		$out = $wgOut;
+		$out->addModules( array( 'ext.echo.overlay' ) );
+
 		global $wgUser;
 		$user = $wgUser;
 				
@@ -35,6 +39,26 @@ class WatchStrengthHooks {
 			$personal_urls['watchlist']['class'] = array( 'mw-watchstrength-watchlist-badge' );
 		} else {
 			$personal_urls['watchlist']['class'] = array( 'mw-watchstrength-watchlist-pending', 'mw-watchstrength-watchlist-badge' );
+		}
+
+		return true;
+	}
+
+	/**
+	 * Handler for ResourceLoaderRegisterModules hook
+	 */
+	public static function onResourceLoaderRegisterModules( ResourceLoader &$resourceLoader ) {
+		global $wgResourceModules, $wgEchoConfig;
+
+		foreach ( $wgEchoConfig['eventlogging'] as $schema => $property ) {
+			if ( $property['enabled'] ) {
+				$wgResourceModules[ 'schema.' . $schema ] = array(
+					'class'  => 'ResourceLoaderSchemaModule',
+					'schema' => $schema,
+					'revision' => $property['revision'],
+				);
+				$wgResourceModules['ext.echo.base']['dependencies'][] = 'schema.' . $schema;
+			}
 		}
 
 		return true;

@@ -5,5 +5,15 @@
         ]
     },
     "watchstrength-desc": "Encouraging good distribution of watchers",
-	"watchstrength-personal-url": "Watchlist ($1)"
+	"watchstrength-personal-url": "Watchlist ($1)",
+
+    "echo-error-preference": "Error: Could not set user preference.",
+    "echo-error-token": "Error: Could not retrieve user token.",
+	"echo-overlay-link": "All notifications",
+    "echo-overlay-title": "<b>Notifications</b>",
+    "echo-overlay-title-overflow": "<b>{{PLURAL:$1|Notifications}}</b> (showing $1 of $2 unread)",
+    "echo-none": "You have no notifications.",
+    "echo-mark-all-as-read": "Mark all as read",
+    "echo-more-info": "More info",
+    "echo-feedback": "Feedback"
 }
