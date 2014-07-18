@@ -40,7 +40,57 @@ class SpecialWatchStrength extends SpecialPage {
 
 		// show the names of the four lists of pages, with the one
 		// corresponding to the current "mode" not being linked		
+
+		// SELECT
+		// 	COUNT(*) AS watches,
+		// 	SUM( IF(watchlist.wl_notificationtimestamp IS NULL, 0, 1) ) AS num_pending,
+		// 	SUM( IF(watchlist.wl_notificationtimestamp IS NULL, 0, 1) ) * 100 / COUNT(*) AS percent_pending
+		// FROM watchlist
+		// INNER JOIN page ON page.page_namespace = watchlist.wl_namespace AND page.page_title = watchlist.wl_title;		$dbr = wfGetDB( DB_SLAVE );
+
+		$dbr = wfGetDB( DB_SLAVE );
+
+		// $res = $dbr->select(
+		// 	array(
+		// 		'w' => 'watchlist',
+		// 		'p' => 'page',
+		// 	),
+		// 	array(
+		// 		"COUNT(*) AS watches", 
+		// 		"SUM( IF(watchlist.wl_notificationtimestamp IS NULL, 0, 1) ) AS num_pending",
+		// 		"SUM( IF(watchlist.wl_notificationtimestamp IS NULL, 0, 1) ) * 100 / COUNT(*) AS percent_pending",
+		// 	),
+		// 	null, // conditions
+		// 	__METHOD__,
+		// 	array(), // options
+		// 	array(
+		// 		'page' => array(
+		// 			'INNER JOIN', 'p.page_namespace=w.wl_namespace AND p.page_title=w.wl_title'
+		// 		)
+		// 	)
+		// );
+
+		$res = $dbr->query('
+			SELECT
+				COUNT(*) AS watches,
+				SUM( IF(watchlist.wl_notificationtimestamp IS NULL, 0, 1) ) AS num_pending,
+				SUM( IF(watchlist.wl_notificationtimestamp IS NULL, 0, 1) ) * 100 / COUNT(*) AS percent_pending
+			FROM watchlist
+			INNER JOIN page ON page.page_namespace = watchlist.wl_namespace AND page.page_title = watchlist.wl_title;
+		');
+
+		$allWikiData = $dbr->fetchRow( $res );
+
+		list($watches, $pending, $percent) = array(
+			$allWikiData['watches'],
+			$allWikiData['num_pending'],
+			$allWikiData['percent_pending']
+		);
 		
+		$percent = round($percent, 1);
+		return "<strong>The state of the Wiki: </strong>$watches watches of which $percent% ($pending) are pending";
+		
+
 		##
 		#
 		#	COMMENTED OUT WHILE ONLY USER PAGE EXISTS
@@ -56,7 +106,6 @@ class SpecialWatchStrength extends SpecialPage {
 
 		// return Xml::tags('div', array('class'=>'special-watchstrength-header'), $header);
 
-		return '';
 	}
 
 	function createHeaderLink($msg, $query_param) {
