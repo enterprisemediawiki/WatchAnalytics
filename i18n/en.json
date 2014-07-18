@@ -5,5 +5,17 @@
         ]
     },
     "watchstrength-desc": "Encouraging good distribution of watchers",
-	"watchstrength-personal-url": "Watchlist ($1)"
+	"watchstrength-personal-url": "Watchlist ($1)",
+	"watchstrength-view": "View:",
+	"watchstrength-pages-specialpage": "Page watch statistics",
+	"watchstrength-users-specialpage": "User watch statistics",
+	"watchstrength-wiki-specialpage": "Wiki watch statistics",
+	"watchstrength-special-users-pagetitle": "Watch Strength: Users",
+	"watchstrength-special-header-user": "User",
+	"watchstrength-special-header-watches": "# Watches",
+	"watchstrength-special-header-pending-watches": "# Pending Watches",
+	"watchstrength-special-header-pending-percent": "% Pending",
+	"watchstrength-special-header-pending-totaltime": "Pending Time Sum",
+	"watchstrength-special-header-pending-averagetime": "Average Pending Time",
+	"watchstrength-view-user-stats": "view user stats"
 }

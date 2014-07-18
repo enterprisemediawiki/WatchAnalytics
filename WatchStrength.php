@@ -44,15 +44,23 @@ $wgExtensionCredits['specialpage'][] = array(
 
 $wgMessagesDirs['WatchStrength'] = __DIR__ . '/i18n';
 $wgExtensionMessagesFiles['WatchStrength'] = __DIR__ . '/WatchStrength.i18n.php';
-// $wgExtensionMessagesFiles['WatchStrengthAliases'] = __DIR__ . '/WatchStrength.alias.php';
+$wgExtensionMessagesFiles['WatchStrengthAliases'] = __DIR__ . '/WatchStrength.alias.php';
 
 $wgAutoloadClasses['WatchStrengthHooks'] = __DIR__ . '/Hooks.php';
 $wgAutoloadClasses['WatchStrengthUser'] = __DIR__ . '/WatchStrengthUser.php';
+$wgAutoloadClasses['SpecialWatchStrength'] = __DIR__ . '/SpecialWatchStrength.php';
 
 // $wgAutoloadClasses['WatchStrengthEvent'] = __DIR__ . '/model/Event.php';
 
 // add watchlist notification system
 $wgHooks['PersonalUrls'][] = 'WatchStrengthHooks::onPersonalUrls';
+
+
+$wgSpecialPages['WatchStrength'] = 'SpecialWatchStrength'; // register special page
+
+
+
+
 
 // Extension initialization
 // $wgExtensionFunctions[] = 'WatchStrengthHooks::initWatchStrengthExtension';
