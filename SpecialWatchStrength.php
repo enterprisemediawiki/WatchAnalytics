@@ -40,16 +40,23 @@ class SpecialWatchStrength extends SpecialPage {
 
 		// show the names of the four lists of pages, with the one
 		// corresponding to the current "mode" not being linked		
-		$navLinks = '';
-		foreach($this->header_links as $msg => $query_param) {
-			$navLinks .= '<li>' . $this->createHeaderLink($msg, $query_param) . '</li>';
-		}
+		
+		##
+		#
+		#	COMMENTED OUT WHILE ONLY USER PAGE EXISTS
+		#
+		##
+		// $navLinks = '';
+		// foreach($this->header_links as $msg => $query_param) {
+		// 	$navLinks .= '<li>' . $this->createHeaderLink($msg, $query_param) . '</li>';
+		// }
 
-		$header = wfMessage( 'watchstrength-view' )->text() . ' ';
-		$header .= Xml::tags( 'ul', null, $navLinks ) . "\n";
+		// $header = wfMessage( 'watchstrength-view' )->text() . ' ';
+		// $header .= Xml::tags( 'ul', null, $navLinks ) . "\n";
 
-		return Xml::tags('div', array('class'=>'special-watchstrength-header'), $header);
+		// return Xml::tags('div', array('class'=>'special-watchstrength-header'), $header);
 
+		return '';
 	}
 
 	function createHeaderLink($msg, $query_param) {
