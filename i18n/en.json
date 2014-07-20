@@ -10,12 +10,16 @@
 	"watchstrength-pages-specialpage": "Page watch statistics",
 	"watchstrength-users-specialpage": "User watch statistics",
 	"watchstrength-wiki-specialpage": "Wiki watch statistics",
+	"watchstrength-special-pages-pagetitle": "Watch Strength: Pages",
 	"watchstrength-special-users-pagetitle": "Watch Strength: Users",
 	"watchstrength-special-header-user": "User",
+	"watchstrength-special-header-page-title": "Page",
 	"watchstrength-special-header-watches": "# Watches",
 	"watchstrength-special-header-pending-watches": "# Pending Watches",
+	"watchstrength-special-header-reviewed-watches": "# Reviewed Watches",
 	"watchstrength-special-header-pending-percent": "% Pending",
-	"watchstrength-special-header-pending-totaltime": "Pending Time Sum",
+	"watchstrength-special-header-pending-maxtime": "Max Pending Time",
 	"watchstrength-special-header-pending-averagetime": "Average Pending Time",
-	"watchstrength-view-user-stats": "view user stats"
+	"watchstrength-view-user-stats": "view user stats",
+	"watchstrength-view-page-stats": "view page stats"
 }

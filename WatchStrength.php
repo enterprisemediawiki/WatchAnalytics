@@ -48,7 +48,14 @@ $wgExtensionMessagesFiles['WatchStrengthAliases'] = __DIR__ . '/WatchStrength.al
 
 $wgAutoloadClasses['WatchStrengthHooks'] = __DIR__ . '/Hooks.php';
 $wgAutoloadClasses['WatchStrengthUser'] = __DIR__ . '/WatchStrengthUser.php';
-$wgAutoloadClasses['SpecialWatchStrength'] = __DIR__ . '/SpecialWatchStrength.php';
+
+// special page
+$wgAutoloadClasses['SpecialWatchStrength'] = __DIR__ . '/specials/SpecialWatchStrength.php';
+$wgAutoloadClasses['WatchStrengthTablePager'] = __DIR__ . '/specials/WatchStrengthTablePager.php';
+$wgAutoloadClasses['WatchStrengthUserTablePager'] = __DIR__ . '/specials/WatchStrengthUserTablePager.php';
+$wgAutoloadClasses['WatchStrengthPageTablePager'] = __DIR__ . '/specials/WatchStrengthPageTablePager.php';
+
+
 
 // $wgAutoloadClasses['WatchStrengthEvent'] = __DIR__ . '/model/Event.php';
 
