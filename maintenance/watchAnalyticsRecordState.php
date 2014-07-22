@@ -193,7 +193,7 @@ class WatchAnalyticsRecordState extends Maintenance {
 
 	public function getWikiQueryInfo ($namespace = false, $prefix = '') {
 
-		$sqlNumPages = "COUNT(*) AS {$prefix}num_pages";
+		$sqlNumPages = "COUNT( DISTINCT p.page_id ) AS {$prefix}num_pages";
 		$sqlNumWatches = "SUM( IF( w.wl_title IS NOT NULL,             1, 0) ) AS {$prefix}num_watches";
 		$sqlNumPending = "SUM( IF( w.wl_notificationtimestamp IS NULL, 0, 1) ) AS {$prefix}num_pending";
 		$sqlMaxPendingMins = "MAX( TIMESTAMPDIFF(MINUTE, w.wl_notificationtimestamp, UTC_TIMESTAMP()) ) AS {$prefix}max_pending_minutes";
