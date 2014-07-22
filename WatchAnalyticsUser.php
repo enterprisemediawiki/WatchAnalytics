@@ -1,7 +1,7 @@
 <?php
 /**
- * MediaWiki Extension: WatchStrength
- * http://www.mediawiki.org/wiki/Extension:WatchStrength
+ * MediaWiki Extension: WatchAnalytics
+ * http://www.mediawiki.org/wiki/Extension:WatchAnalytics
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,12 +28,12 @@
 if ( !defined( 'MEDIAWIKI' ) ) {
 	echo <<<EOT
 To install this extension, put the following line in LocalSettings.php:
-require_once( "$IP/extensions/WatchStrength/WatchStrength.php" );
+require_once( "$IP/extensions/WatchAnalytics/WatchAnalytics.php" );
 EOT;
 	exit( 1 );
 }
 
-class WatchStrengthUser {
+class WatchAnalyticsUser {
 
 	protected $user;
 	protected $pendingWatches;

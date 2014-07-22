@@ -1,15 +1,15 @@
-# MediaWiki-WatchStrength
+# MediaWiki-WatchAnalytics
 
-Extension:WatchStrength
+Extension:WatchAnalytics
 
 Used to determine how well pages are watched on a wiki
  
 ## Special Pages
 
-### SpecialPage:WeakPagesWatchStrength
+### SpecialPage:WeakPagesWatchAnalytics
 Lists pages which are not being watched strongly. Compares to average watch strength and highest watch strength.
  
-### SpecialPage:UserWatchStrength
+### SpecialPage:UserWatchAnalytics
 Determines how strong a watcher a user is. If no user is specified, lists users by their watch strength. Also list number of pages watched
  
 #### A user's watch strength determined by:

@@ -1,6 +1,6 @@
 <?php
 
-class WatchStrengthHooks {
+class WatchAnalyticsHooks {
 
 	/**
 	 * Handler for PersonalUrls hook.
@@ -24,20 +24,20 @@ class WatchStrengthHooks {
 			return true;
 		}
 
-		$watcher = new WatchStrengthUser( $user );
+		$watcher = new WatchAnalyticsUser( $user );
 		$watcher->getPendingWatches();
 		
 		// when $sk (third arg) available, replace wfMessage with $sk->msg()
-		$text = wfMessage( 'watchstrength-personal-url' )->params( $watcher->countPendingChanges() )->text();		
+		$text = wfMessage( 'watchanalytics-personal-url' )->params( $watcher->countPendingChanges() )->text();		
 		
 		$personal_urls['watchlist']['text'] = $text;
 		if ( $watcher->countPendingChanges() == 0 ) {
-			$personal_urls['watchlist']['class'] = array( 'mw-watchstrength-watchlist-badge' );
+			$personal_urls['watchlist']['class'] = array( 'mw-watchanalytics-watchlist-badge' );
 		} else {
-			$personal_urls['watchlist']['class'] = array( 'mw-watchstrength-watchlist-pending', 'mw-watchstrength-watchlist-badge' );
+			$personal_urls['watchlist']['class'] = array( 'mw-watchanalytics-watchlist-pending', 'mw-watchanalytics-watchlist-badge' );
 		}
 
 		return true;
 	}
-	
+
 }

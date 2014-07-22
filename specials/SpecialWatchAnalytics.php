@@ -1,18 +1,18 @@
 <?php
 
-class SpecialWatchStrength extends SpecialPage {
+class SpecialWatchAnalytics extends SpecialPage {
 
 	public $mMode;
 	protected $header_links = array(
-		'watchstrength-pages-specialpage' => '',
-		'watchstrength-users-specialpage' => 'users',
-		// 'watchstrength-wiki-specialpage'  => 'wiki',
+		'watchanalytics-pages-specialpage' => '',
+		'watchanalytics-users-specialpage' => 'users',
+		// 'watchanalytics-wiki-specialpage'  => 'wiki',
 	);
 
 
 	public function __construct() {
 		parent::__construct( 
-			"Watchstrength", // 
+			"WatchAnalytics", // 
 			"",  // rights required to view
 			true // show in Special:SpecialPages
 		);
@@ -72,7 +72,7 @@ class SpecialWatchStrength extends SpecialPage {
 
 		$res = $dbr->query('
 			SELECT
-				COUNT(*) AS watches,
+				COUNT(*) AS num_watches,
 				SUM( IF(watchlist.wl_notificationtimestamp IS NULL, 0, 1) ) AS num_pending,
 				SUM( IF(watchlist.wl_notificationtimestamp IS NULL, 0, 1) ) * 100 / COUNT(*) AS percent_pending
 			FROM watchlist
@@ -82,7 +82,7 @@ class SpecialWatchStrength extends SpecialPage {
 		$allWikiData = $dbr->fetchRow( $res );
 
 		list($watches, $pending, $percent) = array(
-			$allWikiData['watches'],
+			$allWikiData['num_watches'],
 			$allWikiData['num_pending'],
 			$allWikiData['percent_pending']
 		);
@@ -95,16 +95,16 @@ class SpecialWatchStrength extends SpecialPage {
 			$navLinks .= '<li>' . $this->createHeaderLink($msg, $query_param) . '</li>';
 		}
 
-		$header = wfMessage( 'watchstrength-view' )->text() . ' ';
+		$header = wfMessage( 'watchanalytics-view' )->text() . ' ';
 		$header .= Xml::tags( 'ul', null, $navLinks ) . "\n";
 
-		return $stateOf . Xml::tags('div', array('class'=>'special-watchstrength-header'), $header);
+		return $stateOf . Xml::tags('div', array('class'=>'special-watchanalytics-header'), $header);
 
 	}
 
 	function createHeaderLink($msg, $query_param) {
 	
-		$watchStrengthTitle = SpecialPage::getTitleFor( $this->getName() );
+		$WatchAnalyticsTitle = SpecialPage::getTitleFor( $this->getName() );
 
 		if ( $this->mMode == $query_param ) {
 			return Xml::element( 'strong',
@@ -114,7 +114,7 @@ class SpecialWatchStrength extends SpecialPage {
 		} else {
 			$show = ($query_param == '') ? array() : array( 'show' => $query_param );
 			return Xml::element( 'a',
-				array( 'href' => $watchStrengthTitle->getLocalURL( $show ) ),
+				array( 'href' => $WatchAnalyticsTitle->getLocalURL( $show ) ),
 				wfMessage( $msg )->text()
 			);
 		}
@@ -124,9 +124,9 @@ class SpecialWatchStrength extends SpecialPage {
 	public function pagesList () {
 		global $wgOut, $wgRequest;
 
-		$wgOut->setPageTitle( wfMessage( 'watchstrength-special-pages-pagetitle' )->text() );
+		$wgOut->setPageTitle( wfMessage( 'watchanalytics-special-pages-pagetitle' )->text() );
 
-		$pager = new WatchStrengthPageTablePager($this, array());
+		$pager = new WatchAnalyticsPageTablePager($this, array());
 		
 		// $form = $pager->getForm();
 		$body = $pager->getBody();
@@ -146,9 +146,9 @@ class SpecialWatchStrength extends SpecialPage {
 	public function usersList () {
 		global $wgOut, $wgRequest;
 
-		$wgOut->setPageTitle( wfMessage( 'watchstrength-special-users-pagetitle' )->text() );
+		$wgOut->setPageTitle( wfMessage( 'watchanalytics-special-users-pagetitle' )->text() );
 
-		$pager = new WatchStrengthUserTablePager($this, array());
+		$pager = new WatchAnalyticsUserTablePager($this, array());
 		
 		// $form = $pager->getForm();
 		$body = $pager->getBody();
@@ -166,7 +166,7 @@ class SpecialWatchStrength extends SpecialPage {
 	}
 	
 	public function totals () {
-		#THIS WAS FROM WIRETAP but watchstrength may use something similar
+		#THIS WAS FROM WIRETAP but WatchAnalytics may use something similar
 
 		// global $wgOut;
 
