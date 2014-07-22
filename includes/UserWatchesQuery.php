@@ -46,7 +46,7 @@ class UserWatchesQuery extends WatchesQuery {
 		'num_pending'             => 'watchanalytics-special-header-pending-watches',
 		'percent_pending'         => 'watchanalytics-special-header-pending-percent',
 		'max_pending_minutes'     => 'watchanalytics-special-header-pending-maxtime',
-		'avg_pending_minutes' => 'watchanalytics-special-header-pending-averagetime',
+		'avg_pending_minutes'     => 'watchanalytics-special-header-pending-averagetime',
 	);
 
 	function getQueryInfo() {
@@ -79,7 +79,7 @@ class UserWatchesQuery extends WatchesQuery {
 			'GROUP BY' => 'w.wl_user'
 		);
 
-		$conds = array();
+		$conds = '';
 
 		$return = array(
 			'tables' => $tables,
@@ -93,4 +93,22 @@ class UserWatchesQuery extends WatchesQuery {
 
 	}
 
+	public function getUserWatchStats ( User $user ) {
+	
+		$qInfo = $this->getQueryInfo();
+	
+		$dbr = wfGetDB( DB_SLAVE );
+
+		$res = $dbr->select(
+			$qInfo['tables'],
+			$qInfo['fields'],
+			'w.wl_user=' . $user->getId(),
+			__METHOD__,
+			$qInfo['options'],
+			$qInfo['join_conds']
+		);
+		
+		return $dbr->fetchRow( $res );
+
+	}
 }

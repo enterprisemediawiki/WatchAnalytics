@@ -93,10 +93,4 @@ class WatchAnalyticsUser {
 		return $this;
 	}
 
-	public function countPendingChanges () {
-		if ( ! isset( $this->pendingWatches ) ) {
-			$this->getPendingWatches();
-		}
-		return count( $this->pendingWatches );
-	}
 }

@@ -24,17 +24,24 @@ class WatchAnalyticsHooks {
 			return true;
 		}
 
-		$watcher = new WatchAnalyticsUser( $user );
-		$watcher->getPendingWatches();
+		$userWatch = new UserWatchesQuery();
+		$watchStats = $userWatch->getUserWatchStats( $user );
+		
+		$maxPendingMinutes = $watchStats['max_pending_minutes'];
+		$numPending = $watchStats['num_pending'];
 		
 		// when $sk (third arg) available, replace wfMessage with $sk->msg()
-		$text = wfMessage( 'watchanalytics-personal-url' )->params( $watcher->countPendingChanges() )->text();		
+		$text = wfMessage( 'watchanalytics-personal-url' )->params( $numPending )->text();		
 		
 		$personal_urls['watchlist']['text'] = $text;
-		if ( $watcher->countPendingChanges() == 0 ) {
+		if ( $numPending == 0 ) {
 			$personal_urls['watchlist']['class'] = array( 'mw-watchanalytics-watchlist-badge' );
 		} else {
+			// convert max pending minutes to days
+			$maxPendingDays = ceil( $maxPendingMinutes / ( 60 * 24 ) );
+			
 			$personal_urls['watchlist']['class'] = array( 'mw-watchanalytics-watchlist-pending', 'mw-watchanalytics-watchlist-badge' );
+			$personal_urls['watchlist']['href'] .= '&days=' . $maxPendingDays;
 		}
 
 		return true;
