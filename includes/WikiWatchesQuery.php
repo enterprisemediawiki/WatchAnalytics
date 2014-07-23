@@ -49,16 +49,16 @@ class WikiWatchesQuery extends WatchesQuery {
 		'num_unreviewed'              => 'watchanalytics-special-header-num-unreviewed',
 		'num_one_reviewed'            => 'watchanalytics-special-header-num-one-reviewed',
 
-		'content_num_pages'           => 'watchanalytics-special-header-main-num-pages',
-		'content_num_watches'         => 'watchanalytics-special-header-main-watches',
-		'content_num_pending'         => 'watchanalytics-special-header-main-pending-watches',
-		'content_max_pending_minutes' => 'watchanalytics-special-header-main-pending-maxtime',
-		'content_avg_pending_minutes' => 'watchanalytics-special-header-main-pending-averagetime',
+		// 'content_num_pages'           => 'watchanalytics-special-header-main-num-pages',
+		// 'content_num_watches'         => 'watchanalytics-special-header-main-watches',
+		// 'content_num_pending'         => 'watchanalytics-special-header-main-pending-watches',
+		// 'content_max_pending_minutes' => 'watchanalytics-special-header-main-pending-maxtime',
+		// 'content_avg_pending_minutes' => 'watchanalytics-special-header-main-pending-averagetime',
 
-		'content_num_unwatched'       => 'watchanalytics-special-header-main-num-unwatched',
-		'content_num_one_watched'     => 'watchanalytics-special-header-main-num-one-watched',
-		'content_num_unreviewed'      => 'watchanalytics-special-header-main-num-unreviewed',
-		'content_num_one_reviewed'    => 'watchanalytics-special-header-main-num-one-reviewed',
+		// 'content_num_unwatched'       => 'watchanalytics-special-header-main-num-unwatched',
+		// 'content_num_one_watched'     => 'watchanalytics-special-header-main-num-one-watched',
+		// 'content_num_unreviewed'      => 'watchanalytics-special-header-main-num-unreviewed',
+		// 'content_num_one_reviewed'    => 'watchanalytics-special-header-main-num-one-reviewed',
 	);
 
 	function getQueryInfo( $conds = null ) {
@@ -81,16 +81,16 @@ class WikiWatchesQuery extends WatchesQuery {
 			'num_unreviewed',
 			'num_one_reviewed',
 
-			'content_num_pages',
-			'content_num_watches',
-			'content_num_pending',
-			'content_max_pending_minutes',
-			'content_avg_pending_minutes',
+			// 'content_num_pages',
+			// 'content_num_watches',
+			// 'content_num_pending',
+			// 'content_max_pending_minutes',
+			// 'content_avg_pending_minutes',
 
-			'content_num_unwatched',
-			'content_num_one_watched',
-			'content_num_unreviewed',
-			'content_num_one_reviewed',
+			// 'content_num_unwatched',
+			// 'content_num_one_watched',
+			// 'content_num_unreviewed',
+			// 'content_num_one_reviewed',
 		);
 
 		$this->conds = $conds ? $conds : array();
