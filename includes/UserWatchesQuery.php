@@ -49,15 +49,15 @@ class UserWatchesQuery extends WatchesQuery {
 		'avg_pending_minutes'     => 'watchanalytics-special-header-pending-averagetime',
 	);
 
-	function getQueryInfo() {
+	public function getQueryInfo( $conds = null ) {
 
-		$tables = array(
+		$this->tables = array(
 			'w' => 'watchlist',
 			'u' => 'user',
 			'p' => 'page',
 		);
 
-		$fields = array(
+		$this->fields = array(
 			$this->sqlUserName,
 			$this->sqlNumWatches,
 			$this->sqlNumPending,
@@ -65,8 +65,10 @@ class UserWatchesQuery extends WatchesQuery {
 			$this->sqlMaxPendingMins,
 			$this->sqlAvgPendingMins,
 		);
+		
+		$this->conds = $conds ? $conds : array();
 
-		$join_conds = array(
+		$this->join_conds = array(
 			'u' => array(
 				'LEFT JOIN', 'u.user_id=w.wl_user'
 			),
@@ -75,21 +77,11 @@ class UserWatchesQuery extends WatchesQuery {
 			),
 		);
 
-		$options = array(
+		$this->options = array(
 			'GROUP BY' => 'w.wl_user'
 		);
-
-		$conds = '';
-
-		$return = array(
-			'tables' => $tables,
-			'fields' => $fields,
-			'join_conds' => $join_conds,
-			'conds' => $conds,
-			'options' => $options,
-		);
 		
-		return $return;
+		return parent::getQueryInfo();
 
 	}
 

@@ -54,6 +54,9 @@ $wgAutoloadClasses['WatchAnalyticsUpdaterHooks'] = __DIR__ . '/schema/WatchAnaly
 $wgAutoloadClasses['WatchesQuery'] = __DIR__ . '/includes/WatchesQuery.php';
 $wgAutoloadClasses['PageWatchesQuery'] = __DIR__ . '/includes/PageWatchesQuery.php';
 $wgAutoloadClasses['UserWatchesQuery'] = __DIR__ . '/includes/UserWatchesQuery.php';
+$wgAutoloadClasses['WikiWatchesQuery'] = __DIR__ . '/includes/WikiWatchesQuery.php';
+
+$wgAutoloadClasses['WatchStateRecorder'] = __DIR__ . '/includes/WatchStateRecorder.php';
 
 // special page
 $wgSpecialPages['WatchAnalytics'] = 'SpecialWatchAnalytics'; // register special page
@@ -61,6 +64,7 @@ $wgAutoloadClasses['SpecialWatchAnalytics'] = __DIR__ . '/specials/SpecialWatchA
 $wgAutoloadClasses['WatchAnalyticsTablePager'] = __DIR__ . '/specials/WatchAnalyticsTablePager.php';
 $wgAutoloadClasses['WatchAnalyticsUserTablePager'] = __DIR__ . '/specials/WatchAnalyticsUserTablePager.php';
 $wgAutoloadClasses['WatchAnalyticsPageTablePager'] = __DIR__ . '/specials/WatchAnalyticsPageTablePager.php';
+$wgAutoloadClasses['WatchAnalyticsWikiTablePager'] = __DIR__ . '/specials/WatchAnalyticsWikiTablePager.php';
 
 // add watchlist notification system
 $wgHooks['PersonalUrls'][] = 'WatchAnalyticsHooks::onPersonalUrls';

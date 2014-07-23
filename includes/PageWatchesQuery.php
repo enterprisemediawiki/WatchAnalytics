@@ -46,16 +46,17 @@ class PageWatchesQuery extends WatchesQuery {
 		'num_reviewed'            => 'watchanalytics-special-header-reviewed-watches',
 		'percent_pending'         => 'watchanalytics-special-header-pending-percent',
 		'max_pending_minutes'     => 'watchanalytics-special-header-pending-maxtime',
-		'avg_pending_minutes' => 'watchanalytics-special-header-pending-averagetime',
+		'avg_pending_minutes'     => 'watchanalytics-special-header-pending-averagetime',
 	);
 
-	function getQueryInfo() {
-		$tables = array(
+	function getQueryInfo( $conds = null ) {
+	
+		$this->tables = array(
 			'w' => 'watchlist',
 			'p' => 'page',
 		);
 
-		$fields = array(
+		$this->fields = array(
 			$this->sqlNsAndTitle,
 			$this->sqlNumWatches,
 			$this->sqlNumReviewed,
@@ -64,28 +65,20 @@ class PageWatchesQuery extends WatchesQuery {
 			$this->sqlAvgPendingMins,
 		);
 
-		$join_conds = array(
+		$this->conds = $conds ? $conds : array();
+		
+		$this->join_conds = array(
 			'p' => array(
 				'RIGHT JOIN', 'p.page_namespace=w.wl_namespace AND p.page_title=w.wl_title'
 			),
 		);
 
-		$options = array(
+		$this->options = array(
 			// 'GROUP BY' => 'w.wl_title, w.wl_namespace'
-			'GROUP BY' => 'p.page_title, p.page_namespace'
-		);
-
-		$conds = array();
-
-		$return = array(
-			'tables' => $tables,
-			'fields' => $fields,
-			'join_conds' => $join_conds,
-			'conds' => $conds,
-			'options' => $options,
+			'GROUP BY' => 'p.page_title, p.page_namespace',
 		);
 		
-		return $return;
+		return parent::getQueryInfo();
 
 	}
 

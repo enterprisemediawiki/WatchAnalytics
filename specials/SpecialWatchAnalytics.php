@@ -6,7 +6,7 @@ class SpecialWatchAnalytics extends SpecialPage {
 	protected $header_links = array(
 		'watchanalytics-pages-specialpage' => '',
 		'watchanalytics-users-specialpage' => 'users',
-		// 'watchanalytics-wiki-specialpage'  => 'wiki',
+		'watchanalytics-wikihistory-specialpage'  => 'wikihistory',
 	);
 
 
@@ -21,19 +21,30 @@ class SpecialWatchAnalytics extends SpecialPage {
 	function execute( $parser = null ) {
 		global $wgRequest, $wgOut;
 
-		list( $limit, $offset ) = wfCheckLimits();
+		$this->setHeaders();
+		
+		list( $this->limit, $this->offset ) = wfCheckLimits();
 
 		// $userTarget = isset( $parser ) ? $parser : $wgRequest->getVal( 'username' );
 		$this->mMode = $wgRequest->getVal( 'show' );
 		//$fileactions = array('actions...?');
 
-		$wgOut->addHTML( $this->getPageHeader() );
+		$w = new WatchStateRecorder();
+		if ( ! $w->recordedWithinHours( 1 ) ) {
+			$w->recordAll();
+			$wgOut->addHTML( '<p>' . wfMessage('watchanalytics-all-wiki-stats-recorded')->text() . '</p>' );
+		}
 		
-		if ($this->mMode == 'users')
+		$wgOut->addHTML( $this->getPageHeader() );
+		if ($this->mMode == 'users') {
 			$this->usersList();
-		else
+		}
+		else if ($this->mMode == 'wikihistory') {
+			$this->wikiHistory();
+		}
+		else {
 			$this->pagesList();
-			
+		}
 	}
 	
 	public function getPageHeader() {
@@ -126,7 +137,7 @@ class SpecialWatchAnalytics extends SpecialPage {
 
 		$wgOut->setPageTitle( wfMessage( 'watchanalytics-special-pages-pagetitle' )->text() );
 
-		$pager = new WatchAnalyticsPageTablePager($this, array());
+		$pager = new WatchAnalyticsPageTablePager( $this, array() );
 		
 		// $form = $pager->getForm();
 		$body = $pager->getBody();
@@ -148,7 +159,7 @@ class SpecialWatchAnalytics extends SpecialPage {
 
 		$wgOut->setPageTitle( wfMessage( 'watchanalytics-special-users-pagetitle' )->text() );
 
-		$pager = new WatchAnalyticsUserTablePager($this, array());
+		$pager = new WatchAnalyticsUserTablePager( $this, array() );
 		
 		// $form = $pager->getForm();
 		$body = $pager->getBody();
@@ -163,6 +174,29 @@ class SpecialWatchAnalytics extends SpecialPage {
 			$html .= '<p>' . wfMsgHTML('listusers-noresult') . '</p>';
 		}
 		$wgOut->addHTML( $html );
+	}
+	
+	public function wikiHistory () {
+		global $wgOut, $wgRequest;
+
+		$wgOut->setPageTitle( wfMessage( 'watchanalytics-special-wikihistory-pagetitle' )->text() );
+
+		$pager = new WatchAnalyticsWikiTablePager( $this, array() );
+		
+		// $form = $pager->getForm();
+		$body = $pager->getBody();
+		$html = '';
+		// $html = $form;
+		if ( $body ) {
+			$html .= $pager->getNavigationBar();
+			$html .= $body;
+			$html .= $pager->getNavigationBar();
+		} 
+		else {
+			$html .= '<p>' . wfMsgHTML('listusers-noresult') . '</p>';
+		}
+		$wgOut->addHTML( $html );
+
 	}
 	
 	public function totals () {

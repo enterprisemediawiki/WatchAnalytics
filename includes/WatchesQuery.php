@@ -37,7 +37,16 @@ class WatchesQuery {
 
 	public $sqlMaxPendingMins = 'MAX( TIMESTAMPDIFF(MINUTE, w.wl_notificationtimestamp, UTC_TIMESTAMP()) ) AS max_pending_minutes';
 	public $sqlAvgPendingMins = 'AVG( TIMESTAMPDIFF(MINUTE, w.wl_notificationtimestamp, UTC_TIMESTAMP()) ) AS avg_pending_minutes';
+	public $tables;
+	public $fields;
+	public $join_conds;
+	public $conds;
+	public $options;
 
+	
+	public function __construct () {
+	}
+	
 	public function createTimeStringFromMinutes ( $totalMinutes ) {
 		
 		$remainder = $totalMinutes;
@@ -64,8 +73,8 @@ class WatchesQuery {
 			$time[] = $minutes . ' minute' . (($minutes > 1) ? 's' : ''); 
 		}
 
-
-		return implode(', ', $time);
+		// return implode(', ', $time);
+		return $time[0];
 	}
 
 	function getFieldNames() {
@@ -76,6 +85,29 @@ class WatchesQuery {
 		}
 
 		return $output;
+	}
+
+	public function getQueryInfo() {
+	
+		$this->conds = $this->conds ? $this->conds : array();
+
+		if ( isset ( $this->limit ) ) {
+			$this->options['LIMIT'] = $this->limit;
+		}
+		if ( isset ( $this->offset ) ) {
+			$this->options['OFFSET'] = $this->offset;
+		}
+
+		$return = array(
+			'tables' => $this->tables,
+			'fields' => $this->fields,
+			'join_conds' => $this->join_conds,
+			'conds' => $this->conds,
+			'options' => $this->options,
+		);
+		
+		return $return;
+
 	}
 
 }

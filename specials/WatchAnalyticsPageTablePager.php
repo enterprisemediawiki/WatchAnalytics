@@ -22,6 +22,8 @@ class WatchAnalyticsPageTablePager extends WatchAnalyticsTablePager {
 		if ( ! isset( $sortField ) ) {
 			$this->mDefaultDirection = false;
 		}
+		
+		$this->mExtraSortFields = array( 'num_watches', 'num_reviewed', 'page_ns_and_title' );
 	}
 
 	function getQueryInfo() {
@@ -37,7 +39,20 @@ class WatchAnalyticsPageTablePager extends WatchAnalyticsTablePager {
 
 			$title = Title::makeTitle( $pageNsIndex, $pageTitleText );
 
-			$pageLink = $this->getSkin()->makeLinkObj( $title, htmlspecialchars( $title->getText() ) );
+			$titleURL = $title->getLinkURL();
+			$titleNsText = $title->getNsText();
+			if ( $titleNsText === '' ) {
+				$titleFullText = $title->getText();
+			}
+			else {
+				$titleFullText = $titleNsText . ':' . $title->getText();
+			}
+			
+			$pageLink = Xml::element(
+				'a',
+				array( 'href' => $titleURL ),
+				$titleFullText
+			);
 			
 			$url = Title::newFromText('Special:WatchAnalytics')->getLocalUrl(
 				array( 'page' => $value )
