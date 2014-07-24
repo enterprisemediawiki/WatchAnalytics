@@ -32,6 +32,8 @@ class SpecialPendingReviews extends SpecialPage {
 			else {
 				$this->mUserIsViewer = false;
 			}
+			$wgOut->setPageTitle( wfMessage( 'pendingreviews-user-page', $this->mUser->getName() )->text() );
+
 		}
 		else {
 			$this->mUser = $wgUser;

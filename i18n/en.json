@@ -8,6 +8,7 @@
 	"watchanalytics-personal-url": "My pending reviews ($1)",
 	"watchanalytics-view": "View:",
 	"pendingreviews": "Pending reviews",
+	"pendingreviews-user-page": "Pending reviews for User:$1",
 	"watchanalytics-pages-specialpage": "Page watch statistics",
 	"watchanalytics-users-specialpage": "User watch statistics",
 	"watchanalytics-wikihistory-specialpage": "Wiki historical watch statistics",
@@ -51,6 +52,7 @@
 	"pendingreviews-timediff-hours": "changed {{PLURAL:$1|1 hour|$1 hours}} ago",
 	"pendingreviews-timediff-minutes": "changed {{PLURAL:$1|1 minute|$1 minutes}} ago",
 	"pendingreviews-timediff-just-now": "just now",
-	"pendingreviews-no-revisions": "No page content changes"
+	"pendingreviews-no-revisions": "No page content changes",
+	"watchanalytics-view-user-pendingreviews": "pending reviews"
 }
 
