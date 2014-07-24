@@ -1,0 +1,13 @@
+.node {
+  stroke: #fff;
+  stroke-width: 0.5px;
+}
+
+.link {
+  stroke: #999;
+  stroke-opacity: .3;
+}
+.unreviewed {
+  stroke: #F00;
+  stroke-opacity: .5;  
+}

@@ -1,6 +1,6 @@
 <?php
 
-class SpecialWatchAnalytics extends SpecialPage {
+class SpecialPendingReviews extends SpecialPage {
 
 	public $mMode;
 	protected $header_links = array(
@@ -12,7 +12,7 @@ class SpecialWatchAnalytics extends SpecialPage {
 
 	public function __construct() {
 		parent::__construct( 
-			"WatchAnalytics", // 
+			"PendingReviews", // 
 			"",  // rights required to view
 			true // show in Special:SpecialPages
 		);
@@ -22,11 +22,15 @@ class SpecialWatchAnalytics extends SpecialPage {
 		global $wgRequest, $wgOut;
 
 		$this->setHeaders();
-		
-		list( $this->limit, $this->offset ) = wfCheckLimits();
+
+		// Load the module for the Notifications flyout
+		$wgOut->addModules( array( 'ext.watchanalytics.forcegraph' ) );
+		// Load the styles for the Notifications badge
+		$wgOut->addModuleStyles( 'ext.watchanalytics.forcegraph' );
+
 
 		// $userTarget = isset( $parser ) ? $parser : $wgRequest->getVal( 'username' );
-		$this->mMode = $wgRequest->getVal( 'show' );
+		// $this->mMode = $wgRequest->getVal( 'show' );
 		//$fileactions = array('actions...?');
 
 		$w = new WatchStateRecorder();
@@ -39,11 +43,8 @@ class SpecialWatchAnalytics extends SpecialPage {
 		if ($this->mMode == 'users') {
 			$this->usersList();
 		}
-		else if ( $this->mMode == 'wikihistory' ) {
+		else if ($this->mMode == 'wikihistory') {
 			$this->wikiHistory();
-		}
-		else if ( $this->mMode == 'forcegraph' ) {
-			$this->forceGraph();
 		}
 		else {
 			$this->pagesList();
@@ -202,125 +203,56 @@ class SpecialWatchAnalytics extends SpecialPage {
 
 	}
 	
-	public function forceGraph () {
+	public function totals () {
+		#THIS WAS FROM WIRETAP but WatchAnalytics may use something similar
 
-		global $wgOut;
+		// global $wgOut;
 
-		$wgOut->setPageTitle( 'Watch Analytics: User/Page Watch Relationships' );
+		// $wgOut->setPageTitle( 'Wiretap: Daily Totals' );
 
-		$dbr = wfGetDB( DB_SLAVE );
+		// $html = '<table class="wikitable"><tr><th>Date</th><th>Hits</th></tr>';
+		// // $html = $form;
+		// // if ( $body ) {
+		
+		// // } 
+		// // else {
+		// 	// $html .= '<p>' . wfMsgHTML('listusers-noresult') . '</p>';
+		// // }
+		// // SELECT wiretap.hit_year, wiretap.hit_month, wiretap.hit_day, count(*) AS num_hits
+		// // FROM wiretap
+		// // WHERE wiretap.hit_timestamp>20131001000000 
+		// // GROUP BY wiretap.hit_year, wiretap.hit_month, wiretap.hit_day
+		// // ORDER BY wiretap.hit_year DESC, wiretap.hit_month DESC, wiretap.hit_day DESC
+		// // LIMIT 100000;
+		// $dbr = wfGetDB( DB_SLAVE );
 
-		// Load the module for the D3.js force directed graph
-		$wgOut->addModules( array( 'ext.watchanalytics.forcegraph' ) );
-		// Load the styles for the D3.js force directed graph
-		$wgOut->addModuleStyles( 'ext.watchanalytics.forcegraph' );
-
-		// SELECT
-		// 	watchlist.wl_title AS title,
-		// 	watchlist.wl_notificationtimestamp AS notification,
-		// 	user.user_name AS user_name,
-		// 	user.user_real_name AS real_name
-		// FROM watchlist
-		// LEFT JOIN user ON user.user_id = watchlist.wl_user
-		// WHERE
-		// 	wl_namespace = 0
-		// 	AND user.user_name IN (\'Lwelsh\',\'Swray\',\'Balpert\',\'Ejmontal\',\'Cmavridi\', \'Sgeffert\', \'Smulhern\', \'Kgjohns1\', \'Bscheib\', \'Ssjohns5\')
-		// LIMIT 20000
-
-		$res = $dbr->select(
-			array(
-				'w' => 'watchlist',
-				'u' => 'user',
-			),
-			array(
-				'w.wl_title AS title',
-				'w.wl_notificationtimestamp as notification',
-				'u.user_name as user_name',
-				'u.user_real_name AS real_name',
-			),
-			'wl_namespace = 0',
-			__METHOD__,
-			array(
-				"LIMIT" => "100000",
-			),
-			array(
-				'u' => array(
-					'LEFT JOIN', 'u.user_id = w.wl_user'
-				),
-			)
-		);
-
-
-		$nodes = array();
-		$pages = array();
-		$users = array();
-		$links = array();
-		while ( $row = $res->fetchRow() ) {
-
-			// if the page isn't in $pages, then it's also not in $nodes
-			// add to both
-			if ( ! isset( $pages[ $row['title'] ] ) ) {
-				$nextNode = count($nodes);
-
-				$pages[ $row['title'] ] = $nextNode;
-
-				// $nodes[ $nextNode ] = $row['title'];
-				$nodes[ $nextNode ] = array(
-					"name" => $row['title'],
-					"label" => $row['title'],
-					"group" => 1
-				);
-			}
-
-			// same for users...add to $users and $nodes accordingly
-			if ( ! isset( $users[ $row['user_name'] ] ) ) {
-				$nextNode = count($nodes);
-
-				$users[ $row['user_name'] ] = $nextNode;
-
-				$nodes[ $nextNode ] = $row['user_name'];
-				if ( $row['real_name'] !== NULL && trim($row['real_name']) !== '' ) {
-					$displayName = $row['real_name'];
-				}
-				else {
-					$displayName = $row['user_name'];
-				}
-
-				$nodes[ $nextNode ] = array(
-					"name" => $displayName,
-					"label" => $displayName,
-					"group" => 2,
-					"weight" => 1
-				);
-
-			}
-			else {
-				$userNodeIndex = $users[ $row['user_name'] ];
-				$nodes[ $userNodeIndex ]['weight']++;
-			}
-
-			if ( $row['notification'] == NULL ) {
-				$linkClass = "link";
-			}
-			else {
-				$linkClass = "unreviewed";
-			}
-
-			// if ( $linkClass !== "unreviewed" ) {
-				$links[] = array(
-					"source" => $users[ $row['user_name'] ],
-					"target" => $pages[ $row['title']     ],
-					"value"  => 1,
-					"linkclass" => $linkClass
-				);
-			// }
-		}
-
-		$json = array( "nodes" => $nodes, "links" => $links );
-		$json = json_encode( $json , JSON_PRETTY_PRINT );
-		$html = '<div id="mw-ext-watchAnalytics-forceGraph-container"></div><pre>' . $json . '</pre>';
-		$html .= "<script type='text/template' id='mw-ext-watchAnalytics-forceGraph'>$json</script>";
-		$wgOut->addHTML( $html );
+		// $res = $dbr->select(
+		// 	array('w' => 'wiretap'),
+		// 	array(
+		// 		"w.hit_year AS year", 
+		// 		"w.hit_month AS month",
+		// 		"w.hit_day AS day",
+		// 		"count(*) AS num_hits",
+		// 	),
+		// 	null, // CONDITIONS? 'wiretap.hit_timestamp>20131001000000',
+		// 	__METHOD__,
+		// 	array(
+		// 		"DISTINCT",
+		// 		"GROUP BY" => "w.hit_year, w.hit_month, w.hit_day",
+		// 		"ORDER BY" => "w.hit_year DESC, w.hit_month DESC, w.hit_day DESC",
+		// 		"LIMIT" => "100000",
+		// 	),
+		// 	null // join conditions
+		// );
+		// while( $row = $dbr->fetchRow( $res ) ) {
+		
+		// 	list($year, $month, $day, $hits) = array($row['year'], $row['month'], $row['day'], $row['num_hits']);
+		// 	$html .= "<tr><td>$year-$month-$day</td><td>$hits</td></tr>";
+		
+		// }
+		// $html .= "</table>";
+		
+		// $wgOut->addHTML( $html );
 
 	}
 }

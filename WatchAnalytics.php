@@ -56,15 +56,18 @@ $wgAutoloadClasses['PageWatchesQuery'] = __DIR__ . '/includes/PageWatchesQuery.p
 $wgAutoloadClasses['UserWatchesQuery'] = __DIR__ . '/includes/UserWatchesQuery.php';
 $wgAutoloadClasses['WikiWatchesQuery'] = __DIR__ . '/includes/WikiWatchesQuery.php';
 
+$wgAutoloadClasses['WatchAnalyticsTablePager'] = __DIR__ . '/includes/WatchAnalyticsTablePager.php';
+$wgAutoloadClasses['WatchAnalyticsUserTablePager'] = __DIR__ . '/includes/WatchAnalyticsUserTablePager.php';
+$wgAutoloadClasses['WatchAnalyticsPageTablePager'] = __DIR__ . '/includes/WatchAnalyticsPageTablePager.php';
+$wgAutoloadClasses['WatchAnalyticsWikiTablePager'] = __DIR__ . '/includes/WatchAnalyticsWikiTablePager.php';
+
 $wgAutoloadClasses['WatchStateRecorder'] = __DIR__ . '/includes/WatchStateRecorder.php';
 
 // special page
-$wgSpecialPages['WatchAnalytics'] = 'SpecialWatchAnalytics'; // register special page
+$wgSpecialPages['WatchAnalytics'] = 'SpecialWatchAnalytics';
 $wgAutoloadClasses['SpecialWatchAnalytics'] = __DIR__ . '/specials/SpecialWatchAnalytics.php';
-$wgAutoloadClasses['WatchAnalyticsTablePager'] = __DIR__ . '/specials/WatchAnalyticsTablePager.php';
-$wgAutoloadClasses['WatchAnalyticsUserTablePager'] = __DIR__ . '/specials/WatchAnalyticsUserTablePager.php';
-$wgAutoloadClasses['WatchAnalyticsPageTablePager'] = __DIR__ . '/specials/WatchAnalyticsPageTablePager.php';
-$wgAutoloadClasses['WatchAnalyticsWikiTablePager'] = __DIR__ . '/specials/WatchAnalyticsWikiTablePager.php';
+$wgSpecialPages['PendingReviews'] = 'SpecialPendingReviews';
+$wgAutoloadClasses['SpecialPendingReviews'] = __DIR__ . '/specials/SpecialPendingReviews.php';
 
 // add watchlist notification system
 $wgHooks['PersonalUrls'][] = 'WatchAnalyticsHooks::onPersonalUrls';
@@ -75,9 +78,39 @@ $wgHooks['LoadExtensionSchemaUpdates'][] = 'WatchAnalyticsUpdaterHooks::addSchem
 
 
 
+$watchAnalyticsResourceTemplate = array(
+	'localBasePath' => __DIR__ . '/modules',
+	'remoteExtPath' => 'WatchAnalytics/modules',
+);
 
+$wgResourceModules += array(
 
+	'ext.watchanalytics.forcegraph' => $watchAnalyticsResourceTemplate + array(
+		'styles' => 'forcegraph/ext.watchanalytics.forcegraph.css',
+		'scripts' => array(
+			'forcegraph/ext.watchanalytics.circlesort.js',
+			'forcegraph/ext.watchanalytics.forcegraph.js',
+		),
+		'dependencies' => array(
+			'underscore.js',
+			'd3.js',
+		),
 
+	),
+
+	'underscore.js' => $watchAnalyticsResourceTemplate + array(
+		'scripts' => array(
+			'underscore.js/underscore-min.js',
+		),
+	),
+
+	'd3.js' => $watchAnalyticsResourceTemplate + array(
+		'scripts' => array(
+			'd3.js/d3.js',
+		),
+	),
+
+);
 
 
 
