@@ -88,7 +88,12 @@ class SpecialPendingReviews extends SpecialPage {
 
 			if ( count( $item->newRevisions ) ) {
 				$mostRecentReviewed = Revision::newFromRow( $item->newRevisions[0] )->getPrevious();
+			}
+			else {
+				$mostRecentReviewed = false; // no previous revision, the user has not reviewed the first!
+			}
 
+			if ( $mostRecentReviewed ) {
 				$diffURL= $item->title->getLocalURL( array(
 					'diff' => '', 
 					'oldid' => $mostRecentReviewed->getId()
