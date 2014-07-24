@@ -319,7 +319,7 @@ class SpecialWatchAnalytics extends SpecialPage {
 		}
 
 		$json = array( "nodes" => $nodes, "links" => $links );
-		$json = json_encode( $json , JSON_PRETTY_PRINT );
+		$json = json_encode( $json ); //, JSON_PRETTY_PRINT );
 
 		$html = '<h3>' . wfMessage('watchanalytics-watch-forcegraph-header')->text() . '</h3>';
 		$html .= '<p>' . wfMessage('watchanalytics-watch-forcegraph-description')->text() . '</p>';

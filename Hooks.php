@@ -41,7 +41,8 @@ class WatchAnalyticsHooks {
 			$maxPendingDays = ceil( $maxPendingMinutes / ( 60 * 24 ) );
 			
 			$personal_urls['watchlist']['class'] = array( 'mw-watchanalytics-watchlist-pending', 'mw-watchanalytics-watchlist-badge' );
-			$personal_urls['watchlist']['href'] .= '&days=' . $maxPendingDays;
+			
+			$personal_urls['watchlist']['href'] = SpecialPage::getTitleFor( 'Watchlist' )->getLocalURL( array( 'days' => $maxPendingDays ) );
 		}
 
 		return true;

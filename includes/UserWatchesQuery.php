@@ -88,7 +88,7 @@ class UserWatchesQuery extends WatchesQuery {
 	public function getUserWatchStats ( User $user ) {
 	
 		$qInfo = $this->getQueryInfo();
-	
+
 		$dbr = wfGetDB( DB_SLAVE );
 
 		$res = $dbr->select(
@@ -102,5 +102,103 @@ class UserWatchesQuery extends WatchesQuery {
 		
 		return $dbr->fetchRow( $res );
 
+	}
+
+	public function getUserPendingWatches ( User $user ) {
+		
+		$tables = array(
+			'w' => 'watchlist',
+			'p' => 'page',
+		);
+
+		$fields = array(
+			'p.page_id AS page_id',
+			'w.wl_notificationtimestamp AS notificationtimestamp',
+		);
+
+		$conds = 'w.wl_user=' . $user->getId() . ' AND w.wl_notificationtimestamp IS NOT NULL';
+
+		$options = array(
+			'ORDER BY' => 'w.wl_notificationtimestamp ASC',
+		);
+
+		$join_conds = array(
+			'p' => array(
+				'INNER JOIN', 'p.page_namespace=w.wl_namespace AND p.page_title=w.wl_title'
+			),
+		);
+
+
+		$dbr = wfGetDB( DB_SLAVE );
+
+		$watchResult = $dbr->select(
+			$tables,
+			$fields,
+			$conds,
+			__METHOD__,
+			$options,
+			$join_conds
+		);
+		
+		$pending = array();
+
+		while ( $row = $dbr->fetchRow( $watchResult ) ) {
+			$title = Title::newFromID( $row['page_id'] );
+			if ( ! $title->exists() ) {
+				$title = false;
+			}
+
+			$pageID = $row['page_id'];
+			$notificationTimestamp = $row['notificationtimestamp'];
+
+			$revResults = $dbr->select(
+				array( 'r' => 'revision' ),
+				array(
+					'r.rev_id AS rev_id',
+					'r.rev_comment AS rev_comment',
+					'r.rev_user AS rev_user_id',
+					'r.rev_user_text AS rev_user_name',
+					'r.rev_timestamp AS rev_timestamp',
+					'r.rev_len AS rev_len',
+				),
+				"r.rev_page=$pageID AND r.rev_timestamp>=$notificationTimestamp",
+				__METHOD__,
+				array( 'ORDER BY' => 'rev_timestamp' ),
+				null
+			);
+			$revsPending = array();
+			while ( $rev = $revResults->fetchRow() ) {
+				$revsPending[] = $rev;
+			}
+
+			$logResults = $dbr->select(
+				array( 'l' => 'logging' ),
+				array(
+					'l.log_id AS log_id',
+					'l.log_type AS log_type',
+					'l.log_action AS log_action',
+					'l.log_timestamp AS log_timestamp',
+					'l.log_user AS log_user_id',
+					'l.log_user_text AS log_user_name',
+				),
+				"l.log_page=$pageID AND l.log_timestamp>=$notificationTimestamp",
+				__METHOD__,
+				array( 'ORDER BY' => 'log_timestamp' ),
+				null
+			);
+			$logPending = array();
+			while ( $log = $logResults->fetchRow() ) {
+				$logPending[] = $log;
+			}
+
+			$pending[] = (object) array(
+				'notificationTimestamp' => $notificationTimestamp,
+				'title' => $title,
+				'newRevisions' => $revsPending,
+				'log' => $logPending,
+			);
+		}
+
+		return $pending;
 	}
 }
