@@ -91,6 +91,10 @@ $wgResourceModules += array(
 			'forcegraph/ext.watchanalytics.circlesort.js',
 			'forcegraph/ext.watchanalytics.forcegraph.js',
 		),
+		'messages' => array(
+			'watchanalytics-pause-visualization',
+			'watchanalytics-unpause-visualization',
+		),
 		'dependencies' => array(
 			'underscore.js',
 			'd3.js',

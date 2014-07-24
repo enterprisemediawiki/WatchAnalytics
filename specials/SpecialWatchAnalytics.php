@@ -111,7 +111,7 @@ class SpecialWatchAnalytics extends SpecialPage {
 			$navLinks .= '<li>' . $this->createHeaderLink($msg, $query_param) . '</li>';
 		}
 
-		$header = wfMessage( 'watchanalytics-view' )->text() . ' ';
+		$header = '<strong>' . wfMessage( 'watchanalytics-view' )->text() . '</strong>';
 		$header .= Xml::tags( 'ul', null, $navLinks ) . "\n";
 
 		return $stateOf . Xml::tags('div', array('class'=>'special-watchanalytics-header'), $header);

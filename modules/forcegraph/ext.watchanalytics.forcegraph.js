@@ -62,15 +62,15 @@
 		.on("dragstart", dragstart);
 
 	svgContainer.append(
-		$( '<button>Pause visualization</button>' ).click(function() {
+		$( '<button>' + mw.message('watchanalytics-pause-visualization').text() + '</button>' ).click(function() {
             if ( force.isPaused ) {
                 force.start();
-                $(this).text( 'Pause visualization' );
+                $(this).text( mw.message('watchanalytics-pause-visualization').text() );
                 force.isPaused = false;
             }
             else {
                 force.stop();
-                $(this).text( 'Un-pause visualization' );
+                $(this).text( mw.message('watchanalytics-unpause-visualization').text() );
                 force.isPaused = true;
             }
         })
