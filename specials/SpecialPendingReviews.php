@@ -23,10 +23,10 @@ class SpecialPendingReviews extends SpecialPage {
 
 		$this->setHeaders();
 
-		// Load the module for the Notifications flyout
-		$wgOut->addModules( array( 'ext.watchanalytics.forcegraph' ) );
-		// Load the styles for the Notifications badge
-		$wgOut->addModuleStyles( 'ext.watchanalytics.forcegraph' );
+		// // Load the module for the Notifications flyout
+		// $wgOut->addModules( array( 'ext.watchanalytics.forcegraph' ) );
+		// // Load the styles for the Notifications badge
+		// $wgOut->addModuleStyles( 'ext.watchanalytics.forcegraph' );
 
 
 		// $userTarget = isset( $parser ) ? $parser : $wgRequest->getVal( 'username' );

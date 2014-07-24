@@ -10,6 +10,7 @@
 	"watchanalytics-pages-specialpage": "Page watch statistics",
 	"watchanalytics-users-specialpage": "User watch statistics",
 	"watchanalytics-wikihistory-specialpage": "Wiki historical watch statistics",
+	"watchanalytics-watch-forcegraph-specialpage": "Visualization of all watches",
 	"watchanalytics-special-pages-pagetitle": "Watch Analytics: Pages",
 	"watchanalytics-special-users-pagetitle": "Watch Analytics: Users",
 	"watchanalytics-special-wikihistory-pagetitle": "Watch Analytics: Wiki historical watch statistics",
@@ -38,6 +39,8 @@
 	"watchanalytics-special-header-main-num-unwatched": "# content unwatched",
 	"watchanalytics-special-header-main-num-one-watched": "# content watched once",
 	"watchanalytics-special-header-main-num-unreviewed": "# content unreviewed",
-	"watchanalytics-special-header-main-num-one-reviewed": "# content reviewed once"
+	"watchanalytics-special-header-main-num-one-reviewed": "# content reviewed once",
+	"watchanalytics-watch-forcegraph-header": "Force-directed graph of user-to-page watch relationships",
+	"watchanalytics-watch-forcegraph-description": "Orange dots represent users. Blue dots represent pages. Lines between the dots represent the user being a watcher of the page. Lines are gray if the latest page revision has been reviewed. Lines are red if reviews are pending. Move your mouse over a dot to see the user or page name."
 }
 

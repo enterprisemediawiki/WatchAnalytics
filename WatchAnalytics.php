@@ -98,6 +98,10 @@ $wgResourceModules += array(
 
 	),
 
+	'ext.watchanalytics.specials' => $watchAnalyticsResourceTemplate + array(
+		'styles' => 'specials/ext.watchanalytics.specials.css',
+	),
+
 	'underscore.js' => $watchAnalyticsResourceTemplate + array(
 		'scripts' => array(
 			'underscore.js/underscore-min.js',

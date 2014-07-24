@@ -7,6 +7,7 @@ class SpecialWatchAnalytics extends SpecialPage {
 		'watchanalytics-pages-specialpage' => '',
 		'watchanalytics-users-specialpage' => 'users',
 		'watchanalytics-wikihistory-specialpage'  => 'wikihistory',
+		'watchanalytics-watch-forcegraph-specialpage' => 'forcegraph',
 	);
 
 
@@ -22,7 +23,8 @@ class SpecialWatchAnalytics extends SpecialPage {
 		global $wgRequest, $wgOut;
 
 		$this->setHeaders();
-		
+		$wgOut->addModuleStyles( 'ext.watchanalytics.specials' );
+
 		list( $this->limit, $this->offset ) = wfCheckLimits();
 
 		// $userTarget = isset( $parser ) ? $parser : $wgRequest->getVal( 'username' );
@@ -318,7 +320,11 @@ class SpecialWatchAnalytics extends SpecialPage {
 
 		$json = array( "nodes" => $nodes, "links" => $links );
 		$json = json_encode( $json , JSON_PRETTY_PRINT );
-		$html = '<div id="mw-ext-watchAnalytics-forceGraph-container"></div><pre>' . $json . '</pre>';
+
+		$html = '<h3>' . wfMessage('watchanalytics-watch-forcegraph-header')->text() . '</h3>';
+		$html .= '<p>' . wfMessage('watchanalytics-watch-forcegraph-description')->text() . '</p>';
+		$html .= '<div id="mw-ext-watchAnalytics-forceGraph-container"></div>';
+		// $html .= "<pre>$json</pre>"; // easy testing
 		$html .= "<script type='text/template' id='mw-ext-watchAnalytics-forceGraph'>$json</script>";
 		$wgOut->addHTML( $html );
 
