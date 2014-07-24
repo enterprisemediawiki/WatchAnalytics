@@ -85,6 +85,10 @@ $watchAnalyticsResourceTemplate = array(
 
 $wgResourceModules += array(
 
+	'ext.watchanalytics.base' => $watchAnalyticsResourceTemplate + array(
+		'styles' => 'base/ext.watchanalytics.base.css',
+	),
+
 	'ext.watchanalytics.forcegraph' => $watchAnalyticsResourceTemplate + array(
 		'styles' => 'forcegraph/ext.watchanalytics.forcegraph.css',
 		'scripts' => array(
@@ -104,6 +108,11 @@ $wgResourceModules += array(
 
 	'ext.watchanalytics.specials' => $watchAnalyticsResourceTemplate + array(
 		'styles' => 'specials/ext.watchanalytics.specials.css',
+	),
+
+	'ext.watchanalytics.pendingreviews' => $watchAnalyticsResourceTemplate + array(
+		'styles' => 'pendingreviews/ext.watchanalytics.pendingreviews.css',
+		'scripts' => 'pendingreviews/ext.watchanalytics.pendingreviews.js',
 	),
 
 	'underscore.js' => $watchAnalyticsResourceTemplate + array(

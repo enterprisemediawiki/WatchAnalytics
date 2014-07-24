@@ -153,41 +153,43 @@ class UserWatchesQuery extends WatchesQuery {
 
 			$revResults = $dbr->select(
 				array( 'r' => 'revision' ),
-				array(
-					'r.rev_id AS rev_id',
-					'r.rev_comment AS rev_comment',
-					'r.rev_user AS rev_user_id',
-					'r.rev_user_text AS rev_user_name',
-					'r.rev_timestamp AS rev_timestamp',
-					'r.rev_len AS rev_len',
-				),
+				array( '*' ),
+				// array(
+				// 	'r.rev_id AS rev_id',
+				// 	'r.rev_comment AS rev_comment',
+				// 	'r.rev_user AS rev_user_id',
+				// 	'r.rev_user_text AS rev_user_name',
+				// 	'r.rev_timestamp AS rev_timestamp',
+				// 	'r.rev_len AS rev_len',
+				// ),
 				"r.rev_page=$pageID AND r.rev_timestamp>=$notificationTimestamp",
 				__METHOD__,
-				array( 'ORDER BY' => 'rev_timestamp' ),
+				array( 'ORDER BY' => 'rev_timestamp ASC' ),
 				null
 			);
 			$revsPending = array();
-			while ( $rev = $revResults->fetchRow() ) {
+			while ( $rev = $revResults->fetchObject() ) {
 				$revsPending[] = $rev;
 			}
 
 			$logResults = $dbr->select(
 				array( 'l' => 'logging' ),
-				array(
-					'l.log_id AS log_id',
-					'l.log_type AS log_type',
-					'l.log_action AS log_action',
-					'l.log_timestamp AS log_timestamp',
-					'l.log_user AS log_user_id',
-					'l.log_user_text AS log_user_name',
-				),
+				array( '*' ),
+				// array(
+				// 	'l.log_id AS log_id',
+				// 	'l.log_type AS log_type',
+				// 	'l.log_action AS log_action',
+				// 	'l.log_timestamp AS log_timestamp',
+				// 	'l.log_user AS log_user_id',
+				// 	'l.log_user_text AS log_user_name',
+				// ),
 				"l.log_page=$pageID AND l.log_timestamp>=$notificationTimestamp",
 				__METHOD__,
-				array( 'ORDER BY' => 'log_timestamp' ),
+				array( 'ORDER BY' => 'log_timestamp ASC' ),
 				null
 			);
 			$logPending = array();
-			while ( $log = $logResults->fetchRow() ) {
+			while ( $log = $logResults->fetchObject() ) {
 				$logPending[] = $log;
 			}
 

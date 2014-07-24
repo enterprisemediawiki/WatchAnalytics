@@ -5,8 +5,9 @@
         ]
     },
     "watchanalytics-desc": "Encouraging good distribution of watchers",
-	"watchanalytics-personal-url": "Watchlist ($1)",
+	"watchanalytics-personal-url": "My pending reviews ($1)",
 	"watchanalytics-view": "View:",
+	"pendingreviews": "Pending reviews",
 	"watchanalytics-pages-specialpage": "Page watch statistics",
 	"watchanalytics-users-specialpage": "User watch statistics",
 	"watchanalytics-wikihistory-specialpage": "Wiki historical watch statistics",
@@ -43,6 +44,13 @@
 	"watchanalytics-watch-forcegraph-header": "Force-directed graph of user-to-page watch relationships",
 	"watchanalytics-watch-forcegraph-description": "Orange dots represent users. Blue dots represent pages. Lines between the dots represent the user being a watcher of the page. Lines are gray if the latest page revision has been reviewed. Lines are red if reviews are pending. Move your mouse over a dot to see the user or page name.",
 	"watchanalytics-pause-visualization": "Pause visualization",
-	"watchanalytics-unpause-visualization": "Unpause visualization"
+	"watchanalytics-unpause-visualization": "Unpause visualization",
+	"watchanalytics-pendingreviews-diff-revisions": "compute difference of {{PLURAL:$1|1 revision|$1 revisions}}",
+	"watchanalytics-pendingreviews-history-link": "view page history",
+	"pendingreviews-timediff-days": "changed {{PLURAL:$1|1 day|$1 days}} ago",
+	"pendingreviews-timediff-hours": "changed {{PLURAL:$1|1 hour|$1 hours}} ago",
+	"pendingreviews-timediff-minutes": "changed {{PLURAL:$1|1 minute|$1 minutes}} ago",
+	"pendingreviews-timediff-just-now": "just now",
+	"pendingreviews-no-revisions": "No page content changes"
 }
 

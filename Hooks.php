@@ -17,12 +17,15 @@ class WatchAnalyticsHooks {
 	 */
 	static function onPersonalUrls( &$personal_urls, &$title /*,$sk*/ ) {
 		
-		global $wgUser;
+		global $wgUser, $wgOut;
 		$user = $wgUser;
 				
 		if ( $user->isAnon() ) {
 			return true;
 		}
+
+		$wgOut->addModuleStyles( 'ext.watchanalytics.base' );
+
 
 		$userWatch = new UserWatchesQuery();
 		$watchStats = $userWatch->getUserWatchStats( $user );
@@ -34,12 +37,13 @@ class WatchAnalyticsHooks {
 		$text = wfMessage( 'watchanalytics-personal-url' )->params( $numPending )->text();		
 		
 		$personal_urls['watchlist']['text'] = $text;
+
 		if ( $numPending == 0 ) {
 			$personal_urls['watchlist']['class'] = array( 'mw-watchanalytics-watchlist-badge' );
 		} else {
 			// convert max pending minutes to days
 			$maxPendingDays = ceil( $maxPendingMinutes / ( 60 * 24 ) );
-			
+
 			$personal_urls['watchlist']['class'] = array( 'mw-watchanalytics-watchlist-pending', 'mw-watchanalytics-watchlist-badge' );
 			
 			$personal_urls['watchlist']['href'] = SpecialPage::getTitleFor( 'Watchlist' )->getLocalURL( array( 'days' => $maxPendingDays ) );
