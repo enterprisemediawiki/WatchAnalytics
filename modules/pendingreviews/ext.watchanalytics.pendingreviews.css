@@ -4,10 +4,19 @@ table.pendingreviews-list {
 }
 td.pendingreviews-page-title {
 	vertical-align: top;
-	font-size: 20px;
+	font-size: 16px;
+	padding-top: 5px;
+}
+.pendingreviews-timediff {
+	font-size: 11px;
+	font-style: italic;
+	padding-left: 5px;
 }
 td.pendingreviews-review-links {
 	text-align: right;
+	white-space: nowrap;
+	vertical-align: top;
+	padding-top: 5px;
 }
 
 tr.pendingreviews-odd-row td {
@@ -15,8 +24,11 @@ tr.pendingreviews-odd-row td {
 tr.pendingreviews-even-row td {
 }
 
-table.pendingreviews-list td.pendingreviews-bottom-cell {
+/* table.pendingreviews-list td.pendingreviews-bottom-cell {
 	border-bottom: solid #ddd 2px;
+} */
+table.pendingreviews-list td.pendingreviews-top-cell {
+	border-top: solid #ddd 2px;
 }
 
 tr.pendingreviews-row td:first-child {
@@ -27,7 +39,7 @@ tr.pendingreviews-row-hover td:first-child {
 	border-left: solid green 5px;
 }
 tr.pendingreviews-row-hover td.pendingreviews-bottom-cell {
-	border-bottom: solid green 2px;
+	/* border-bottom: solid green 2px; */
 }
 
 td.pendingreviews-review-links a {
@@ -35,10 +47,8 @@ td.pendingreviews-review-links a {
 	border: 1px solid transparent;
 /* 	background-color: #428bca;
 	border-color: #357ebd; */
-	background-color: #347BFF;
-	border-color: #347BFF;
-	padding: 10px;
-	font-size: 16px;
+	padding: 8px;
+	font-size: 14px;
 	line-height: 1;
 	border-radius: 6px;
 	display: inline-block;
@@ -59,7 +69,24 @@ td.pendingreviews-review-links a:hover {
 	color: #fff;
 /* 	background-color: #3276b1;
 	border-color: #285e8e; */
+	text-decoration: none;
+}
+
+.pendingreviews-hist-button {
+	background-color: #347BFF;
+	border-color: #347BFF;
+}
+.pendingreviews-hist-button:hover {
 	background-color: #2456B3;
 	border-color: #347BFF;
-	text-decoration: none;
+}
+
+.pendingreviews-diff-button {
+	background-color: #5cb85c;
+	border-color: #4cae4c;
+}
+
+.pendingreviews-diff-button:hover {
+	background-color: #449d44;
+	border-color: #398439;
 }

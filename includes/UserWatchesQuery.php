@@ -104,7 +104,7 @@ class UserWatchesQuery extends WatchesQuery {
 
 	}
 
-	public function getUserPendingWatches ( User $user ) {
+	public function getUserPendingWatches ( User $user, $limit ) {
 		
 		$tables = array(
 			'w' => 'watchlist',
@@ -183,9 +183,9 @@ class UserWatchesQuery extends WatchesQuery {
 				// 	'l.log_user AS log_user_id',
 				// 	'l.log_user_text AS log_user_name',
 				// ),
-				"l.log_page=$pageID AND l.log_timestamp>=$notificationTimestamp",
+				"l.log_page=$pageID AND l.log_timestamp>=$notificationTimestamp AND l.log_type != 'patrol'",
 				__METHOD__,
-				array( 'ORDER BY' => 'log_timestamp ASC' ),
+				array( 'ORDER BY' => 'log_timestamp ASC', 'LIMIT' => $limit ),
 				null
 			);
 			$logPending = array();

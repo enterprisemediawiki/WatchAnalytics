@@ -48,11 +48,13 @@
 	"watchanalytics-unpause-visualization": "Unpause visualization",
 	"watchanalytics-pendingreviews-diff-revisions": "compute difference of {{PLURAL:$1|1 revision|$1 revisions}}",
 	"watchanalytics-pendingreviews-history-link": "view page history",
-	"pendingreviews-timediff-days": "changed {{PLURAL:$1|1 day|$1 days}} ago",
-	"pendingreviews-timediff-hours": "changed {{PLURAL:$1|1 hour|$1 hours}} ago",
-	"pendingreviews-timediff-minutes": "changed {{PLURAL:$1|1 minute|$1 minutes}} ago",
-	"pendingreviews-timediff-just-now": "just now",
+	"pendingreviews-timediff-days": "Changed {{PLURAL:$1|1 day|$1 days}} ago",
+	"pendingreviews-timediff-hours": "Changed {{PLURAL:$1|1 hour|$1 hours}} ago",
+	"pendingreviews-timediff-minutes": "Changed {{PLURAL:$1|1 minute|$1 minutes}} ago",
+	"pendingreviews-timediff-just-now": "Changed just now",
 	"pendingreviews-no-revisions": "No page content changes",
+	"pendingreviews-num-reviews": "You have $1 pending {{PLURAL:$1|review|reviews}}.",
+	"pendingreviews-num-shown": "Showing the oldest {{PLURAL:$1|review|$1 reviews}}.",
 	"watchanalytics-view-user-pendingreviews": "pending reviews"
 }
 

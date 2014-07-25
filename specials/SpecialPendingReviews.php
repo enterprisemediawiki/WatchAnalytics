@@ -55,12 +55,20 @@ class SpecialPendingReviews extends SpecialPage {
 
 		$userWatchQuery = new UserWatchesQuery();
 
-		$pending = $userWatchQuery->getUserPendingWatches( $this->mUser );
+		$limit = 20;
+		$pending = $userWatchQuery->getUserPendingWatches( $this->mUser, $limit );
 
 		// $html = '<pre>' . json_encode( $pending, JSON_PRETTY_PRINT ) . '</pre>';
 		// $html = '<ul>';
-		$html = '<table class="pendingreviews-list">';
+		$html = '<p>' . wfMessage( 'pendingreviews-num-reviews', count( $pending ) )->text();
+		if ( count( $pending ) == $limit ) {
+			$html .= ' ' . wfMessage( 'pendingreviews-num-shown', $limit )->text();
+		}
+		$html .= '</p>';
+		
+		$html .= '<table class="pendingreviews-list">';
 		$rowCount = 0;
+		
 		foreach ( $pending as $item ) {
 			// logic for:
 			//   * isRedirect
@@ -68,6 +76,22 @@ class SpecialPendingReviews extends SpecialPage {
 			//   * isNewPage
 			//   * files, approvals ... other log actions?
 
+			$combinedList = $this->combineLogAndChanges( $item->log, $item->newRevisions );
+			$changes = array();
+			foreach ( $combinedList as $change ) {
+				if ( isset( $change->log_timestamp ) ) {
+					$changeTs = new MWTimestamp( $change->log_timestamp );
+					$changes[] = $changeTs->getHumanTimestamp() . ': ' . $change->log_type . '/' . $change->log_action . ' by ' . $change->log_user_text;
+				}
+				else {
+					$changeTs = new MWTimestamp( $change->rev_timestamp );
+					$changes[] = $changeTs->getHumanTimestamp() . ': edited by ' . $change->rev_user_text;
+				}
+			}
+			
+			$changes = '<ul><li>' . implode( '</li><li>', $changes ) . '</li></ul>';
+			
+			
 			$ts = new MWTimestamp( $item->notificationTimestamp );
 			$displayTime = '<small>' . $ts->getHumanTimestamp( new MWTimestamp() ) . '</small>';
 
@@ -100,7 +124,7 @@ class SpecialPendingReviews extends SpecialPage {
 				) );
 
 				$diffLink = Xml::element( 'a',
-					array( 'href' => $diffURL ),
+					array( 'href' => $diffURL, 'class' => 'pendingreviews-diff-button' ),
 					wfMessage(
 						'watchanalytics-pendingreviews-diff-revisions',
 						count( $item->newRevisions )
@@ -112,11 +136,15 @@ class SpecialPendingReviews extends SpecialPage {
 			}
 
 			$histLink = Xml::element( 'a',
-				array( 'href' => $item->title->getLocalURL( array( 'action' => 'history' ) ) ),
+				array(
+					'href' => $item->title->getLocalURL( array( 'action' => 'history' ) ),
+					'class' => 'pendingreviews-hist-button'
+				),
 				wfMessage( 'watchanalytics-pendingreviews-history-link' )->text()
 			);
 
-			$displayTitle = '<strong>' . $item->title->getFullText() . '</strong> <small>' . $timeDiff . '</small>';
+			$displayTitle = '<strong>' . $item->title->getFullText() . '</strong>';
+			$displayTitle .= "<p class='pendingreviews-timediff'>$timeDiff</p>";
 
 
 
@@ -130,8 +158,8 @@ class SpecialPendingReviews extends SpecialPage {
 			$rowClass = ( $rowCount % 2 === 0 ) ? 'pendingreviews-even-row' : 'pendingreviews-odd-row';
 			$classAndAttr = "class='pendingreviews-row $rowClass pendingreviews-row-$rowCount' pendingreviews-row-count='$rowCount'";
 
-			$html .= "<tr $classAndAttr><td class='pendingreviews-page-title'>$displayTitle</td><td rowspan='2' class='pendingreviews-review-links pendingreviews-bottom-cell'>$diffLink $histLink</td></tr>";
-			$html .= "<tr $classAndAttr><td class='pendingreviews-bottom-cell'>... list of stuff here</td></tr>";
+			$html .= "<tr $classAndAttr><td class='pendingreviews-page-title pendingreviews-top-cell'>$displayTitle</td><td rowspan='2' class='pendingreviews-review-links pendingreviews-bottom-cell pendingreviews-top-cell'>$diffLink $histLink</td></tr>";
+			$html .= "<tr $classAndAttr><td class='pendingreviews-bottom-cell'>$changes</td></tr>";
 		
 			$rowCount++;
 		}
@@ -165,6 +193,36 @@ class SpecialPendingReviews extends SpecialPage {
 	
 	public function getPageHeader() {
 
+	}
+	
+	protected function combineLogAndChanges( $log, $revisions ) {
+	
+		$log = array_reverse( $log );
+		$revisions = array_reverse( $revisions );
+		$logI = 0;
+		$revI = 0;
+		
+		$combinedArray = array();
+		
+		while ( count( $log ) || count( $revisions ) ) {
+		
+			if ( ! count( $log ) ) {
+				$combinedArray[] = array_shift( $revisions );
+			}
+			else if ( ! count( $revisions ) ) {
+				$combinedArray[] = array_shift( $log );
+			}
+			else if ( $revisions[ $revI ]->rev_timestamp > $log[ $logI ]->log_timestamp ) {
+				$combinedArray[] = array_shift( $log );
+			}
+			else {
+				$combinedArray[] = array_shift( $revisions );
+			}
+			
+		}
+		
+		return $combinedArray;
+	
 	}
 
 }
