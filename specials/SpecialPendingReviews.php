@@ -56,12 +56,12 @@ class SpecialPendingReviews extends SpecialPage {
 		$userWatchQuery = new UserWatchesQuery();
 
 		$limit = 20;
-		$pending = $userWatchQuery->getUserPendingWatches( $this->mUser, $limit );
+		$pending = $userWatchQuery->getUserPendingWatches( $this->mUser );
 
 		// $html = '<pre>' . json_encode( $pending, JSON_PRETTY_PRINT ) . '</pre>';
 		// $html = '<ul>';
 		$html = '<p>' . wfMessage( 'pendingreviews-num-reviews', count( $pending ) )->text();
-		if ( count( $pending ) == $limit ) {
+		if ( count( $pending ) > $limit ) {
 			$html .= ' ' . wfMessage( 'pendingreviews-num-shown', $limit )->text();
 		}
 		$html .= '</p>';
@@ -70,6 +70,10 @@ class SpecialPendingReviews extends SpecialPage {
 		$rowCount = 0;
 		
 		foreach ( $pending as $item ) {
+			if ( $rowCount >= $limit ) {
+				break;
+			}
+			
 			// logic for:
 			//   * isRedirect
 			//   * isDeleted
@@ -197,8 +201,8 @@ class SpecialPendingReviews extends SpecialPage {
 	
 	protected function combineLogAndChanges( $log, $revisions ) {
 	
-		$log = array_reverse( $log );
-		$revisions = array_reverse( $revisions );
+		// $log = array_reverse( $log );
+		// $revisions = array_reverse( $revisions );
 		$logI = 0;
 		$revI = 0;
 		
