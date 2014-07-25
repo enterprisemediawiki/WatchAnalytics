@@ -40,6 +40,7 @@ class WatchAnalyticsHooks {
 
 		if ( $numPending == 0 ) {
 			$personal_urls['watchlist']['class'] = array( 'mw-watchanalytics-watchlist-badge' );
+			$maxPendingDays = 0;
 		} else {
 			// convert max pending minutes to days
 			$maxPendingDays = ceil( $maxPendingMinutes / ( 60 * 24 ) );
@@ -47,6 +48,10 @@ class WatchAnalyticsHooks {
 			$personal_urls['watchlist']['class'] = array( 'mw-watchanalytics-watchlist-pending', 'mw-watchanalytics-watchlist-badge' );
 			
 			$personal_urls['watchlist']['href'] = SpecialPage::getTitleFor( 'Watchlist' )->getLocalURL( array( 'days' => $maxPendingDays ) );
+		}
+
+		if ( $maxPendingDays > 6 ) {
+			$personal_urls['watchlist']['class'][] = 'mw-watchanalytics-watchlist-pending-old';
 		}
 
 		return true;

@@ -4,5 +4,8 @@
 
 .mw-watchanalytics-watchlist-pending {
 	font-weight: bold;
+}
+
+.mw-watchanalytics-watchlist-pending-old {
 	font-size: 16px;
 }
