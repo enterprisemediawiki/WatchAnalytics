@@ -55,6 +55,7 @@
 	"pendingreviews-no-revisions": "No page content changes",
 	"pendingreviews-num-reviews": "You have $1 pending {{PLURAL:$1|review|reviews}}.",
 	"pendingreviews-num-shown": "Showing the oldest {{PLURAL:$1|review|$1 reviews}}.",
-	"watchanalytics-view-user-pendingreviews": "pending reviews"
+	"watchanalytics-view-user-pendingreviews": "pending reviews",
+	"pendingreviews-edited-by": "edited by [[$1]]"
 }
 

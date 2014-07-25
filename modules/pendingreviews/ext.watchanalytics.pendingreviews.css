@@ -24,6 +24,11 @@ tr.pendingreviews-odd-row td {
 tr.pendingreviews-even-row td {
 }
 
+.pendingreviews-changes-list-time {
+	font-size: 10px;
+	font-style: italic;
+}
+
 /* table.pendingreviews-list td.pendingreviews-bottom-cell {
 	border-bottom: solid #ddd 2px;
 } */
@@ -40,6 +45,9 @@ tr.pendingreviews-row-hover td:first-child {
 }
 tr.pendingreviews-row-hover td.pendingreviews-bottom-cell {
 	/* border-bottom: solid green 2px; */
+}
+tr.pendingreviews-row-hover td {
+	background-color: #f9f9f9;
 }
 
 td.pendingreviews-review-links a {
