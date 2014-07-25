@@ -80,13 +80,22 @@ class SpecialPendingReviews extends SpecialPage {
 			$changes = array();
 			foreach ( $combinedList as $change ) {
 				if ( isset( $change->log_timestamp ) ) {
-					$changeTs = new MWTimestamp( $change->log_timestamp );
-					$changes[] = $changeTs->getHumanTimestamp() . ': ' . $change->log_type . '/' . $change->log_action . ' by ' . $change->log_user_text;
+					$changeTs = $change->log_timestamp;
+					$changeText = $change->log_type . '/' . $change->log_action . ' by ' . $change->log_user_text;
 				}
 				else {
-					$changeTs = new MWTimestamp( $change->rev_timestamp );
-					$changes[] = $changeTs->getHumanTimestamp() . ': edited by ' . $change->rev_user_text;
+					$changeTs = $change->rev_timestamp;
+					$userPage = Title::makeTitle( NS_USER , $change->rev_user_text )->getFullText();
+
+					$changeText = wfMessage( 'pendingreviews-edited-by', $userPage )->parse();
 				}
+
+				$changeTs = Xml::element( 'span',
+					array( 'class' => 'pendingreviews-changes-list-time' ),
+					( new MWTimestamp( $changeTs ) )->getHumanTimestamp()
+				) . ' ';
+
+				$changes[] = $changeTs . $changeText;
 			}
 			
 			$changes = '<ul><li>' . implode( '</li><li>', $changes ) . '</li></ul>';
@@ -206,19 +215,22 @@ class SpecialPendingReviews extends SpecialPage {
 		
 		while ( count( $log ) || count( $revisions ) ) {
 		
-			if ( ! count( $log ) ) {
+			if ( count( $log ) === 0 ) {
 				$combinedArray[] = array_shift( $revisions );
 			}
-			else if ( ! count( $revisions ) ) {
-				$combinedArray[] = array_shift( $log );
-			}
-			else if ( $revisions[ $revI ]->rev_timestamp > $log[ $logI ]->log_timestamp ) {
+			else if ( count( $revisions ) === 0 ) {
 				$combinedArray[] = array_shift( $log );
 			}
 			else {
-				$combinedArray[] = array_shift( $revisions );
+				$revTs = new MWTimestamp( $revisions[ $revI ]->rev_timestamp );
+				$logTs = new MWTimestamp( $log[ $logI ]->log_timestamp );
+				if (  $logTs->diff( $revTs )->invert > 0  ) {
+					$combinedArray[] = array_shift( $log );
+				}
+				else {
+					$combinedArray[] = array_shift( $revisions );
+				}
 			}
-			
 		}
 		
 		return $combinedArray;
