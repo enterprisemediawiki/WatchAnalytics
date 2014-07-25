@@ -80,18 +80,23 @@ class SpecialPendingReviews extends SpecialPage {
 			//   * isNewPage
 			//   * files, approvals ... other log actions?
 
-			$combinedList = $this->combineLogAndChanges( $item->log, $item->newRevisions );
+			$combinedList = $this->combineLogAndChanges( $item->log, $item->newRevisions, $item->title );
 			$changes = array();
 			foreach ( $combinedList as $change ) {
 				if ( isset( $change->log_timestamp ) ) {
 					$changeTs = $change->log_timestamp;
-					$changeText = $change->log_type . '/' . $change->log_action . ' by ' . $change->log_user_text;
+					$changeText = $this->getLogChangeMessage( $change );
 				}
 				else {
+					$rev = Revision::newFromRow( $change );
 					$changeTs = $change->rev_timestamp;
 					$userPage = Title::makeTitle( NS_USER , $change->rev_user_text )->getFullText();
 
 					$changeText = wfMessage( 'pendingreviews-edited-by', $userPage )->parse();
+					$comment = $rev->getComment();
+					if ( $comment ) {
+						$changeText .= ' ' . wfMessage( 'pendingreviews-with-comment', $comment)->text();
+					}
 				}
 
 				$changeTs = Xml::element( 'span',
@@ -157,7 +162,7 @@ class SpecialPendingReviews extends SpecialPage {
 			);
 
 			$displayTitle = '<strong>' . $item->title->getFullText() . '</strong>';
-			$displayTitle .= "<p class='pendingreviews-timediff'>$timeDiff</p>";
+			//$displayTitle .= "<p class='pendingreviews-timediff'>$timeDiff</p>";
 
 
 
@@ -171,8 +176,8 @@ class SpecialPendingReviews extends SpecialPage {
 			$rowClass = ( $rowCount % 2 === 0 ) ? 'pendingreviews-even-row' : 'pendingreviews-odd-row';
 			$classAndAttr = "class='pendingreviews-row $rowClass pendingreviews-row-$rowCount' pendingreviews-row-count='$rowCount'";
 
-			$html .= "<tr $classAndAttr><td class='pendingreviews-page-title pendingreviews-top-cell'>$displayTitle</td><td rowspan='2' class='pendingreviews-review-links pendingreviews-bottom-cell pendingreviews-top-cell'>$diffLink $histLink</td></tr>";
-			$html .= "<tr $classAndAttr><td class='pendingreviews-bottom-cell'>$changes</td></tr>";
+			$html .= "<tr $classAndAttr><td class='pendingreviews-page-title pendingreviews-top-cell'>$displayTitle</td><td class='pendingreviews-review-links pendingreviews-bottom-cell pendingreviews-top-cell'>$diffLink $histLink</td></tr>";
+			$html .= "<tr $classAndAttr><td colspan='2' class='pendingreviews-bottom-cell'>$changes</td></tr>";
 		
 			$rowCount++;
 		}
@@ -208,37 +213,82 @@ class SpecialPendingReviews extends SpecialPage {
 
 	}
 	
-	protected function combineLogAndChanges( $log, $revisions ) {
+	protected function combineLogAndChanges( $log, $revisions, $title ) {
 	
+		// if ( $title->getNamespace() === NS_FILE ) {
+			
+		// }
+
+
 		// $log = array_reverse( $log );
 		// $revisions = array_reverse( $revisions );
 		$logI = 0;
 		$revI = 0;
-		
+
 		$combinedArray = array();
 		
-		while ( count( $log ) || count( $revisions ) ) {
-		
-			if ( count( $log ) === 0 ) {
-				$combinedArray[] = array_shift( $revisions );
-			}
-			else if ( count( $revisions ) === 0 ) {
+		while ( count( $log ) > 0 && count( $revisions ) > 0 ) {
+
+			$revTs = $revisions[ $revI ]->rev_timestamp;
+			$logTs = $log[ $logI ]->log_timestamp;
+
+			if ( $revTs > $logTs ) {
 				$combinedArray[] = array_shift( $log );
 			}
 			else {
-				$revTs = new MWTimestamp( $revisions[ $revI ]->rev_timestamp );
-				$logTs = new MWTimestamp( $log[ $logI ]->log_timestamp );
-				if (  $logTs->diff( $revTs )->invert > 0  ) {
-					$combinedArray[] = array_shift( $log );
-				}
-				else {
-					$combinedArray[] = array_shift( $revisions );
-				}
+				$combinedArray[] = array_shift( $revisions );
 			}
+
 		}
-		
+
+		// $combinedArray += $revisions;
+		// $combinedArray += $log;
+		// print_r( array(count($combinedArray), count($log), count($revisions)) );
+		$combinedArray = array_merge( $combinedArray, $revisions, $log );
+
 		return $combinedArray;
 	
+	}
+
+	protected function getLogChangeMessage ( $logEntry ) {
+
+		// add pendingreviews-edited-by?
+		$messages = array(
+			'approval' => array( 
+				'approve' => 'pendingreviews-log-approved',
+				'unapprove' => 'pendingreviews-log-unapproved'
+			),
+			'delete' => array(
+				'delete' => 'pendingreviews-log-delete',
+				'restore' => 'pendingreviews-log-restore',
+			),
+			'import' => array(
+				'upload' => 'pendingreviews-log-import-upload',
+			),
+			'move' => array(
+				'move' => 'pendingreviews-log-move',
+				'move_redir' => 'pendingreviews-log-move-redir',
+			),
+			'protect' => array(
+				'protect' => 'pendingreviews-log-protect',
+				'unprotect' => 'pendingreviews-log-unprotect',
+				'modify' => 'pendingreviews-log-modify-protect',
+			),
+			'upload' => array(
+				'upload' => 'pendingreviews-log-upload-new',
+				'overwrite' => 'pendingreviews-log-upload-overwrite',
+			),
+		);
+
+		$userPage = Title::makeTitle( NS_USER , $logEntry->log_user_text )->getFullText();
+
+		if ( isset( $messages[ $logEntry->log_type ][ $logEntry->log_action ] ) ) {
+			return wfMessage( $messages[ $logEntry->log_type ][ $logEntry->log_action ], $userPage );
+		}
+		else {
+			return wfMessage( 'pendingreviews-log-unknown-change', $userPage );
+		}
+
 	}
 
 }

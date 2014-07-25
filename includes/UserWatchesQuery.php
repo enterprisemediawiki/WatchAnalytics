@@ -184,7 +184,8 @@ class UserWatchesQuery extends WatchesQuery {
 				// 	'l.log_user AS log_user_id',
 				// 	'l.log_user_text AS log_user_name',
 				// ),
-				"l.log_page=$pageID AND l.log_timestamp>=$notificationTimestamp AND l.log_type != 'patrol'",
+				"l.log_page=$pageID AND l.log_timestamp>=$notificationTimestamp 
+					AND l.log_type NOT IN ('interwiki','newusers','patrol','rights','upload')",
 				__METHOD__,
 				array( 'ORDER BY' => 'log_timestamp ASC' ),
 				null
