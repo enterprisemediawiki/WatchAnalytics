@@ -150,7 +150,26 @@ class SpecialPendingReviews extends SpecialPage {
 				);
 			}
 			else {
-				$diffLink = wfMessage( 'pendingreviews-no-revisions' )->text();
+				// $diffLink = wfMessage( 'pendingreviews-no-revisions' )->text();
+				
+				$lastRevIndex = count( $item->newRevisions ) - 1;
+				$latestRevision = Revision::newFromRow( $item->newRevisions[ $lastRevIndex ] );
+				$diffURL= $item->title->getLocalURL( array(
+					'oldid' => $latestRevision->getId()
+				) );
+
+				if ( $lastRevIndex === 0 ) {
+					$linkText = '1 version: view latest';
+				}
+				else {
+					$linkText = 'No changes - view latest revision';
+				}
+				
+				$diffLink = Xml::element( 'a',
+					array( 'href' => $diffURL, 'class' => 'pendingreviews-diff-button' ),
+					$linkText
+				);
+
 			}
 
 			$histLink = Xml::element( 'a',
