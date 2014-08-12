@@ -128,7 +128,10 @@ class SpecialPendingReviews extends SpecialPage {
 			}
 
 
-			if ( count( $item->newRevisions ) ) {
+			if ( count( $item->newRevisions ) > 0 ) {
+			
+				// returns essentially the negative-oneth revision...the one before
+				// the wl_notificationtimestamp revision...or null/false if none exists?
 				$mostRecentReviewed = Revision::newFromRow( $item->newRevisions[0] )->getPrevious();
 			}
 			else {
@@ -136,6 +139,7 @@ class SpecialPendingReviews extends SpecialPage {
 			}
 
 			if ( $mostRecentReviewed ) {
+
 				$diffURL= $item->title->getLocalURL( array(
 					'diff' => '', 
 					'oldid' => $mostRecentReviewed->getId()
@@ -150,20 +154,10 @@ class SpecialPendingReviews extends SpecialPage {
 				);
 			}
 			else {
-				// $diffLink = wfMessage( 'pendingreviews-no-revisions' )->text();
-				
-				$lastRevIndex = count( $item->newRevisions ) - 1;
-				$latestRevision = Revision::newFromRow( $item->newRevisions[ $lastRevIndex ] );
-				$diffURL= $item->title->getLocalURL( array(
-					'oldid' => $latestRevision->getId()
-				) );
 
-				if ( $lastRevIndex === 0 ) {
-					$linkText = '1 version: view latest';
-				}
-				else {
-					$linkText = 'No changes - view latest revision';
-				}
+				$latest = Revision::newFromTitle( $item->title );
+				$diffURL = $item->title->getLocalURL( array( 'oldid' => $latest->getId() ) );
+				$linkText = 'No content changes - view latest';
 				
 				$diffLink = Xml::element( 'a',
 					array( 'href' => $diffURL, 'class' => 'pendingreviews-diff-button' ),
