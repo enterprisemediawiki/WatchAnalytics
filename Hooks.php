@@ -53,9 +53,7 @@ class WatchAnalyticsHooks {
 		if ( $maxPendingDays > 6 ) {
 			$personal_urls['watchlist']['class'][] = 'mw-watchanalytics-watchlist-pending-old';
 		}
-		if ( in_array( $wgUser->getName(), array( "Sgeffert", "Bscheib", "Pdum", "Fsabur", "Jkagey", "Ajarvis", "Abolinge", "Lwelsh", "Balpert", "Cmavridi", "Swray", "Ejmontal" ) ) ) {
-			$personal_urls['watchlist']['href'] = SpecialPage::getTitleFor( 'PendingReviews' )->getLocalURL();
-		}
+		$personal_urls['watchlist']['href'] = SpecialPage::getTitleFor( 'PendingReviews' )->getLocalURL();
 		return true;
 	}
 
