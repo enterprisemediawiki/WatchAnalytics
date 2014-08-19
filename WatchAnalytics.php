@@ -71,6 +71,7 @@ $wgAutoloadClasses['SpecialPendingReviews'] = __DIR__ . '/specials/SpecialPendin
 
 // add watchlist notification system
 $wgHooks['PersonalUrls'][] = 'WatchAnalyticsHooks::onPersonalUrls';
+$wgHooks['BeforePageDisplay'][] = 'WatchAnalyticsHooks::onBeforePageDisplay';
 
 // update database
 $wgHooks['LoadExtensionSchemaUpdates'][] = 'WatchAnalyticsUpdaterHooks::addSchemaUpdates';
@@ -127,9 +128,21 @@ $wgResourceModules += array(
 		),
 	),
 
+	'ext.watchanalytics.shakependingreviews' => $watchAnalyticsResourceTemplate + array(
+		'scripts' => array(
+			'shakependingreviews/shake.js',
+		),
+		'dependencies' => array(
+			'jquery.effects.shake',
+		),
+	),
 );
 
+$egPendingReviewsEmphasizeDays = 7;
 
+/*
+
+*/
 
 // Extension initialization
 // $wgExtensionFunctions[] = 'WatchAnalyticsHooks::initWatchAnalyticsExtension';
