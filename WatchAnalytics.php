@@ -45,22 +45,30 @@ $wgExtensionCredits['specialpage'][] = array(
 $wgMessagesDirs['WatchAnalytics'] = __DIR__ . '/i18n';
 $wgExtensionMessagesFiles['WatchAnalytics'] = __DIR__ . '/WatchAnalytics.i18n.php';
 $wgExtensionMessagesFiles['WatchAnalyticsAliases'] = __DIR__ . '/WatchAnalytics.alias.php';
+$wgExtensionMessagesFiles['WatchAnalyticsMagic'] = __DIR__ . '/WatchAnalytics.i18n.magic.php';
 
 $wgAutoloadClasses['WatchAnalyticsHooks'] = __DIR__ . '/Hooks.php';
 $wgAutoloadClasses['WatchAnalyticsUser'] = __DIR__ . '/WatchAnalyticsUser.php';
+
+// schema updater
 $wgAutoloadClasses['WatchAnalyticsUpdaterHooks'] = __DIR__ . '/schema/WatchAnalyticsUpdaterHooks.php';
 
-
+// query classes
 $wgAutoloadClasses['WatchesQuery'] = __DIR__ . '/includes/WatchesQuery.php';
 $wgAutoloadClasses['PageWatchesQuery'] = __DIR__ . '/includes/PageWatchesQuery.php';
 $wgAutoloadClasses['UserWatchesQuery'] = __DIR__ . '/includes/UserWatchesQuery.php';
 $wgAutoloadClasses['WikiWatchesQuery'] = __DIR__ . '/includes/WikiWatchesQuery.php';
 
+// table pages for special pages
 $wgAutoloadClasses['WatchAnalyticsTablePager'] = __DIR__ . '/includes/WatchAnalyticsTablePager.php';
 $wgAutoloadClasses['WatchAnalyticsUserTablePager'] = __DIR__ . '/includes/WatchAnalyticsUserTablePager.php';
 $wgAutoloadClasses['WatchAnalyticsPageTablePager'] = __DIR__ . '/includes/WatchAnalyticsPageTablePager.php';
 $wgAutoloadClasses['WatchAnalyticsWikiTablePager'] = __DIR__ . '/includes/WatchAnalyticsWikiTablePager.php';
 
+// parser functions
+$wgAutoloadClasses['WatchAnalyticsParserFunctions'] = __DIR__ . '/includes/WatchAnalyticsParserFunctions.php';
+
+// state recorder
 $wgAutoloadClasses['WatchStateRecorder'] = __DIR__ . '/includes/WatchStateRecorder.php';
 
 // special page
@@ -72,6 +80,7 @@ $wgAutoloadClasses['SpecialPendingReviews'] = __DIR__ . '/specials/SpecialPendin
 // add watchlist notification system
 $wgHooks['PersonalUrls'][] = 'WatchAnalyticsHooks::onPersonalUrls';
 $wgHooks['BeforePageDisplay'][] = 'WatchAnalyticsHooks::onBeforePageDisplay';
+$wgHooks['ParserFirstCallInit'][] = 'WatchAnalyticsParserFunctions::setup';
 
 // update database
 $wgHooks['LoadExtensionSchemaUpdates'][] = 'WatchAnalyticsUpdaterHooks::addSchemaUpdates';
