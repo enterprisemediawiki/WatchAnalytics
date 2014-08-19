@@ -19,6 +19,8 @@ class WatchAnalyticsPageTablePager extends WatchAnalyticsTablePager {
 		global $wgRequest;
 
 		$sortField = $wgRequest->getVal( 'sort' );
+		$this->mQueryNamespace = $wgRequest->getVal( 'ns' );
+
 		if ( ! isset( $sortField ) ) {
 			$this->mDefaultDirection = false;
 		}
@@ -27,7 +29,20 @@ class WatchAnalyticsPageTablePager extends WatchAnalyticsTablePager {
 	}
 
 	function getQueryInfo() {
-		return $this->watchQuery->getQueryInfo();
+		$namespaces = MWNamespace::getCanonicalNamespaces();
+		
+		if ( $this->mQueryNamespace !== null 
+			&& $this->mQueryNamespace >= 0 
+			&& isset( $namespaces[ $this->mQueryNamespace ] ) ) {
+			
+			$conds = array(
+				'p.page_namespace = ' . $this->mQueryNamespace
+			);
+		}
+		else {
+			$conds = array();
+		}
+		return $this->watchQuery->getQueryInfo( $conds );
 	}
 
 	function formatValue ( $fieldName , $value ) {
