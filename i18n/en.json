@@ -63,6 +63,7 @@
 	"pendingreviews-page-deleted":         "Deleted page: $1",
 	"pendingreviews-page-deleted-talk":    "Ask $1 about deletion",
 	"pendingreviews-accept-deletion":      "Accept deletion",
+	"pendingreviews-clear-page-notification": "Page \"$1\" has been marked reviewed. Return to $2",
 	"pendingreviews-log-approved":         "[[$1]] approved a revision",
 	"pendingreviews-log-unapproved":       "[[$1]] removed all revision approvals",
 	"pendingreviews-log-delete":           "[[$1]] deleted this page",

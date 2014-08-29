@@ -197,4 +197,23 @@ class PendingReview {
 
 		return $pending;
 	}
+	
+	public function getDeletionLog ( $title, $ns, $notificationTimestamp ) {
+	
+		$dbr = wfGetDB( DB_SLAVE );
+		
+		$logResults = $dbr->select(
+			array( 'l' => 'logging' ),
+			array( '*' ),
+			"l.log_title=$title AND l.log_namespace=$ns AND l.log_timestamp>=$notificationTimestamp 
+				AND l.log_type = 'delete'",
+			__METHOD__,
+			array( 'ORDER BY' => 'log_timestamp ASC' ),
+			null
+		);
+		$logPending = array();
+		while ( $log = $logResults->fetchObject() ) {
+			$logPending[] = $log;
+		}
+	}
 }

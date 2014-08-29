@@ -23,7 +23,36 @@ class SpecialPendingReviews extends SpecialPage {
 
 		$this->setHeaders();
 
-		$requestUser = $wgRequest->getVal( 'user' );
+		$clearNotifyTitle = $wgRequest->getVal( 'clearNotificationTitle' );
+		if ( $clearNotifyTitle ) {
+			$clearNotifyNS = $wgRequest->getVal( 'clearNotificationNS' );
+			if ( ! $clearNotifyNS ) {
+				$clearNotifyNS = 0;
+			}
+			
+			$title = Title::newFromText( $clearNotifyTitle, $clearNotifyNS );
+			$watch = WatchedItem::fromUserTitle( $wgUser, $title );
+			$watch->resetNotificationTimestamp();
+			
+			$wgOut->addHTML(
+				wfMessage(
+					'pendingreviews-clear-page-notification',
+					$title->getFullText(),
+					Xml::tags('a', 
+						array(
+							'href' => $this->getTitle()->getLocalUrl(),
+							'style' => 'font-weight:bold;',
+						), 
+						$this->getTitle() 
+					)
+				)->text()
+			);
+			
+			return true;
+			
+		}
+		
+		$requestUser = $wgRequest->getVal( 'user' );		
 		if ( $requestUser ) {
 			$this->mUser = User::newFromName( $requestUser );
 			if ( $this->mUser->getId() === $wgUser->getId() ) {
@@ -224,7 +253,10 @@ class SpecialPendingReviews extends SpecialPage {
 		
 		return Xml::element( 'a',
 			array(
-				'href' => $wgTitle->getLocalURL( array( 'action' => 'history' ) ),
+				'href' => $this->getTitle()->getLocalURL( array( 
+					'clearNotificationTitle' => $titleText,
+					'clearNotificationNS' => $namespace,
+				) ),
 				'class' => 'pendingreviews-red-button pendingreviews-accept-deletion',
 				'pending-namespace' => $namespace,
 				'pending-title' => $titleText,
