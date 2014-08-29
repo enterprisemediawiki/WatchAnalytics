@@ -53,6 +53,9 @@ $wgAutoloadClasses['WatchAnalyticsUser'] = __DIR__ . '/WatchAnalyticsUser.php';
 // schema updater
 $wgAutoloadClasses['WatchAnalyticsUpdaterHooks'] = __DIR__ . '/schema/WatchAnalyticsUpdaterHooks.php';
 
+// pending reviews
+$wgAutoloadClasses['PendingReview'] = __DIR__ . '/includes/PendingReview.php';
+
 // query classes
 $wgAutoloadClasses['WatchesQuery'] = __DIR__ . '/includes/WatchesQuery.php';
 $wgAutoloadClasses['PageWatchesQuery'] = __DIR__ . '/includes/PageWatchesQuery.php';
@@ -123,6 +126,10 @@ $wgResourceModules += array(
 	'ext.watchanalytics.pendingreviews' => $watchAnalyticsResourceTemplate + array(
 		'styles' => 'pendingreviews/ext.watchanalytics.pendingreviews.css',
 		'scripts' => 'pendingreviews/ext.watchanalytics.pendingreviews.js',
+		'dependencies' => array(
+			'mediawiki.Title',
+		),
+
 	),
 
 	'underscore.js' => $watchAnalyticsResourceTemplate + array(

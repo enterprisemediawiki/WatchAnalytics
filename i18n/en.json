@@ -8,6 +8,7 @@
 	"watchanalytics-personal-url": "My pending reviews ($1)",
 	"watchanalytics-view": "View:",
 	"pendingreviews": "Pending reviews",
+	"watchanalytics": "Watch analytics",
 	"pendingreviews-user-page": "Pending reviews for User:$1",
 	"watchanalytics-pages-specialpage": "Page watch statistics",
 	"watchanalytics-users-specialpage": "User watch statistics",
@@ -59,6 +60,9 @@
 	
 	"pendingreviews-with-comment":         "with comment: ''$1''",
 	"pendingreviews-edited-by":            "[[$1]] made an edit",
+	"pendingreviews-page-deleted":         "Deleted page: $1",
+	"pendingreviews-page-deleted-talk":    "Ask $1 about deletion",
+	"pendingreviews-accept-deletion":      "Accept deletion",
 	"pendingreviews-log-approved":         "[[$1]] approved a revision",
 	"pendingreviews-log-unapproved":       "[[$1]] removed all revision approvals",
 	"pendingreviews-log-delete":           "[[$1]] deleted this page",
