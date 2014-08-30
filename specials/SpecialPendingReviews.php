@@ -128,11 +128,12 @@ class SpecialPendingReviews extends SpecialPage {
 			}
 			else {
 			
-				$changes = '';
-				
+				$changes = '';				
+				$changes = $this->getPendingReviewChangesList( $item->deletionLog );
+
 				$acceptDeletionButton = $this->getMarkDeleteReviewedButton( $item->deletedTitle, $item->deletedNS );
 
-				$talkToDeleterButton = $this->getDeleterTalkButton( $wgUser );
+				$talkToDeleterButton = $this->getDeleterTalkButton( $item->deletionLog );
 
 				$title = Title::makeTitle( $item->deletedNS, $item->deletedTitle );
 				
@@ -265,7 +266,13 @@ class SpecialPendingReviews extends SpecialPage {
 		);
 	}
 	
-	public function getDeleterTalkButton ( $user ) {
+	public function getDeleterTalkButton ( $deletionLog ) {
+
+		// echo "<pre>" . print_r($deletionLog, true) . "</pre>"; return '';
+		$userId = $deletionLog[ count( $deletionLog ) - 1 ]->log_user;
+		$user = User::newFromId( $userId );
+
+
 		$userTalk = $user->getTalkPage();
 		
 		if ( $userTalk->exists() ) {

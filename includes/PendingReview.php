@@ -95,12 +95,14 @@ class PendingReview {
 
 			$deletedNS = false;
 			$deletedTitle = false;
+			$deletionLog = false;
 
 		}
 		else {
 			$title = false;
 			$deletedNS = $row['namespace'];
 			$deletedTitle = $row['title'];
+			$deletionLog = $this->getDeletionLog( $deletedTitle, $deletedNS, $notificationTimestamp );
 			$logPending = false;
 			$revsPending = false;
 			
@@ -112,6 +114,7 @@ class PendingReview {
 		$this->newRevisions = $revsPending;
 		$this->deletedTitle = $deletedTitle;
 		$this->deletedNS = $deletedNS;
+		$this->deletionLog = $deletionLog;
 		$this->log = $logPending;
 
 	}
@@ -202,6 +205,8 @@ class PendingReview {
 	
 		$dbr = wfGetDB( DB_SLAVE );
 		
+		$title = $dbr->addQuotes( $title );
+
 		$logResults = $dbr->select(
 			array( 'l' => 'logging' ),
 			array( '*' ),
@@ -211,9 +216,11 @@ class PendingReview {
 			array( 'ORDER BY' => 'log_timestamp ASC' ),
 			null
 		);
-		$logPending = array();
+		$logDeletes = array();
 		while ( $log = $logResults->fetchObject() ) {
-			$logPending[] = $log;
+			$logDeletes[] = $log;
 		}
+
+		return $logDeletes;
 	}
 }
