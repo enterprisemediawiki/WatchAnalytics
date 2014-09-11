@@ -55,6 +55,7 @@ class UserWatchesQuery extends WatchesQuery {
 			'w' => 'watchlist',
 			'u' => 'user',
 			'p' => 'page',
+			'log' => 'logging',
 		);
 
 		$this->fields = array(
@@ -73,8 +74,17 @@ class UserWatchesQuery extends WatchesQuery {
 				'LEFT JOIN', 'u.user_id=w.wl_user'
 			),
 			'p' => array(
-				'INNER JOIN', 'p.page_namespace=w.wl_namespace AND p.page_title=w.wl_title'
+				'LEFT JOIN', 'p.page_namespace=w.wl_namespace AND p.page_title=w.wl_title'
 			),
+			'log' => array(
+				'LEFT JOIN', 
+				'log.log_namespace = w.wl_namespace '
+				. ' AND log.log_title = w.wl_title'
+				. ' AND p.page_namespace IS NULL'
+				. ' AND p.page_title IS NULL'
+				. ' AND log.log_action = "delete"'
+			),
+
 		);
 
 		$this->options = array(
