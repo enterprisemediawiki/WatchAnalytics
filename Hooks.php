@@ -97,12 +97,13 @@ class WatchAnalyticsHooks {
 		// $art = json_encode( print_r( $article, true ) );
 		// $f = json_encode( print_r ( $fields, true ) );
 
-		global $wgUser;
+		global $wgUser, $egWatchAnalyticsNotifyTSInitial;
 		$title = $article->getTitle();
 		$wi = WatchedItem::fromUserTitle( $wgUser, $title );
-
-		$notifyTS = json_encode( array( "notifyTS" => $wi->getNotificationTimestamp() ) );
-
+		
+		$egWatchAnalyticsNotifyTSInitial = $wi->getNotificationTimestamp();
+		$notifyTS = json_encode( array( "notifyTS" => $egWatchAnalyticsNotifyTSInitial ) );
+		
 		echo "<script>console.log( $notifyTS );</script>";
 		return true;
 
@@ -114,15 +115,41 @@ class WatchAnalyticsHooks {
 		// $art = json_encode( print_r( $article, true ) );
 		// $r = json_encode( print_r ( $row, true ) );
 
-		global $wgUser, $wgTitle;
+		global $wgUser, $wgTitle, $egWatchAnalyticsNotifyTSInitial, $egWatchAnalyticsNotifyTSFinal;
 		// $title = $article->getTitle();
 		$wi = WatchedItem::fromUserTitle( $wgUser, $wgTitle );
+		
+		$egWatchAnalyticsNotifyTSFinal = $wi->getNotificationTimestamp();
+		$notifyTS = json_encode( array( "notifyTS" => $egWatchAnalyticsNotifyTSFinal ) );
 
-		$notifyTS = json_encode( array( "notifyTS" => $wi->getNotificationTimestamp() ) );
+		
+		if ( $egWatchAnalyticsNotifyTSInitial !== $egWatchAnalyticsNotifyTSFinal ) {
+			$asdf = 'jQuery("#ext-watch-analytics-review-notifier").html("DONE GOT CHANGED!");';
+		}
 
 		echo "<script>console.log('test'); console.log( $notifyTS );</script>";
 		return true;
 
 	}
+	
+	static function onArticleViewHeader ( Article &$article, &$outputDone, &$pcache ) {
+		global $wgOut, $wgRequest;
+
+
+		$title = $article->getTitle();
+		
+
+		// Disable caching, so that if it's a specific ID being shown
+		// that happens to be the latest, it doesn't show a blank page.
+		$useParserCache = false; // @TODO: do I need this?
+
+		echo "<script>console.log('header!');</script>";
+
+		$wgOut->addHTML( '<span id="ext-watch-analytics-review-notifier"></span>' );
+
+		return true;
+		
+	}
+	
 
 }

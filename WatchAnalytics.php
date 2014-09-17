@@ -89,12 +89,14 @@ $wgHooks['ParserFirstCallInit'][] = 'WatchAnalyticsParserFunctions::setup';
 
 // continuous logging and alerts when pages have been marked reviewed
 $wgHooks['ArticlePageDataBefore'][] = 'WatchAnalyticsHooks::onArticlePageDataBefore';
-$wgHooks['AfterFinalPageOutput'][] = 'WatchAnalyticsHooks::onAfterFinalPageOutput';
+$wgHooks['AfterFinalPageOutput'][]  = 'WatchAnalyticsHooks::onAfterFinalPageOutput';
+$wgHooks['ArticleViewHeader'][]     = 'WatchAnalyticsHooks::onArticleViewHeader';
 
 // update database
 $wgHooks['LoadExtensionSchemaUpdates'][] = 'WatchAnalyticsUpdaterHooks::addSchemaUpdates';
 
-
+$egWatchAnalyticsNotifyTSInitial = false;
+$egWatchAnalyticsNotifyTSFinal = false;
 
 
 $watchAnalyticsResourceTemplate = array(
