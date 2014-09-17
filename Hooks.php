@@ -85,4 +85,44 @@ class WatchAnalyticsHooks {
 		}
 		return true;
 	}
+
+
+
+
+
+
+
+
+	public static function onArticlePageDataBefore ( $article, $fields ) {
+		// $art = json_encode( print_r( $article, true ) );
+		// $f = json_encode( print_r ( $fields, true ) );
+
+		global $wgUser;
+		$title = $article->getTitle();
+		$wi = WatchedItem::fromUserTitle( $wgUser, $title );
+
+		$notifyTS = json_encode( array( "notifyTS" => $wi->getNotificationTimestamp() ) );
+
+		echo "<script>console.log( $notifyTS );</script>";
+		return true;
+
+	}
+
+
+	public static function onAfterFinalPageOutput ( $a ) {
+
+		// $art = json_encode( print_r( $article, true ) );
+		// $r = json_encode( print_r ( $row, true ) );
+
+		global $wgUser, $wgTitle;
+		// $title = $article->getTitle();
+		$wi = WatchedItem::fromUserTitle( $wgUser, $wgTitle );
+
+		$notifyTS = json_encode( array( "notifyTS" => $wi->getNotificationTimestamp() ) );
+
+		echo "<script>console.log('test'); console.log( $notifyTS );</script>";
+		return true;
+
+	}
+
 }

@@ -83,7 +83,13 @@ $wgAutoloadClasses['SpecialPendingReviews'] = __DIR__ . '/specials/SpecialPendin
 // add watchlist notification system
 $wgHooks['PersonalUrls'][] = 'WatchAnalyticsHooks::onPersonalUrls';
 $wgHooks['BeforePageDisplay'][] = 'WatchAnalyticsHooks::onBeforePageDisplay';
+
+// parser functions
 $wgHooks['ParserFirstCallInit'][] = 'WatchAnalyticsParserFunctions::setup';
+
+// continuous logging and alerts when pages have been marked reviewed
+$wgHooks['ArticlePageDataBefore'][] = 'WatchAnalyticsHooks::onArticlePageDataBefore';
+$wgHooks['AfterFinalPageOutput'][] = 'WatchAnalyticsHooks::onAfterFinalPageOutput';
 
 // update database
 $wgHooks['LoadExtensionSchemaUpdates'][] = 'WatchAnalyticsUpdaterHooks::addSchemaUpdates';
