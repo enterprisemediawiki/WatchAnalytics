@@ -104,7 +104,7 @@ class WatchAnalyticsHooks {
 		$egWatchAnalyticsNotifyTSInitial = $wi->getNotificationTimestamp();
 		$notifyTS = json_encode( array( "notifyTS" => $egWatchAnalyticsNotifyTSInitial ) );
 		
-		echo "<script>console.log( $notifyTS );</script>";
+		echo "<script>console.log('onArticlePageDataBefore'); console.log( $notifyTS );</script>";
 		return true;
 
 	}
@@ -127,7 +127,7 @@ class WatchAnalyticsHooks {
 			$asdf = 'jQuery("#ext-watch-analytics-review-notifier").html("DONE GOT CHANGED!");';
 		}
 
-		echo "<script>console.log('test'); console.log( $notifyTS );</script>";
+		echo "<script>console.log('onAfterFinalPageOutput'); console.log( $notifyTS );</script>";
 		return true;
 
 	}
@@ -143,13 +143,38 @@ class WatchAnalyticsHooks {
 		// that happens to be the latest, it doesn't show a blank page.
 		$useParserCache = false; // @TODO: do I need this?
 
-		echo "<script>console.log('header!');</script>";
+		echo "<script>console.log('onArticleViewHeader!');</script>";
 
-		$wgOut->addHTML( '<span id="ext-watch-analytics-review-notifier"></span>' );
+		$wgOut->addHTML( '<div style="background-color:red;">ArticleViewHeader</div>' );
 
 		return true;
 		
 	}
 	
 
+	public static function onDiffViewHeader( $diff, $oldRev, $newRev ) {
+		global $wgOut, $wgRequest;		
+
+
+		global $wgUser, $wgTitle, $egWatchAnalyticsNotifyTSInitial, $egWatchAnalyticsNotifyTSFinal;
+		// $title = $article->getTitle();
+		$wi = WatchedItem::fromUserTitle( $wgUser, $wgTitle );
+		
+		$egWatchAnalyticsNotifyTSFinal = $wi->getNotificationTimestamp();
+		$notifyTS = json_encode( array( "notifyTS" => $egWatchAnalyticsNotifyTSFinal ) );
+
+
+		$diff->getOutput()->addHTML( '<div style="background-color:red;">DiffViewHeader</div>' );
+
+		// Disable caching, so that if it's a specific ID being shown
+		// that happens to be the latest, it doesn't show a blank page.
+		$useParserCache = false; // @TODO: do I need this?
+
+		echo "<script>console.log('onDiffViewHeader!'); console.log( $notifyTS );</script>";
+
+		//$wgOut->addHTML( '<span id="ext-watch-analytics-review-notifier"></span>' );
+
+		return true;
+
+	}
 }

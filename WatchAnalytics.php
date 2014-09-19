@@ -91,6 +91,7 @@ $wgHooks['ParserFirstCallInit'][] = 'WatchAnalyticsParserFunctions::setup';
 $wgHooks['ArticlePageDataBefore'][] = 'WatchAnalyticsHooks::onArticlePageDataBefore';
 $wgHooks['AfterFinalPageOutput'][]  = 'WatchAnalyticsHooks::onAfterFinalPageOutput';
 $wgHooks['ArticleViewHeader'][]     = 'WatchAnalyticsHooks::onArticleViewHeader';
+$wgHooks['DiffViewHeader'][]        = 'WatchAnalyticsHooks::onDiffViewHeader';
 
 // update database
 $wgHooks['LoadExtensionSchemaUpdates'][] = 'WatchAnalyticsUpdaterHooks::addSchemaUpdates';
