@@ -24,6 +24,8 @@ class SpecialPendingReviews extends SpecialPage {
 		$this->setHeaders();
 
 		$clearNotifyTitle = $wgRequest->getVal( 'clearNotificationTitle' );
+		$setNotifyTitle = $wgRequest->getVal( 'setNotificationTitle' );
+		
 		if ( $clearNotifyTitle ) {
 			$clearNotifyNS = $wgRequest->getVal( 'clearNotificationNS' );
 			if ( ! $clearNotifyNS ) {
@@ -49,8 +51,47 @@ class SpecialPendingReviews extends SpecialPage {
 			);
 			
 			return true;
-			
 		}
+
+		// if resetting a notification timestamp for a title/user
+		elseif ( $setNotifyTitle ) {
+			$setNotifyNS = $wgRequest->getVal( 'setNotificationNS' );
+			$setNotifyTS = $wgRequest->getVal( 'setNotificationTS' );
+
+			$title = Title::newFromText( $setNotifyTitle, $setNotifyNS );
+
+			$dbw = wfGetDB( DB_MASTER );
+			$dbw->update( 
+				'watchlist',
+				array( /* SET */
+					'wl_notificationtimestamp' => $dbw->timestamp( $setNotifyTS )
+				), 
+				array( /* WHERE */
+					'wl_user' => $wgUser->getId(),
+					'wl_namespace' => $title->getNamespace(),
+					'wl_title' => $title->getDBkey(),
+				),
+				__METHOD__
+			);
+
+			$wgOut->addHTML(
+				wfMessage(
+					'pendingreviews-set-page-notification',
+					$title->getFullText(),
+					Xml::tags('a', 
+						array(
+							'href' => $this->getTitle()->getLocalUrl(),
+							'style' => 'font-weight:bold;',
+						), 
+						$this->getTitle() 
+					)
+				)->text()
+			);
+
+			return true;
+		}
+
+
 		
 		$requestUser = $wgRequest->getVal( 'user' );		
 		if ( $requestUser ) {
@@ -69,7 +110,7 @@ class SpecialPendingReviews extends SpecialPage {
 		}
 
 
-		$wgOut->addModules( 'ext.watchanalytics.pendingreviews' );
+		$wgOut->addModules( array( 'ext.watchanalytics.pendingreviews', 'ext.watchanalytics.buttons' ) );
 
 		// load styles for watch analytics special pages
 		$wgOut->addModuleStyles( array(
@@ -204,7 +245,7 @@ class SpecialPendingReviews extends SpecialPage {
 			) );
 
 			$diffLink = Xml::element( 'a',
-				array( 'href' => $diffURL, 'class' => 'pendingreviews-green-button' ),
+				array( 'href' => $diffURL, 'class' => 'pendingreviews-green-button pendingreviews-button' ),
 				wfMessage(
 					'watchanalytics-pendingreviews-diff-revisions',
 					count( $item->newRevisions )
@@ -218,7 +259,7 @@ class SpecialPendingReviews extends SpecialPage {
 			$linkText = 'No content changes - view latest';
 			
 			$diffLink = Xml::element( 'a',
-				array( 'href' => $diffURL, 'class' => 'pendingreviews-green-button' ),
+				array( 'href' => $diffURL, 'class' => 'pendingreviews-green-button pendingreviews-button' ),
 				$linkText
 			);
 
@@ -231,7 +272,7 @@ class SpecialPendingReviews extends SpecialPage {
 		return Xml::element( 'a',
 			array(
 				'href' => $item->title->getLocalURL( array( 'action' => 'history' ) ),
-				'class' => 'pendingreviews-dark-blue-button'
+				'class' => 'pendingreviews-dark-blue-button pendingreviews-button'
 			),
 			wfMessage( 'watchanalytics-pendingreviews-history-link' )->text()
 		);
@@ -258,7 +299,7 @@ class SpecialPendingReviews extends SpecialPage {
 					'clearNotificationTitle' => $titleText,
 					'clearNotificationNS' => $namespace,
 				) ),
-				'class' => 'pendingreviews-red-button pendingreviews-accept-deletion',
+				'class' => 'pendingreviews-red-button pendingreviews-button pendingreviews-accept-deletion',
 				'pending-namespace' => $namespace,
 				'pending-title' => $titleText,
 			),
@@ -285,7 +326,7 @@ class SpecialPendingReviews extends SpecialPage {
 		return Xml::element( 'a',
 			array(
 				'href' => $userTalk->getLocalURL( $talkQueryString ),
-				'class' => 'pendingreviews-dark-blue-button' // pendingreviews-delete-talk-button
+				'class' => 'pendingreviews-dark-blue-button pendingreviews-button' // pendingreviews-delete-talk-button
 			),
 			wfMessage( 'pendingreviews-page-deleted-talk', $user->getUserPage()->getFullText() )->text()
 		);

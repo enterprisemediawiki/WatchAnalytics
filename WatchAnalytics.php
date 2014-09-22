@@ -68,6 +68,9 @@ $wgAutoloadClasses['WatchAnalyticsUserTablePager'] = __DIR__ . '/includes/WatchA
 $wgAutoloadClasses['WatchAnalyticsPageTablePager'] = __DIR__ . '/includes/WatchAnalyticsPageTablePager.php';
 $wgAutoloadClasses['WatchAnalyticsWikiTablePager'] = __DIR__ . '/includes/WatchAnalyticsWikiTablePager.php';
 
+// notification of page being reviewed
+$wgAutoloadClasses['ReviewedPageNotifier'] = __DIR__ . '/includes/ReviewedPageNotifier.php';
+
 // parser functions
 $wgAutoloadClasses['WatchAnalyticsParserFunctions'] = __DIR__ . '/includes/WatchAnalyticsParserFunctions.php';
 
@@ -88,8 +91,13 @@ $wgHooks['BeforePageDisplay'][] = 'WatchAnalyticsHooks::onBeforePageDisplay';
 $wgHooks['ParserFirstCallInit'][] = 'WatchAnalyticsParserFunctions::setup';
 
 // continuous logging and alerts when pages have been marked reviewed
-$wgHooks['ArticlePageDataBefore'][] = 'WatchAnalyticsHooks::onArticlePageDataBefore';
-$wgHooks['AfterFinalPageOutput'][]  = 'WatchAnalyticsHooks::onAfterFinalPageOutput';
+// $wgHooks['ArticlePageDataBefore'][] = 'WatchAnalyticsHooks::onArticlePageDataBefore';
+// $wgHooks['BeforePageDisplay'][] = 'WatchAnalyticsHooks::onBeforePageDisplayAlert';
+// $wgHooks['AfterFinalPageOutput'][]  = 'WatchAnalyticsHooks::onAfterFinalPageOutput';
+
+// continuous logging and alerts when pages have been marked reviewed
+$wgHooks['BeforeInitialize'][]      = 'WatchAnalyticsHooks::onBeforeInitialize';
+$wgHooks['ArticleFromTitle'][]      = 'WatchAnalyticsHooks::onArticleFromTitle';
 $wgHooks['ArticleViewHeader'][]     = 'WatchAnalyticsHooks::onArticleViewHeader';
 $wgHooks['DiffViewHeader'][]        = 'WatchAnalyticsHooks::onDiffViewHeader';
 
@@ -160,6 +168,17 @@ $wgResourceModules += array(
 		'dependencies' => array(
 			'jquery.effects.shake',
 		),
+	),
+
+	'ext.watchanalytics.reviewedpagenotifier' => $watchAnalyticsResourceTemplate + array(
+		'styles' => 'reviewedpagenotifier/reviewedpagenotifier.css',
+		'scripts' => array(
+			'reviewedpagenotifier/reviewedpagenotifier.js',
+		),
+	),
+
+	'ext.watchanalytics.buttons' => $watchAnalyticsResourceTemplate + array(
+		'styles' => 'buttons/ext.watchanalytics.buttons.css',
 	),
 );
 

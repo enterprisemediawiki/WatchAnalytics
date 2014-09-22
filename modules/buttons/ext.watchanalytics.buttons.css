@@ -1,0 +1,80 @@
+/*td.pendingreviews-review-links a {*/
+.pendingreviews-button {
+	color: #fff !important;	
+	border: 1px solid transparent;
+/* 	color: #fff;
+	background-color: #428bca;
+	border-color: #357ebd; */
+	padding: 8px;
+	font-size: 14px;
+	line-height: 1;
+	border-radius: 6px;
+	display: inline-block;
+	margin-bottom: 0;
+	font-weight: 400;
+	text-align: center;
+	vertical-align: middle;
+	cursor: pointer;
+	background-image: none;
+	white-space: nowrap;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
+/*td.pendingreviews-review-links a:hover {*/
+.pendingreviews-button:hover {
+	color: #fff;
+/* 	background-color: #3276b1;
+	border-color: #285e8e; */
+	text-decoration: none;
+}
+
+.pendingreviews-dark-blue-button {
+	background-color: #347BFF;
+	border-color: #347BFF;
+}
+.pendingreviews-dark-blue-button:hover {
+	background-color: #2456B3;
+	border-color: #347BFF;
+}
+
+.pendingreviews-green-button {
+	background-color: #5cb85c;
+	border-color: #4cae4c;
+}
+
+.pendingreviews-green-button:hover {
+	background-color: #449d44;
+	border-color: #398439;
+}
+
+.pendingreviews-light-blue-button {
+	background-color: #5bc0de;
+	border-color: #46b8da;
+}
+
+.pendingreviews-light-blue-button:hover {
+	background-color: #31b0d5;
+	border-color: #269abc;
+}
+
+.pendingreviews-orange-button {
+	background-color: #f0ad4e;
+	border-color: #eea236;
+}
+
+.pendingreviews-orange-button:hover {
+	background-color: #ec971f;
+	border-color: #d58512;
+}
+
+.pendingreviews-red-button {
+	background-color: #d9534f;
+	border-color: #d43f3a;
+}
+.pendingreviews-red-button:hover {
+	background-color: #c9302c;
+	border-color: #ac2925;
+}

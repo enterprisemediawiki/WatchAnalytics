@@ -61,7 +61,7 @@ class WatchAnalyticsHooks {
 	* @param $skin Skin being used.
 	* @return bool true in all cases
 	*/
-	static function onBeforePageDisplay( $out, $skin ) {
+	static function onBeforePageDisplay ( OutputPage &$out, Skin &$skin ) {
 		$user = $out->getUser();
 
 		$userWatch = new UserWatchesQuery();
@@ -83,98 +83,40 @@ class WatchAnalyticsHooks {
 		if ( $user->watchStats['max_pending_days'] > $egPendingReviewsEmphasizeDays ) {
 			$out->addModules( array( 'ext.watchanalytics.shakependingreviews' ) );
 		}
+
+
+		// create reviewed page notification as required
+		$user->reviewedPageNotifier->notifyIfReviewed( $out );
+
 		return true;
 	}
 
 
 
 
-
-
-
-
-	public static function onArticlePageDataBefore ( $article, $fields ) {
-		// $art = json_encode( print_r( $article, true ) );
-		// $f = json_encode( print_r ( $fields, true ) );
-
-		global $wgUser, $egWatchAnalyticsNotifyTSInitial;
-		$title = $article->getTitle();
-		$wi = WatchedItem::fromUserTitle( $wgUser, $title );
-		
-		$egWatchAnalyticsNotifyTSInitial = $wi->getNotificationTimestamp();
-		$notifyTS = json_encode( array( "notifyTS" => $egWatchAnalyticsNotifyTSInitial ) );
-		
-		echo "<script>console.log('onArticlePageDataBefore'); console.log( $notifyTS );</script>";
+	public static function onBeforeInitialize ( &$title, &$article, &$output, &$user, $request, $mediaWiki ) {
+		$user->reviewedPageNotifier = new ReviewedPageNotifier( $user );
 		return true;
-
 	}
 
 
-	public static function onAfterFinalPageOutput ( $a ) {
-
-		// $art = json_encode( print_r( $article, true ) );
-		// $r = json_encode( print_r ( $row, true ) );
-
-		global $wgUser, $wgTitle, $egWatchAnalyticsNotifyTSInitial, $egWatchAnalyticsNotifyTSFinal;
-		// $title = $article->getTitle();
-		$wi = WatchedItem::fromUserTitle( $wgUser, $wgTitle );
-		
-		$egWatchAnalyticsNotifyTSFinal = $wi->getNotificationTimestamp();
-		$notifyTS = json_encode( array( "notifyTS" => $egWatchAnalyticsNotifyTSFinal ) );
-
-		
-		if ( $egWatchAnalyticsNotifyTSInitial !== $egWatchAnalyticsNotifyTSFinal ) {
-			$asdf = 'jQuery("#ext-watch-analytics-review-notifier").html("DONE GOT CHANGED!");';
-		}
-
-		echo "<script>console.log('onAfterFinalPageOutput'); console.log( $notifyTS );</script>";
+	public static function onArticleFromTitle ( Title &$title, &$article, $context ) {
+		$context->getUser()->reviewedPageNotifier->setTitle( $title );
 		return true;
-
 	}
-	
+
+
 	static function onArticleViewHeader ( Article &$article, &$outputDone, &$pcache ) {
-		global $wgOut, $wgRequest;
+		global $wgOut;
 
-
-		$title = $article->getTitle();
-		
-
-		// Disable caching, so that if it's a specific ID being shown
-		// that happens to be the latest, it doesn't show a blank page.
-		$useParserCache = false; // @TODO: do I need this?
-
-		echo "<script>console.log('onArticleViewHeader!');</script>";
-
-		$wgOut->addHTML( '<div style="background-color:red;">ArticleViewHeader</div>' );
-
-		return true;
-		
+		$wgOut->addHTML( '<div id="reviewed-page-notifier" class="reviewed-page-notifier-blue"></div>' );
+		return true;		
 	}
 	
 
 	public static function onDiffViewHeader( $diff, $oldRev, $newRev ) {
-		global $wgOut, $wgRequest;		
 
-
-		global $wgUser, $wgTitle, $egWatchAnalyticsNotifyTSInitial, $egWatchAnalyticsNotifyTSFinal;
-		// $title = $article->getTitle();
-		$wi = WatchedItem::fromUserTitle( $wgUser, $wgTitle );
-		
-		$egWatchAnalyticsNotifyTSFinal = $wi->getNotificationTimestamp();
-		$notifyTS = json_encode( array( "notifyTS" => $egWatchAnalyticsNotifyTSFinal ) );
-
-
-		$diff->getOutput()->addHTML( '<div style="background-color:red;">DiffViewHeader</div>' );
-
-		// Disable caching, so that if it's a specific ID being shown
-		// that happens to be the latest, it doesn't show a blank page.
-		$useParserCache = false; // @TODO: do I need this?
-
-		echo "<script>console.log('onDiffViewHeader!'); console.log( $notifyTS );</script>";
-
-		//$wgOut->addHTML( '<span id="ext-watch-analytics-review-notifier"></span>' );
-
+		$diff->getOutput()->addHTML( '<div id="reviewed-page-notifier" class="reviewed-page-notifier-blue"></div>' );
 		return true;
-
 	}
 }

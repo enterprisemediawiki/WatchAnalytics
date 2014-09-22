@@ -1,0 +1,37 @@
+.reviewed-page-notifier-orange {
+	color: #8a6d3b;
+	background-color: #fcf8e3;
+	border: solid #faebcc 1px;
+	
+
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	
+
+	border-radius: 4px;
+	
+	padding: 15px;
+	margin-top: 20px;
+	margin-bottom: 20px;
+
+}
+
+.reviewed-page-notifier-blue {
+	color: #31708f;
+	background-color: #d9edf7;
+	border: solid #bce8f1 1px;
+	
+
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	
+
+	border-radius: 4px;
+	
+	padding: 15px;
+	margin-top: 20px;
+	margin-bottom: 20px;
+
+}
