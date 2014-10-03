@@ -30,7 +30,12 @@ class WatchAnalyticsHooks {
 		
 		$watchStats = $user->watchStats; // set in onBeforePageDisplay() hook
 		
-		$numPending = $watchStats['num_pending'];
+		if ( isset( $watchStats['num_pending'] ) ) {
+			$numPending = $watchStats['num_pending'];
+		}
+		else {
+			$numPending = 0;
+		}
 		
 		// when $sk (third arg) available, replace wfMessage with $sk->msg()
 		$text = wfMessage( 'watchanalytics-personal-url' )->params( $numPending )->text();		
@@ -68,8 +73,15 @@ class WatchAnalyticsHooks {
 
 		$user->watchStats = $userWatch->getUserWatchStats( $user );
 		
+		if ( isset( $user->watchStats['max_pending_minutes'] ) ) {
+			$maxPendingMinutes = $user->watchStats['max_pending_minutes'];
+		}
+		else {
+			$maxPendingMinutes = 0;
+		}
+
 		$user->watchStats['max_pending_days'] = ceil(
-			$user->watchStats['max_pending_minutes'] / ( 60 * 24 )
+			$maxPendingMinutes / ( 60 * 24 )
 		);
 
 		// if ( $user->isLoggedIn() && $user->getOption( 'echo-notify-show-link' ) ) {
