@@ -23,7 +23,36 @@ class SpecialPendingReviews extends SpecialPage {
 
 		$this->setHeaders();
 
-		$requestUser = $wgRequest->getVal( 'user' );
+		$clearNotifyTitle = $wgRequest->getVal( 'clearNotificationTitle' );
+		if ( $clearNotifyTitle ) {
+			$clearNotifyNS = $wgRequest->getVal( 'clearNotificationNS' );
+			if ( ! $clearNotifyNS ) {
+				$clearNotifyNS = 0;
+			}
+			
+			$title = Title::newFromText( $clearNotifyTitle, $clearNotifyNS );
+			$watch = WatchedItem::fromUserTitle( $wgUser, $title );
+			$watch->resetNotificationTimestamp();
+			
+			$wgOut->addHTML(
+				wfMessage(
+					'pendingreviews-clear-page-notification',
+					$title->getFullText(),
+					Xml::tags('a', 
+						array(
+							'href' => $this->getTitle()->getLocalUrl(),
+							'style' => 'font-weight:bold;',
+						), 
+						$this->getTitle() 
+					)
+				)->text()
+			);
+			
+			return true;
+			
+		}
+		
+		$requestUser = $wgRequest->getVal( 'user' );		
 		if ( $requestUser ) {
 			$this->mUser = User::newFromName( $requestUser );
 			if ( $this->mUser->getId() === $wgUser->getId() ) {
@@ -45,32 +74,27 @@ class SpecialPendingReviews extends SpecialPage {
 		// load styles for watch analytics special pages
 		$wgOut->addModuleStyles( array(
 			'ext.watchanalytics.specials',
-			'ext.watchanalytics.pendingreviews',
+			'ext.watchanalytics.pendingreviews', // redundant?
 		) );
 
-		
-		$wgOut->addHTML( $this->getPageHeader() );
-		
-		// ...
 
-		$userWatchQuery = new UserWatchesQuery();
+		$this->reviewLimit = 20;
 
-		$limit = 20;
-		$pending = $userWatchQuery->getUserPendingWatches( $this->mUser );
+		//FIXME: is this using a limit?
+		$this->pendingReviewList = PendingReview::getPendingReviewsList( $this->mUser );
 
-		// $html = '<pre>' . json_encode( $pending, JSON_PRETTY_PRINT ) . '</pre>';
-		// $html = '<ul>';
-		$html = '<p>' . wfMessage( 'pendingreviews-num-reviews', count( $pending ) )->text();
-		if ( count( $pending ) > $limit ) {
-			$html .= ' ' . wfMessage( 'pendingreviews-num-shown', $limit )->text();
-		}
-		$html .= '</p>';
+		$html = $this->getPageHeader();
+
+		// $html .= '<pre>' . print_r( $this->pendingReviewList , true ) . '</pre>';
+		// $wgOut->addHTML( $html );
+		// return true;
+
 		
 		$html .= '<table class="pendingreviews-list">';
 		$rowCount = 0;
-		
-		foreach ( $pending as $item ) {
-			if ( $rowCount >= $limit ) {
+				
+		foreach ( $this->pendingReviewList as $item ) {
+			if ( $rowCount >= $this->reviewLimit ) {
 				break;
 			}
 			
@@ -80,117 +104,54 @@ class SpecialPendingReviews extends SpecialPage {
 			//   * isNewPage
 			//   * files, approvals ... other log actions?
 
-			$combinedList = $this->combineLogAndChanges( $item->log, $item->newRevisions, $item->title );
-			$changes = array();
-			foreach ( $combinedList as $change ) {
-				if ( isset( $change->log_timestamp ) ) {
-					$changeTs = $change->log_timestamp;
-					$changeText = $this->getLogChangeMessage( $change );
-				}
-				else {
-					$rev = Revision::newFromRow( $change );
-					$changeTs = $change->rev_timestamp;
-					$userPage = Title::makeTitle( NS_USER , $change->rev_user_text )->getFullText();
-
-					$changeText = wfMessage( 'pendingreviews-edited-by', $userPage )->parse();
-					$comment = $rev->getComment();
-					if ( $comment ) {
-						$changeText .= ' ' . wfMessage( 'pendingreviews-with-comment', $comment)->text();
-					}
-				}
-
-				$changeTs = Xml::element( 'span',
-					array( 'class' => 'pendingreviews-changes-list-time' ),
-					( new MWTimestamp( $changeTs ) )->getHumanTimestamp()
-				) . ' ';
-
-				$changes[] = $changeTs . $changeText;
-			}
+			if ( $item->title ) {
 			
-			$changes = '<ul><li>' . implode( '</li><li>', $changes ) . '</li></ul>';
-			
-			
-			$ts = new MWTimestamp( $item->notificationTimestamp );
-			$displayTime = '<small>' . $ts->getHumanTimestamp( new MWTimestamp() ) . '</small>';
-
-			$timeDiff = $ts->diff( new MWTimestamp() );
-			if ( $timeDiff->days > 0 ) {
-				$timeDiff = wfMessage( 'pendingreviews-timediff-days', $timeDiff->format( '%a' ) );
-			}
-			else if ( $timeDiff->h > 0 ) {
-				$timeDiff = wfMessage( 'pendingreviews-timediff-hours', $timeDiff->format( '%h' ) );
-			}
-			else if ( $timeDiff->i > 0 ) {
-				$timeDiff = wfMessage( 'pendingreviews-timediff-minutes', $timeDiff->format( '%i' ) );
-			}
-			else {
-				$timeDiff = wfMessage( 'pendingreviews-timediff-just-now' )->text();
-			}
-
-
-			if ( count( $item->newRevisions ) > 0 ) {
-			
-				// returns essentially the negative-oneth revision...the one before
-				// the wl_notificationtimestamp revision...or null/false if none exists?
-				$mostRecentReviewed = Revision::newFromRow( $item->newRevisions[0] )->getPrevious();
-			}
-			else {
-				$mostRecentReviewed = false; // no previous revision, the user has not reviewed the first!
-			}
-
-			if ( $mostRecentReviewed ) {
-
-				$diffURL= $item->title->getLocalURL( array(
-					'diff' => '', 
-					'oldid' => $mostRecentReviewed->getId()
-				) );
-
-				$diffLink = Xml::element( 'a',
-					array( 'href' => $diffURL, 'class' => 'pendingreviews-diff-button' ),
-					wfMessage(
-						'watchanalytics-pendingreviews-diff-revisions',
-						count( $item->newRevisions )
-					)->text()
-				);
-			}
-			else {
-
-				$latest = Revision::newFromTitle( $item->title );
-				$diffURL = $item->title->getLocalURL( array( 'oldid' => $latest->getId() ) );
-				$linkText = 'No content changes - view latest';
+				$combinedList = $this->combineLogAndChanges( $item->log, $item->newRevisions, $item->title );
+				$changes = $this->getPendingReviewChangesList( $combinedList );
 				
-				$diffLink = Xml::element( 'a',
-					array( 'href' => $diffURL, 'class' => 'pendingreviews-diff-button' ),
-					$linkText
-				);
+				$reviewButton = $this->getReviewButton( $item );
 
+				$historyButton = $this->getHistoryButton( $item );
+
+				$displayTitle = '<strong>' . $item->title->getFullText() . '</strong>';
+				
+
+				// FIXME: wow this is ugly
+				$rowClass = ( $rowCount % 2 === 0 ) ? 'pendingreviews-even-row' : 'pendingreviews-odd-row';
+				
+				$classAndAttr = "class='pendingreviews-row $rowClass pendingreviews-row-$rowCount' pendingreviews-row-count='$rowCount'";
+
+				$html .= "<tr $classAndAttr><td class='pendingreviews-page-title pendingreviews-top-cell'>$displayTitle</td><td class='pendingreviews-review-links pendingreviews-bottom-cell pendingreviews-top-cell'>$reviewButton $historyButton</td></tr>";
+				
+				$html .= "<tr $classAndAttr><td colspan='2' class='pendingreviews-bottom-cell'>$changes</td></tr>";
+		
 			}
-
-			$histLink = Xml::element( 'a',
-				array(
-					'href' => $item->title->getLocalURL( array( 'action' => 'history' ) ),
-					'class' => 'pendingreviews-hist-button'
-				),
-				wfMessage( 'watchanalytics-pendingreviews-history-link' )->text()
-			);
-
-			$displayTitle = '<strong>' . $item->title->getFullText() . '</strong>';
-			//$displayTitle .= "<p class='pendingreviews-timediff'>$timeDiff</p>";
-
-
-
-			// $revisions = count($item->newRevisions) . ' revisions';
-			$logActions = count($item->log) . ' log actions';
-
-			// $html .= "<li>$displayTime : $displayTitle - $diffLink  ($logActions)</li>";
+			else {
 			
+				$changes = '';				
+				$changes = $this->getPendingReviewChangesList( $item->deletionLog );
 
-			// FIXME: wow this is ugly
-			$rowClass = ( $rowCount % 2 === 0 ) ? 'pendingreviews-even-row' : 'pendingreviews-odd-row';
-			$classAndAttr = "class='pendingreviews-row $rowClass pendingreviews-row-$rowCount' pendingreviews-row-count='$rowCount'";
+				$acceptDeletionButton = $this->getMarkDeleteReviewedButton( $item->deletedTitle, $item->deletedNS );
 
-			$html .= "<tr $classAndAttr><td class='pendingreviews-page-title pendingreviews-top-cell'>$displayTitle</td><td class='pendingreviews-review-links pendingreviews-bottom-cell pendingreviews-top-cell'>$diffLink $histLink</td></tr>";
-			$html .= "<tr $classAndAttr><td colspan='2' class='pendingreviews-bottom-cell'>$changes</td></tr>";
+				$talkToDeleterButton = $this->getDeleterTalkButton( $item->deletionLog );
+
+				$title = Title::makeTitle( $item->deletedNS, $item->deletedTitle );
+				
+				$displayTitle = '<strong>' 
+					. wfMessage( 'pendingreviews-page-deleted', $title->getFullText() )->parse()
+					. '</strong>';
+				
+
+				// FIXME: wow this is ugly
+				$rowClass = ( $rowCount % 2 === 0 ) ? 'pendingreviews-even-row' : 'pendingreviews-odd-row';
+				
+				$classAndAttr = "class='pendingreviews-row $rowClass pendingreviews-row-$rowCount' pendingreviews-row-count='$rowCount'";
+
+				$html .= "<tr $classAndAttr><td class='pendingreviews-page-title pendingreviews-top-cell'>$displayTitle</td><td class='pendingreviews-review-links pendingreviews-bottom-cell pendingreviews-top-cell'>$acceptDeletionButton $talkToDeleterButton</td></tr>";
+				
+				$html .= "<tr $classAndAttr><td colspan='2' class='pendingreviews-bottom-cell'>$changes</td></tr>";
+		
+			}
 		
 			$rowCount++;
 		}
@@ -222,8 +183,127 @@ class SpecialPendingReviews extends SpecialPage {
 
 	}
 	
-	public function getPageHeader() {
+	public function getReviewButton ( $item ) {
 
+
+		if ( count( $item->newRevisions ) > 0 ) {
+		
+			// returns essentially the negative-oneth revision...the one before
+			// the wl_notificationtimestamp revision...or null/false if none exists?
+			$mostRecentReviewed = Revision::newFromRow( $item->newRevisions[0] )->getPrevious();
+		}
+		else {
+			$mostRecentReviewed = false; // no previous revision, the user has not reviewed the first!
+		}
+
+		if ( $mostRecentReviewed ) {
+
+			$diffURL= $item->title->getLocalURL( array(
+				'diff' => '', 
+				'oldid' => $mostRecentReviewed->getId()
+			) );
+
+			$diffLink = Xml::element( 'a',
+				array( 'href' => $diffURL, 'class' => 'pendingreviews-green-button' ),
+				wfMessage(
+					'watchanalytics-pendingreviews-diff-revisions',
+					count( $item->newRevisions )
+				)->text()
+			);
+		}
+		else {
+
+			$latest = Revision::newFromTitle( $item->title );
+			$diffURL = $item->title->getLocalURL( array( 'oldid' => $latest->getId() ) );
+			$linkText = 'No content changes - view latest';
+			
+			$diffLink = Xml::element( 'a',
+				array( 'href' => $diffURL, 'class' => 'pendingreviews-green-button' ),
+				$linkText
+			);
+
+		}
+		
+		return $diffLink;
+	}
+	
+	public function getHistoryButton ( $item ) {
+		return Xml::element( 'a',
+			array(
+				'href' => $item->title->getLocalURL( array( 'action' => 'history' ) ),
+				'class' => 'pendingreviews-dark-blue-button'
+			),
+			wfMessage( 'watchanalytics-pendingreviews-history-link' )->text()
+		);
+	}
+	
+	/*
+	http://localhost/wiki/eva/api.php?
+	
+	action=setnotificationtimestamp
+	
+	&titles=ORU%20Temporary%20Stowage%20Device
+	
+	&format=jsonfm
+	
+	&token=ef93a5946cdd798274990bc31d804625%2B%5C
+	*/
+	public function getMarkDeleteReviewedButton ( $titleText, $namespace ) {
+		global $wgTitle;
+		
+		
+		return Xml::element( 'a',
+			array(
+				'href' => $this->getTitle()->getLocalURL( array( 
+					'clearNotificationTitle' => $titleText,
+					'clearNotificationNS' => $namespace,
+				) ),
+				'class' => 'pendingreviews-red-button pendingreviews-accept-deletion',
+				'pending-namespace' => $namespace,
+				'pending-title' => $titleText,
+			),
+			wfMessage( 'pendingreviews-accept-deletion' )->text()
+		);
+	}
+	
+	public function getDeleterTalkButton ( $deletionLog ) {
+
+		// echo "<pre>" . print_r($deletionLog, true) . "</pre>"; return '';
+		$userId = $deletionLog[ count( $deletionLog ) - 1 ]->log_user;
+		$user = User::newFromId( $userId );
+
+
+		$userTalk = $user->getTalkPage();
+		
+		if ( $userTalk->exists() ) {
+			$talkQueryString = array();
+		}
+		else {
+			$talkQueryString = array( 'action' => 'edit' );
+		}
+		
+		return Xml::element( 'a',
+			array(
+				'href' => $userTalk->getLocalURL( $talkQueryString ),
+				'class' => 'pendingreviews-dark-blue-button' // pendingreviews-delete-talk-button
+			),
+			wfMessage( 'pendingreviews-page-deleted-talk', $user->getUserPage()->getFullText() )->text()
+		);
+	}
+	
+	public function getPageHeader() {
+		// message like "You have X pending reviews"
+		$html = '<p>' . wfMessage( 'pendingreviews-num-reviews', count( $this->pendingReviewList ) )->text();
+		
+		// message like "showing the oldest Y reviews"
+		if ( count( $this->pendingReviewList ) > $this->reviewLimit ) {
+			$html .= ' ' . wfMessage( 'pendingreviews-num-shown', $this->reviewLimit )->text();
+		}
+		
+		// close out header
+		$html .= '</p>';
+		
+		return $html;
 	}
 	
 	protected function combineLogAndChanges( $log, $revisions, $title ) {
@@ -303,6 +383,60 @@ class SpecialPendingReviews extends SpecialPage {
 		}
 
 	}
+	
+	public function getReviewTimeDiff ( $item ) {	
+			
+		$ts = new MWTimestamp( $item->notificationTimestamp );
+		$displayTime = '<small>' . $ts->getHumanTimestamp( new MWTimestamp() ) . '</small>';
 
+		$timeDiff = $ts->diff( new MWTimestamp() );
+		if ( $timeDiff->days > 0 ) {
+			$timeDiff = wfMessage( 'pendingreviews-timediff-days', $timeDiff->format( '%a' ) );
+		}
+		else if ( $timeDiff->h > 0 ) {
+			$timeDiff = wfMessage( 'pendingreviews-timediff-hours', $timeDiff->format( '%h' ) );
+		}
+		else if ( $timeDiff->i > 0 ) {
+			$timeDiff = wfMessage( 'pendingreviews-timediff-minutes', $timeDiff->format( '%i' ) );
+		}
+		else {
+			$timeDiff = wfMessage( 'pendingreviews-timediff-just-now' )->text();
+		}
+		
+		return $timeDiff;
+	}
+
+	public function getPendingReviewChangesList ( $combinedList ) {
+		$changes = array();
+		foreach ( $combinedList as $change ) {
+			if ( isset( $change->log_timestamp ) ) {
+				$changeTs = $change->log_timestamp;
+				$changeText = $this->getLogChangeMessage( $change );
+			}
+			else {
+				$rev = Revision::newFromRow( $change );
+				$changeTs = $change->rev_timestamp;
+				$userPage = Title::makeTitle( NS_USER , $change->rev_user_text )->getFullText();
+
+				$changeText = wfMessage( 'pendingreviews-edited-by', $userPage )->parse();
+				$comment = $rev->getComment();
+				if ( $comment ) {
+					$changeText .= ' ' . wfMessage( 'pendingreviews-with-comment', $comment)->text();
+				}
+			}
+
+			$changeTs = Xml::element( 'span',
+				array( 'class' => 'pendingreviews-changes-list-time' ),
+				( new MWTimestamp( $changeTs ) )->getHumanTimestamp()
+			) . ' ';
+
+			$changes[] = $changeTs . $changeText;
+		}
+		
+		$changes = '<ul><li>' . implode( '</li><li>', $changes ) . '</li></ul>';
+		
+		return $changes;
+	}
+	
 }
 

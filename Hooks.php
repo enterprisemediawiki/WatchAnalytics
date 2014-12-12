@@ -28,7 +28,7 @@ class WatchAnalyticsHooks {
 		// NOTE: $wgOut->addModules() does not appear to work here, so 
 		// the onBeforePageDisplay() method was created below.
 		
-		$watchStats = $user->watchStats;
+		$watchStats = $user->watchStats; // set in onBeforePageDisplay() hook
 		
 		$numPending = $watchStats['num_pending'];
 		

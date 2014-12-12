@@ -97,3 +97,31 @@ ORDER BY
 	unique_hits DESC
 LIMIT 20;
 ```
+
+Counting reviews required per day
+---------------------------------
+
+```sql
+SELECT user_id from user where user_name = "Athomaso";
+
+
+
+SELECT
+	SUBSTR( r.rev_timestamp, 1, 8 ) AS rev_date,
+	COUNT( DISTINCT( CONCAT( p.page_namespace, ':', p.page_title ) ) ) AS revised_pages,
+	COUNT( * ) AS total_revisions
+FROM revision AS r
+LEFT JOIN page AS p ON
+	r.rev_page = p.page_id
+INNER JOIN watchlist AS w ON
+	p.page_namespace = w.wl_namespace
+	AND p.page_title = w.wl_title
+	AND w.wl_user = 2
+WHERE
+	r.rev_timestamp > 20140601000000
+GROUP BY
+	rev_date
+ORDER BY
+	rev_date DESC
+LIMIT 100000;
+```

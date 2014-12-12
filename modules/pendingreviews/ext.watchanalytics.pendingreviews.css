@@ -80,21 +80,53 @@ td.pendingreviews-review-links a:hover {
 	text-decoration: none;
 }
 
-.pendingreviews-hist-button {
+.pendingreviews-dark-blue-button {
 	background-color: #347BFF;
 	border-color: #347BFF;
 }
-.pendingreviews-hist-button:hover {
+.pendingreviews-dark-blue-button:hover {
 	background-color: #2456B3;
 	border-color: #347BFF;
 }
 
-.pendingreviews-diff-button {
+.pendingreviews-green-button {
 	background-color: #5cb85c;
 	border-color: #4cae4c;
 }
 
-.pendingreviews-diff-button:hover {
+.pendingreviews-green-button:hover {
 	background-color: #449d44;
 	border-color: #398439;
+}
+
+.pendingreviews-light-blue-button {
+	background-color: #5bc0de;
+	border-color: #46b8da;
+}
+
+.pendingreviews-light-blue-button:hover {
+	background-color: #31b0d5;
+	border-color: #269abc;
+}
+
+/* NOT USING THESE now? 
+This is bootstrap's orange button 
+.pendingreviews-orange-button {
+	background-color: #ec971f;
+	border-color: #d58512;
+}
+
+.pendingreviews-orange-button:hover {
+	background-color: #ec971f;
+	border-color: #d58512;
+}
+*/
+
+.pendingreviews-red-button {
+	background-color: #d9534f;
+	border-color: #d43f3a;
+}
+.pendingreviews-red-button:hover {
+	background-color: #c9302c;
+	border-color: #ac2925;
 }

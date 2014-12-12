@@ -1,8 +1,8 @@
 # MediaWiki-WatchAnalytics
 
-Extension:WatchAnalytics
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/jamesmontalvo3/WatchAnalytics/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/jamesmontalvo3/WatchAnalytics/?branch=master)
 
-Used to determine how well pages are watched on a wiki
+Extension:WatchAnalytics is used to determine how well pages are watched on a wiki
  
 ## Special Pages
 
