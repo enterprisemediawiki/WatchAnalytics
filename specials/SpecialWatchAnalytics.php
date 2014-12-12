@@ -38,8 +38,14 @@ class SpecialWatchAnalytics extends SpecialPage {
 		}
 		
 		$filters = array(
-			'groupfilter' => $wgRequest->getVal( 'groupfilter', false ),
+			'groupfilter'    => $wgRequest->getVal( 'groupfilter', '' ),
+			'categoryfilter' => $wgRequest->getVal( 'categoryfilter', '' ),
 		);
+		foreach( $filters as &$filter ) {
+			if ( $filter === '' ) {
+				$filter = false;
+			}
+		}
 		
 		$wgOut->addHTML( $this->getPageHeader() );
 		if ($this->mMode == 'users') {

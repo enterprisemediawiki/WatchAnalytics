@@ -116,4 +116,11 @@ class WatchesQuery {
 			$this->userGroupFilter = $ugf;
 		}
 	}
+
+	public function setCategoryFilter ( $cf ) {
+		if ( $cf ) {
+			$this->categoryFilter = $cf;
+		}
+	}
+	
 }

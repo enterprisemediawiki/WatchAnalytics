@@ -15,6 +15,12 @@ abstract class WatchAnalyticsTablePager extends TablePager {
 				trim( $filters['groupfilter'] )
 			);
 		}
+
+		if ( $filters['categoryfilter'] ) {
+			$this->watchQuery->setCategoryFilter(
+				trim( $filters['categoryfilter'] )
+			);
+		}
 		
 		// $this->mIndexField = 'am_title';
 		// $this->mPage = $page;
@@ -179,9 +185,9 @@ abstract class WatchAnalyticsTablePager extends TablePager {
 	public function buildForm() {
 		global $wgScript;
 
-		$groupFilter = new XmlSelect( 'groupfilter', false, $this->filters['groupfilter'] );
+		// user group filter
+		$groups = array( $this->msg( 'watchanalytics-user-group-no-filter' )->text() => '');
 		$rawGroups = User::getAllGroups();
-		$groups = array();
 		foreach( $rawGroups as $group ) {
 			$labelMsg = $this->msg( 'group-' . $group );
 			if ( $labelMsg->exists() ) {
@@ -192,8 +198,27 @@ abstract class WatchAnalyticsTablePager extends TablePager {
 			}
 			$groups[ $label ] = $group;
 		}
+		$groupFilter = new XmlSelect( 'groupfilter', false, $this->filters['groupfilter'] );
 		$groupFilter->addOptions( $groups );
 
+		// category filter
+		$dbr = wfGetDB( DB_SLAVE );
+		$result = $dbr->select(
+			'categorylinks',
+			'cl_to',
+			'',
+			__METHOD__,
+			array( 'DISTINCT' )
+		);
+		$categories = array( $this->msg( 'watchanalytics-category-no-filter' )->text() => '');
+		while ( $row = $result->fetchRow() ) {
+			$category = Category::newFromName( $row['cl_to'] );
+			$label = $category->getTitle()->getText();
+			
+			$categories[ $label ] = $row['cl_to'];
+		}
+		$categoryFilter = new XmlSelect( 'categoryfilter', false, $this->filters['categoryfilter'] );
+		$categoryFilter->addOptions( $categories );
 		
 		$out = 
 			// create the form element
@@ -222,6 +247,18 @@ abstract class WatchAnalyticsTablePager extends TablePager {
 			'</td>
 			</tr>' .
 
+			// filter results by page category
+			'<tr>
+				<td class="mw-label">' .
+			Xml::label(
+				$this->msg( 'watchanalytics-category-filter-label' )->text(),
+				'ext-watchanalytics-category-filter'
+			) .
+			'</td>
+			<td class="mw-input">' .
+			$categoryFilter->getHTML() .
+			'</td>
+			</tr>' .
 			
 			// limit results returned
 			'<tr>
@@ -246,7 +283,7 @@ abstract class WatchAnalyticsTablePager extends TablePager {
 			
 			// FIXME: are all of these needed? are additional need to support
 			// WatchAnalytics fields?
-			$this->getHiddenFields( array( 'title', 'prefix', 'filter', 'lang', 'limit', 'groupfilter' ) ) .
+			$this->getHiddenFields( array( 'title', 'prefix', 'filter', 'lang', 'limit', 'groupfilter', 'categoryfilter' ) ) .
 			
 			// close fieldset and form elements
 			Xml::closeElement( 'fieldset' ) .

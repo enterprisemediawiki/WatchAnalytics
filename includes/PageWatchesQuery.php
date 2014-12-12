@@ -60,7 +60,7 @@ class PageWatchesQuery extends WatchesQuery {
 			$this->sqlAvgPendingMins,
 		);
 
-		$this->conds = $conds ? $conds : array();
+		$this->conds = $conds ? $conds : array( 'p.page_namespace IS NOT NULL' );
 	
 		$this->tables = array( 'w' => 'watchlist' );
 	
@@ -80,6 +80,13 @@ class PageWatchesQuery extends WatchesQuery {
 			'RIGHT JOIN', 'p.page_namespace=w.wl_namespace AND p.page_title=w.wl_title'
 		);
 
+		// optionally join the 'categorylinks' table to filter by page category
+		if ( $this->categoryFilter ) {
+			$this->tables['cat'] = 'categorylinks';
+			$this->join_conds['cat'] = array(
+				'RIGHT JOIN', "cat.cl_from = p.page_id AND cat.cl_to = \"{$this->categoryFilter}\""
+			);
+		}
 		
 		$this->options = array(
 			// 'GROUP BY' => 'w.wl_title, w.wl_namespace'
