@@ -42,6 +42,7 @@ class WatchesQuery {
 	public $join_conds;
 	public $conds;
 	public $options;
+	protected $userGroupFilter = false;
 
 	
 	public function __construct () {
@@ -110,4 +111,7 @@ class WatchesQuery {
 
 	}
 
+	public function setUserGroupFilter ( $ugf ) {
+		$this->userGroupFilter = $ugf;
+	}
 }

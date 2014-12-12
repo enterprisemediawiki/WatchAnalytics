@@ -146,7 +146,7 @@ class SpecialWatchAnalytics extends SpecialPage {
 		
 		// $form = $pager->getForm();
 		$body = $pager->getBody();
-		$html = '';
+		$html = ''; // FIXME: make a <SELECT> using User::getAllGroups()
 		// $html = $form;
 		if ( $body ) {
 			$html .= $pager->getNavigationBar();

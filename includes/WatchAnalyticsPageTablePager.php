@@ -12,11 +12,17 @@ class WatchAnalyticsPageTablePager extends WatchAnalyticsTablePager {
 	);
 
 	function __construct( $page, $conds ) {
+		global $wgRequest;
+
 		$this->watchQuery = new PageWatchesQuery();
 
+		if ( $wgRequest->getVal( 'groupfilter' ) ) {
+			$this->watchQuery->setUserGroupFilter(
+				trim( $wgRequest->getVal( 'groupfilter' ) )
+			);
+		}
+		
 		parent::__construct( $page , $conds );
-
-		global $wgRequest;
 
 		$sortField = $wgRequest->getVal( 'sort' );
 		$this->mQueryNamespace = $wgRequest->getVal( 'ns' );

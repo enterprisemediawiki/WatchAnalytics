@@ -39,7 +39,7 @@ class PageWatchesQuery extends WatchesQuery {
 	public $sqlNumWatches = 'SUM( IF(w.wl_title IS NOT NULL, 1, 0) ) AS num_watches';
 	public $sqlNumReviewed = 'SUM( IF(w.wl_title IS NOT NULL AND w.wl_notificationtimestamp IS NULL, 1, 0) ) AS num_reviewed';
 	public $sqlPercentPending = 'SUM( IF(w.wl_title IS NOT NULL AND w.wl_notificationtimestamp IS NULL, 0, 1) ) * 100 / COUNT(*) AS percent_pending';
-
+	
 	protected $fieldNames = array(
 		'page_ns_and_title'       => 'watchanalytics-special-header-page-title',
 		'num_watches'             => 'watchanalytics-special-header-watches',
@@ -51,11 +51,6 @@ class PageWatchesQuery extends WatchesQuery {
 
 	function getQueryInfo( $conds = null ) {
 	
-		$this->tables = array(
-			'w' => 'watchlist',
-			'p' => 'page',
-		);
-
 		$this->fields = array(
 			$this->sqlNsAndTitle,
 			$this->sqlNumWatches,
@@ -66,11 +61,22 @@ class PageWatchesQuery extends WatchesQuery {
 		);
 
 		$this->conds = $conds ? $conds : array();
+	
+		$this->tables = array( 'w' => 'watchlist' );
+	
+		$this->join_conds = array();
 		
-		$this->join_conds = array(
-			'p' => array(
-				'RIGHT JOIN', 'p.page_namespace=w.wl_namespace AND p.page_title=w.wl_title'
-			),
+		if ( $this->userGroupFilter ) {
+			$this->tables['ug'] = 'user_groups';
+			$this->join_conds['ug'] = array(
+				'RIGHT JOIN', "w.wl_user = ug.ug_user AND ug.ug_group = \"{$this->userGroupFilter}\""
+			);
+		}
+
+		$this->tables['p'] = 'page';
+		
+		$this->join_conds['p'] = array(
+			'RIGHT JOIN', 'p.page_namespace=w.wl_namespace AND p.page_title=w.wl_title'
 		);
 
 		$this->options = array(
@@ -81,5 +87,5 @@ class PageWatchesQuery extends WatchesQuery {
 		return parent::getQueryInfo();
 
 	}
-
+	
 }
