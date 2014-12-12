@@ -11,18 +11,12 @@ class WatchAnalyticsPageTablePager extends WatchAnalyticsTablePager {
 		'avg_pending_minutes' => true,
 	);
 
-	function __construct( $page, $conds ) {
+	function __construct( $page, $conds, $filters=array() ) {
 		global $wgRequest;
 
 		$this->watchQuery = new PageWatchesQuery();
 
-		if ( $wgRequest->getVal( 'groupfilter' ) ) {
-			$this->watchQuery->setUserGroupFilter(
-				trim( $wgRequest->getVal( 'groupfilter' ) )
-			);
-		}
-		
-		parent::__construct( $page , $conds );
+		parent::__construct( $page, $conds, $filters );
 
 		$sortField = $wgRequest->getVal( 'sort' );
 		$this->mQueryNamespace = $wgRequest->getVal( 'ns' );

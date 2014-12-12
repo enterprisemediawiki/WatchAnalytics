@@ -37,6 +37,10 @@ class SpecialWatchAnalytics extends SpecialPage {
 			$wgOut->addHTML( '<p>' . wfMessage('watchanalytics-all-wiki-stats-recorded')->text() . '</p>' );
 		}
 		
+		$filters = array(
+			'groupfilter' => $wgRequest->getVal( 'groupfilter', false ),
+		);
+		
 		$wgOut->addHTML( $this->getPageHeader() );
 		if ($this->mMode == 'users') {
 			$this->usersList();
@@ -48,7 +52,7 @@ class SpecialWatchAnalytics extends SpecialPage {
 			$this->forceGraph();
 		}
 		else {
-			$this->pagesList();
+			$this->pagesList( $filters );
 		}
 	}
 	
@@ -137,18 +141,19 @@ class SpecialWatchAnalytics extends SpecialPage {
 
 	}
 	
-	public function pagesList () {
+	public function pagesList ( $filters ) {
 		global $wgOut, $wgRequest;
 
 		$wgOut->setPageTitle( wfMessage( 'watchanalytics-special-pages-pagetitle' )->text() );
 
-		$pager = new WatchAnalyticsPageTablePager( $this, array() );
+		$pager = new WatchAnalyticsPageTablePager( $this, array(), $filters );
 		
 		// $form = $pager->getForm();
 		$body = $pager->getBody();
 		$html = ''; // FIXME: make a <SELECT> using User::getAllGroups()
 		// $html = $form;
 		if ( $body ) {
+			$html .= $pager->buildForm();
 			$html .= $pager->getNavigationBar();
 			$html .= $body;
 			$html .= $pager->getNavigationBar();

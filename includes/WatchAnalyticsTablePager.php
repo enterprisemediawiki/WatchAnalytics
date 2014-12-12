@@ -2,12 +2,19 @@
 
 abstract class WatchAnalyticsTablePager extends TablePager {
 	
-	function __construct( $page, $conds ) {
+	function __construct( $page, $conds, $filters=array() ) {
 		$this->page = $page;
 		$this->limit = $page->limit;
 		$this->offset = $page->offset;
 		$this->conds = $conds;
+		$this->filters = $filters;
 		$this->mDefaultDirection = true;
+				
+		if ( $filters['groupfilter'] ) {
+			$this->watchQuery->setUserGroupFilter(
+				trim( $filters['groupfilter'] )
+			);
+		}
 		
 		// $this->mIndexField = 'am_title';
 		// $this->mPage = $page;
@@ -158,5 +165,93 @@ abstract class WatchAnalyticsTablePager extends TablePager {
 			// 'first' => $first,
 			// 'last' => $last
 		// );
+	}
+	
+
+	/**
+	 * Creates form to filter Watch Analytics results (e.g. by user group or
+	 * page category).
+	 * 
+	 * FIXME: this is the ugly method taken from SpecialAllmessages...I'm
+	 * hoping MW has a better way (templating engine?) to do this now than it
+	 * did when SpecialAllmessages was created...
+	 */
+	public function buildForm() {
+		global $wgScript;
+
+		$groupFilter = new XmlSelect( 'groupfilter', false, $this->filters['groupfilter'] );
+		$rawGroups = User::getAllGroups();
+		$groups = array();
+		foreach( $rawGroups as $group ) {
+			$labelMsg = $this->msg( 'group-' . $group );
+			if ( $labelMsg->exists() ) {
+				$label = $labelMsg->text();
+			}
+			else {
+				$label = $group;
+			}
+			$groups[ $label ] = $group;
+		}
+		$groupFilter->addOptions( $groups );
+
+		
+		$out = 
+			// create the form element
+			Xml::openElement( 'form', array( 'method' => 'get', 'action' => $wgScript, 'id' => 'ext-watchanalytics-form' ) ) .
+			
+			// create fieldset
+			Xml::fieldset( $this->msg( 'allmessages-filter-legend' )->text() ) .
+			
+			// create hidden <input> showing page name (Special:WatchAnalytics)
+			Html::hidden( 'title', $this->getTitle()->getPrefixedText() ) .
+			
+			// create table for form elements
+			Xml::openElement( 'table', array( 'class' => 'ext-watchanalytics-stats-filter-table' ) ) . "\n" .
+			
+			
+			// filter results by user group
+			'<tr>
+				<td class="mw-label">' .
+			Xml::label(
+				$this->msg( 'watchanalytics-user-group-filter-label' )->text(),
+				'ext-watchanalytics-user-group-filter'
+			) .
+			'</td>
+			<td class="mw-input">' .
+			$groupFilter->getHTML() .
+			'</td>
+			</tr>' .
+
+			
+			// limit results returned
+			'<tr>
+				<td class="mw-label">' .
+			Xml::label( $this->msg( 'table_pager_limit_label' )->text(), 'mw-table_pager_limit_label' ) .
+			'</td>
+			<td class="mw-input">' .
+			$this->getLimitSelect() .
+			'</td>
+			</tr>' .
+			
+			// submit button
+			'<tr>
+				<td></td>
+				<td>' .
+			Xml::submitButton( $this->msg( 'allmessages-filter-submit' )->text() ) .
+			"</td>\n
+			</tr>" .
+
+			// close out table element
+			Xml::closeElement( 'table' ) .
+			
+			// FIXME: are all of these needed? are additional need to support
+			// WatchAnalytics fields?
+			$this->getHiddenFields( array( 'title', 'prefix', 'filter', 'lang', 'limit', 'groupfilter' ) ) .
+			
+			// close fieldset and form elements
+			Xml::closeElement( 'fieldset' ) .
+			Xml::closeElement( 'form' );
+			
+		return $out;
 	}
 }

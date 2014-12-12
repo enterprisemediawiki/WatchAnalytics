@@ -66,6 +66,7 @@ class PageWatchesQuery extends WatchesQuery {
 	
 		$this->join_conds = array();
 		
+		// optionally join the 'user_groups' table to filter by user group
 		if ( $this->userGroupFilter ) {
 			$this->tables['ug'] = 'user_groups';
 			$this->join_conds['ug'] = array(
@@ -73,12 +74,13 @@ class PageWatchesQuery extends WatchesQuery {
 			);
 		}
 
+		// JOIN 'page' table
 		$this->tables['p'] = 'page';
-		
 		$this->join_conds['p'] = array(
 			'RIGHT JOIN', 'p.page_namespace=w.wl_namespace AND p.page_title=w.wl_title'
 		);
 
+		
 		$this->options = array(
 			// 'GROUP BY' => 'w.wl_title, w.wl_namespace'
 			'GROUP BY' => 'p.page_title, p.page_namespace',

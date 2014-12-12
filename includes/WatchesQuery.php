@@ -112,6 +112,8 @@ class WatchesQuery {
 	}
 
 	public function setUserGroupFilter ( $ugf ) {
-		$this->userGroupFilter = $ugf;
+		if ( $ugf ) {
+			$this->userGroupFilter = $ugf;
+		}
 	}
 }
