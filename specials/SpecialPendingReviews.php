@@ -11,18 +11,34 @@ class SpecialPendingReviews extends SpecialPage {
 
 
 	public function __construct() {
-		parent::__construct( 
+		parent::__construct(
 			"PendingReviews", // 
 			"",  // rights required to view
 			true // show in Special:SpecialPages
 		);
 	}
 	
+	/**
+	 * Main function for generating special page.
+	 *
+	 * First checks if this request is to clear a notification timestamp for a
+	 * particular NS/title. If so, clear the notification then generate a
+	 * simple response message and return
+	 *
+	 * Otherwise generates the special page.
+	 *
+	 * Generally this special page is only for the current user ($wgUser) to
+	 * see their own pending reviews, but by setting the 'user' param in the
+	 * query string it is possible to view others' Pending Reviews. FIXME: When
+	 * this extension is "released" this function should be limited only to
+	 * people with a special right.
+	 */
 	function execute( $parser = null ) {
 		global $wgRequest, $wgOut, $wgUser;
 
 		$this->setHeaders();
 
+		// check if the request is to clear a notification timestamp
 		$clearNotifyTitle = $wgRequest->getVal( 'clearNotificationTitle' );
 		if ( $clearNotifyTitle ) {
 			$clearNotifyNS = $wgRequest->getVal( 'clearNotificationNS' );
@@ -49,9 +65,9 @@ class SpecialPendingReviews extends SpecialPage {
 			);
 			
 			return true;
-			
 		}
 		
+		// Check if a user has been specified.
 		$requestUser = $wgRequest->getVal( 'user' );		
 		if ( $requestUser ) {
 			$this->mUser = User::newFromName( $requestUser );
@@ -68,31 +84,32 @@ class SpecialPendingReviews extends SpecialPage {
 			$this->mUser = $wgUser;
 		}
 
-
+		// add pending reviews JS/CSS
 		$wgOut->addModules( 'ext.watchanalytics.pendingreviews' );
 
 		// load styles for watch analytics special pages
 		$wgOut->addModuleStyles( array(
 			'ext.watchanalytics.specials',
-			'ext.watchanalytics.pendingreviews', // redundant?
+			'ext.watchanalytics.pendingreviews', // FIXME:redundant?
 		) );
 
-
-		$this->reviewLimit = 20;
-
+		// how many reviews to display
+		if( $wgRequest->getVal( 'limit' ) ) {
+			$this->reviewLimit = $wgRequest->getVal( 'limit' ); //FIXME: for consistency, shouldn't this be just "limit"
+		}
+		else {
+			$this->reviewLimit = 20;		
+		}
+		
 		//FIXME: is this using a limit?
 		$this->pendingReviewList = PendingReview::getPendingReviewsList( $this->mUser );
 
 		$html = $this->getPageHeader();
-
-		// $html .= '<pre>' . print_r( $this->pendingReviewList , true ) . '</pre>';
-		// $wgOut->addHTML( $html );
-		// return true;
-
 		
 		$html .= '<table class="pendingreviews-list">';
 		$rowCount = 0;
-				
+	
+		// loop through pending reviews
 		foreach ( $this->pendingReviewList as $item ) {
 			if ( $rowCount >= $this->reviewLimit ) {
 				break;
@@ -104,6 +121,8 @@ class SpecialPendingReviews extends SpecialPage {
 			//   * isNewPage
 			//   * files, approvals ... other log actions?
 
+			// if the title exists, then the page exists (and hence it has not
+			// been deleted)
 			if ( $item->title ) {
 			
 				$combinedList = $this->combineLogAndChanges( $item->log, $item->newRevisions, $item->title );
@@ -126,6 +145,7 @@ class SpecialPendingReviews extends SpecialPage {
 				$html .= "<tr $classAndAttr><td colspan='2' class='pendingreviews-bottom-cell'>$changes</td></tr>";
 		
 			}
+			// page has been deleted (or moved w/o a redirect)
 			else {
 			
 				$changes = '';				
@@ -376,7 +396,11 @@ class SpecialPendingReviews extends SpecialPage {
 		$userPage = Title::makeTitle( NS_USER , $logEntry->log_user_text )->getFullText();
 
 		if ( isset( $messages[ $logEntry->log_type ][ $logEntry->log_action ] ) ) {
-			return wfMessage( $messages[ $logEntry->log_type ][ $logEntry->log_action ], $userPage );
+			$messageParams = array( $userPage );
+			if ( $logEntry->log_action == 'move' || $logEntry->log_action == 'move_redir' ) {
+				$messageParams[] = PendingReview::getMoveTarget( $logEntry->log_params );
+			}
+			return wfMessage( $messages[ $logEntry->log_type ][ $logEntry->log_action ], $messageParams );
 		}
 		else {
 			return wfMessage( 'pendingreviews-log-unknown-change', $userPage );
@@ -418,10 +442,13 @@ class SpecialPendingReviews extends SpecialPage {
 				$changeTs = $change->rev_timestamp;
 				$userPage = Title::makeTitle( NS_USER , $change->rev_user_text )->getFullText();
 
-				$changeText = wfMessage( 'pendingreviews-edited-by', $userPage )->parse();
 				$comment = $rev->getComment();
 				if ( $comment ) {
-					$changeText .= ' ' . wfMessage( 'pendingreviews-with-comment', $comment)->text();
+					$comment = '<nowiki>' . htmlspecialchars($comment) . "</nowiki>";
+					$changeText = ' ' . wfMessage( 'pendingreviews-with-comment', array( $userPage, $comment ) )->parse();
+				}
+				else {
+					$changeText = ' ' . wfMessage( 'pendingreviews-edited-by', $userPage )->parse();
 				}
 			}
 

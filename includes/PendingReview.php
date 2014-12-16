@@ -105,7 +105,6 @@ class PendingReview {
 			$deletionLog = $this->getDeletionLog( $deletedTitle, $deletedNS, $notificationTimestamp );
 			$logPending = false;
 			$revsPending = false;
-			
 		}
 
 		
@@ -152,6 +151,7 @@ class PendingReview {
 
 		$fields = array(
 			'p.page_id AS page_id',
+			'log.log_action AS log_action',
 			'w.wl_namespace AS namespace',
 			'w.wl_title AS title',
 			'w.wl_notificationtimestamp AS notificationtimestamp',
@@ -174,7 +174,7 @@ class PendingReview {
 				. ' AND log.log_title = w.wl_title'
 				. ' AND p.page_namespace IS NULL'
 				. ' AND p.page_title IS NULL'
-				. ' AND log.log_action = "delete"'
+				. ' AND log.log_action IN ("delete","move")'
 			),
 		);
 
@@ -207,11 +207,13 @@ class PendingReview {
 		
 		$title = $dbr->addQuotes( $title );
 
+		// pages are deleted when (a) they are explicitly deleted or (b) they
+		// are moved without leaving a redirect behind.
 		$logResults = $dbr->select(
 			array( 'l' => 'logging' ),
 			array( '*' ),
 			"l.log_title=$title AND l.log_namespace=$ns AND l.log_timestamp>=$notificationTimestamp 
-				AND l.log_type = 'delete'",
+				AND l.log_type IN ('delete','move')",
 			__METHOD__,
 			array( 'ORDER BY' => 'log_timestamp ASC' ),
 			null
@@ -222,5 +224,34 @@ class PendingReview {
 		}
 
 		return $logDeletes;
+	}
+
+
+	/**
+	 * FIXME: This was copied from LogEntry::getParameters() because
+	 * I couldn't find a cleaner way to do it.
+	 *
+	 * var $logParams is the content of the column log_params in the logging table
+	 */
+	public static function getMoveTarget ( $logParams ) {
+		
+		wfSuppressWarnings();
+		$unserializedParams = unserialize( $logParams );
+		wfRestoreWarnings();
+		if ( $unserializedParams !== false ) {
+			$moveLogParams = $unserializedParams;
+			// $this->legacy = false;
+
+			// for some reason this serialized array is in the form:
+			// Array( "4::target" => FULLPAGENAME, "5::noredir" => 1 )
+			return $moveLogParams[ '4::target' ];
+
+		} else {
+			$moveLogParams = $logParams === '' ? array() : explode( "\n", $logParams );
+			// $this->legacy = true;
+
+			return $moveLogParams[0];
+		}
+		
 	}
 }

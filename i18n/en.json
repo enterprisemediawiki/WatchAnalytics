@@ -61,9 +61,9 @@
 	"pendingreviews-num-reviews": "You have $1 pending {{PLURAL:$1|review|reviews}}.",
 	"pendingreviews-num-shown": "Showing the oldest {{PLURAL:$1|review|$1 reviews}}.",
 	"watchanalytics-view-user-pendingreviews": "pending reviews",
-	
-	"pendingreviews-with-comment":         "with comment: ''$1''",
+
 	"pendingreviews-edited-by":            "[[$1]] made an edit",
+	"pendingreviews-with-comment":         "[[$1]] made an edit with summary: ''$2''",
 	"pendingreviews-page-deleted":         "Deleted page: $1",
 	"pendingreviews-page-deleted-talk":    "Ask $1 about deletion",
 	"pendingreviews-accept-deletion":      "Accept deletion",
@@ -73,8 +73,8 @@
 	"pendingreviews-log-delete":           "[[$1]] deleted this page",
 	"pendingreviews-log-restore":          "[[$1]] un-deleted this page",
 	"pendingreviews-log-import-upload":    "[[$1]] uploaded this file",
-	"pendingreviews-log-move":             "[[$1]] moved this page",
-	"pendingreviews-log-move-redir":       "[[$1]] moved this page (with redirect?)",
+	"pendingreviews-log-move":             "[[$1]] moved this page to the new title '''[[$2]]'''",
+	"pendingreviews-log-move-redir":       "[[$1]] redirected this page to the new title '''[[$2]]'''",
 	"pendingreviews-log-protect":          "[[$1]] marked this page protected",
 	"pendingreviews-log-unprotect":        "[[$1]] removed protection from this page",
 	"pendingreviews-log-modify-protect":   "[[$1]] modified protection info",
