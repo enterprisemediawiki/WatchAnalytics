@@ -10,13 +10,13 @@ abstract class WatchAnalyticsTablePager extends TablePager {
 		$this->filters = $filters;
 		$this->mDefaultDirection = true;
 				
-		if ( $filters['groupfilter'] ) {
+		if ( isset( $filters['groupfilter'] ) ) {
 			$this->watchQuery->setUserGroupFilter(
 				trim( $filters['groupfilter'] )
 			);
 		}
 
-		if ( $filters['categoryfilter'] ) {
+		if ( isset( $filters['categoryfilter'] ) ) {
 			$this->watchQuery->setCategoryFilter(
 				trim( $filters['categoryfilter'] )
 			);
