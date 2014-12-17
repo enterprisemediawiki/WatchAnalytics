@@ -254,4 +254,35 @@ class PendingReview {
 		}
 		
 	}
+
+	/**
+	 * Clears a pending reviews of a particular page for a particular user.
+	 * 
+	 * @param User $user
+	 * @param Title $title
+	 * @return string HTML for row
+	 */
+	public function clearByUserAndTitle ( $user, $title ) {
+		
+		$watch = WatchedItem::fromUserTitle( $user, $title );
+		$watch->resetNotificationTimestamp();
+		
+		// $wgOut->addHTML(
+		// 	wfMessage(
+		// 		'pendingreviews-clear-page-notification',
+		// 		$title->getFullText(),
+		// 		Xml::tags('a', 
+		// 			array(
+		// 				'href' => $this->getTitle()->getLocalUrl(),
+		// 				'style' => 'font-weight:bold;',
+		// 			), 
+		// 			$this->getTitle() 
+		// 		)
+		// 	)->text()
+		// );
+		
+		return true;
+
+
+	}
 }

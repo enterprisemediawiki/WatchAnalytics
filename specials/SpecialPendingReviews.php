@@ -68,78 +68,60 @@ class SpecialPendingReviews extends SpecialPage {
 	 * this extension is "released" this function should be limited only to
 	 * people with a special right.
 	 * 
+	 * Useful Title functions:
+	 * -----------------------
+	 *   getAuthorsBetween
+	 *   countAuthorsBetwee
+	 *   countRevisionsBetween
+	 *   exists
+	 *   getEditNotices
+	 *   getInternalURL - getLinkURL - getLocalURL
+	 *   getFullURL
+	 *   getFullText - getPrefixedText
+	 *   getLatestRevID
+	 *   getLength
+	 *   getNextRevisionID
+	 *   getNotificationTimestamp
+	 *   isDeleted (returns num deleted revs) --AND-- isDeletedQuick (returns bool)
+	 *   isNewPage
+	 *   isRedirect
+	 *
 	 * @todo FIXME: break sections out into smaller functions - namely HTML writing (HTML templates?x)
-	 * 
+	 * @todo FIXME: need logic for: isRedirect, isDeleted, isNewPage, 
+	 * and files, approvals ... other log actions?
+	 * @todo FIXME: improve documentation above
 	 * @param Parser|null $parser
 	 * @return bool
 	 */
 	function execute( $parser = null ) {
-		global $wgRequest, $wgOut, $wgUser;
+		global $wgOut, $wgUser;
 
 		$this->setHeaders();
 
 		// check if the request is to clear a notification timestamp
-		$clearNotifyTitle = $wgRequest->getVal( 'clearNotificationTitle' );
+		$clearNotifyTitle = $this->getClearNotificationTitle();
 		if ( $clearNotifyTitle ) {
-			$clearNotifyNS = $wgRequest->getVal( 'clearNotificationNS' );
-			if ( ! $clearNotifyNS ) {
-				$clearNotifyNS = 0;
-			}
-			
-			$title = Title::newFromText( $clearNotifyTitle, $clearNotifyNS );
-			$watch = WatchedItem::fromUserTitle( $wgUser, $title );
-			$watch->resetNotificationTimestamp();
-			
-			$wgOut->addHTML(
-				wfMessage(
-					'pendingreviews-clear-page-notification',
-					$title->getFullText(),
-					Xml::tags('a', 
-						array(
-							'href' => $this->getTitle()->getLocalUrl(),
-							'style' => 'font-weight:bold;',
-						), 
-						$this->getTitle() 
-					)
-				)->text()
-			);
-			
+			$this->handleClearNotification( $clearNotifyTitle );			
 			return true;
 		}
-		
-		// Check if a user has been specified.
-		$requestUser = $wgRequest->getVal( 'user' );		
-		if ( $requestUser ) {
-			$this->mUser = User::newFromName( $requestUser );
-			if ( $this->mUser->getId() === $wgUser->getId() ) {
-				$this->mUserIsViewer = true;
-			}
-			else {
-				$this->mUserIsViewer = false;
-			}
-			$wgOut->setPageTitle( wfMessage( 'pendingreviews-user-page', $this->mUser->getName() )->text() );
 
-		}
-		else {
-			$this->mUser = $wgUser;
-		}
+		// sets user reviews to be displayed (if different from viewing user)
+		$this->setPendingReviewsUser();
 
-		// add pending reviews JS/CSS
+		// add pending reviews JS (and CSS, but need to explicitly call it below)
 		$wgOut->addModules( 'ext.watchanalytics.pendingreviews' );
 
 		// load styles for watch analytics special pages
+		// Note: doing $out->addModules( ... ) instead of the two separate
+		// functions causes the CSS to load later, which makes the page styles
+		// apply late. This looks bad.
 		$wgOut->addModuleStyles( array(
 			'ext.watchanalytics.specials',
-			'ext.watchanalytics.pendingreviews', // FIXME:redundant?
+			'ext.watchanalytics.pendingreviews',
 		) );
 
 		// how many reviews to display
-		if( $wgRequest->getVal( 'limit' ) ) {
-			$this->reviewLimit = $wgRequest->getVal( 'limit' ); //FIXME: for consistency, shouldn't this be just "limit"
-		}
-		else {
-			$this->reviewLimit = 20;		
-		}
+		$this->setReviewLimit();
 		
 		//FIXME: is this using a limit?
 		$this->pendingReviewList = PendingReview::getPendingReviewsList( $this->mUser );
@@ -151,96 +133,187 @@ class SpecialPendingReviews extends SpecialPage {
 	
 		// loop through pending reviews
 		foreach ( $this->pendingReviewList as $item ) {
-			if ( $rowCount >= $this->reviewLimit ) {
-				break;
-			}
 			
-			// logic for:
-			//   * isRedirect
-			//   * isDeleted
-			//   * isNewPage
-			//   * files, approvals ... other log actions?
-
 			// if the title exists, then the page exists (and hence it has not
 			// been deleted)
 			if ( $item->title ) {
-			
-				$combinedList = $this->combineLogAndChanges( $item->log, $item->newRevisions, $item->title );
-				$changes = $this->getPendingReviewChangesList( $combinedList );
-				
-				$reviewButton = $this->getReviewButton( $item );
-
-				$historyButton = $this->getHistoryButton( $item );
-
-				$displayTitle = '<strong>' . $item->title->getFullText() . '</strong>';
-				
-
-				// FIXME: wow this is ugly
-				$rowClass = ( $rowCount % 2 === 0 ) ? 'pendingreviews-even-row' : 'pendingreviews-odd-row';
-				
-				$classAndAttr = "class='pendingreviews-row $rowClass pendingreviews-row-$rowCount' pendingreviews-row-count='$rowCount'";
-
-				$html .= "<tr $classAndAttr><td class='pendingreviews-page-title pendingreviews-top-cell'>$displayTitle</td><td class='pendingreviews-review-links pendingreviews-bottom-cell pendingreviews-top-cell'>$reviewButton $historyButton</td></tr>";
-				
-				$html .= "<tr $classAndAttr><td colspan='2' class='pendingreviews-bottom-cell'>$changes</td></tr>";
-		
+				$html .= $this->getStandardChangeRow( $item, $rowCount );		
 			}
 			// page has been deleted (or moved w/o a redirect)
 			else {
-			
-				$changes = '';				
-				$changes = $this->getPendingReviewChangesList( $item->deletionLog );
-
-				$acceptDeletionButton = $this->getMarkDeleteReviewedButton( $item->deletedTitle, $item->deletedNS );
-
-				$talkToDeleterButton = $this->getDeleterTalkButton( $item->deletionLog );
-
-				$title = Title::makeTitle( $item->deletedNS, $item->deletedTitle );
-				
-				$displayTitle = '<strong>' 
-					. wfMessage( 'pendingreviews-page-deleted', $title->getFullText() )->parse()
-					. '</strong>';
-				
-
-				// FIXME: wow this is ugly
-				$rowClass = ( $rowCount % 2 === 0 ) ? 'pendingreviews-even-row' : 'pendingreviews-odd-row';
-				
-				$classAndAttr = "class='pendingreviews-row $rowClass pendingreviews-row-$rowCount' pendingreviews-row-count='$rowCount'";
-
-				$html .= "<tr $classAndAttr><td class='pendingreviews-page-title pendingreviews-top-cell'>$displayTitle</td><td class='pendingreviews-review-links pendingreviews-bottom-cell pendingreviews-top-cell'>$acceptDeletionButton $talkToDeleterButton</td></tr>";
-				
-				$html .= "<tr $classAndAttr><td colspan='2' class='pendingreviews-bottom-cell'>$changes</td></tr>";
-		
+				$html .= $this->getDeletedPageRow( $item, $rowCount );
 			}
 		
 			$rowCount++;
+			if ( $rowCount >= $this->reviewLimit ) {
+				break;
+			}
+		}
+		$html .= '</table>';
+		$this->getOutput()->addHTML( $html );
+
+		return true;
+	}
+
+	/**
+	 * Handles case where user clicked a link to clear a pending review
+	 * This will not display the pending reviews page.
+	 * 
+	 * @return bool
+	 */
+	public function handleClearNotification ( $clearNotifyTitle ) {
+
+		PendingReview::clearByUserAndTitle( $this->getUser(), $clearNotifyTitle );
+		
+		$wgOut->addHTML(
+			$this->msg(
+				'pendingreviews-clear-page-notification',
+				$clearNotifyTitle->getFullText(),
+				Xml::tags('a', 
+					array(
+						'href' => $this->getTitle()->getLocalUrl(),
+						'style' => 'font-weight:bold;',
+					), 
+					$this->getTitle() 
+				)
+			)->text()
+		);
+
+	}
+
+	/**
+	 * Sending which user's reviews to display
+	 * 
+	 * @return bool
+	 */
+	public function setPendingReviewsUser () {
+
+		$viewingUser = $this->getUser();
+
+		// Check if a user has been specified.
+		$requestUser = $this->getRequest()->getVal( 'user' );		
+		if ( $requestUser ) {
+			$this->mUser = User::newFromName( $requestUser );
+			if ( $this->mUser->getId() === $viewingUser ) {
+				$this->mUserIsViewer = true;
+			}
+			else {
+				$this->mUserIsViewer = false;
+			}
+			$this->getOutput()->setPageTitle( wfMessage( 'pendingreviews-user-page', $this->mUser->getName() )->text() );
+
+		}
+		else {
+			$this->mUser = $viewingUser;
 		}
 
-		// $html .= '</ul>';
-		$html .= '</table>';
+		return true;
+	}
 
-		/*
-		Useful Title functions:
-			* getAuthorsBetween
-			* countAuthorsBetwee
-			* countRevisionsBetween
-			* exists
-			* getEditNotices
-			* getInternalURL - getLinkURL - getLocalURL
-			* getFullURL
-			* getFullText - getPrefixedText
-			* getLatestRevID
-			* getLength
-			* getNextRevisionID
-			* getNotificationTimestamp
-			* isDeleted (returns num deleted revs)
-			  * isDeletedQuick (returns bool)
-			* isNewPage
-			* isRedirect
-		 */
+	/**
+	 * Sets the number of reviews to return
+	 * 
+	 * @return null
+	 */
+	public function setReviewLimit () {
+		if( $this->getRequest()->getVal( 'limit' ) ) {
+			$this->reviewLimit = $this->getRequest()->getVal( 'limit' ); //FIXME: for consistency, shouldn't this be just "limit"
+		}
+		else {
+			$this->reviewLimit = 20;		
+		}
+	}
 
-		$wgOut->addHTML( $html );
+	/**
+	 * Determines if user is attempting to clear a notification and returns
+	 * the appropriate title.
+	 * 
+	 * @return Title
+	 */
+	public function getClearNotificationTitle () {
 
+		$clearNotifyTitle = $this->getRequest()->getVal( 'clearNotificationTitle' );
+
+		if ( ! $clearNotifyTitle ) {
+			return false;
+		}
+
+		$clearNotifyNS = $this->getRequest()->getVal( 'clearNotificationNS' );
+		if ( ! $clearNotifyNS ) {
+			$clearNotifyNS = 0;
+		}
+		
+		$title = Title::newFromText( $clearNotifyTitle, $clearNotifyNS );
+		return $title;
+	}
+
+
+	/**
+	 * Generates row for a particular page in PendingReviews.
+	 * 
+	 * @param PendingReview $item
+	 * @param int $rowCount used to determine if the row is odd or even
+	 * @return string HTML for row
+	 */
+	public function getStandardChangeRow ( PendingReview $item, $rowCount ) {
+		$html = '';
+
+		$combinedList = $this->combineLogAndChanges( $item->log, $item->newRevisions, $item->title );
+		$changes = $this->getPendingReviewChangesList( $combinedList );
+		
+		$reviewButton = $this->getReviewButton( $item );
+
+		$historyButton = $this->getHistoryButton( $item );
+
+		$displayTitle = '<strong>' . $item->title->getFullText() . '</strong>';
+		
+
+		// FIXME: wow this is ugly
+		$rowClass = ( $rowCount % 2 === 0 ) ? 'pendingreviews-even-row' : 'pendingreviews-odd-row';
+		
+		$classAndAttr = "class='pendingreviews-row $rowClass pendingreviews-row-$rowCount' pendingreviews-row-count='$rowCount'";
+
+		$html .= "<tr $classAndAttr><td class='pendingreviews-page-title pendingreviews-top-cell'>$displayTitle</td><td class='pendingreviews-review-links pendingreviews-bottom-cell pendingreviews-top-cell'>$reviewButton $historyButton</td></tr>";
+		
+		$html .= "<tr $classAndAttr><td colspan='2' class='pendingreviews-bottom-cell'>$changes</td></tr>";
+
+		return $html;
+
+	}
+
+	/**
+	 * Generates row for a particular page in PendingReviews - if page was deleted.
+	 * 
+	 * @param PendingReview $item
+	 * @param int $rowCount used to determine if the row is odd or even
+	 * @return string HTML for row
+	 */
+	public function getDeletedPageRow ( PendingReview $item, $rowCount ) {
+		$html = '';
+		$changes = '';
+		$changes = $this->getPendingReviewChangesList( $item->deletionLog );
+
+		$acceptDeletionButton = $this->getMarkDeleteReviewedButton( $item->deletedTitle, $item->deletedNS );
+
+		$talkToDeleterButton = $this->getDeleterTalkButton( $item->deletionLog );
+
+		$title = Title::makeTitle( $item->deletedNS, $item->deletedTitle );
+		
+		$displayTitle = '<strong>' 
+			. wfMessage( 'pendingreviews-page-deleted', $title->getFullText() )->parse()
+			. '</strong>';
+		
+
+		// FIXME: wow this is ugly
+		$rowClass = ( $rowCount % 2 === 0 ) ? 'pendingreviews-even-row' : 'pendingreviews-odd-row';
+		
+		$classAndAttr = "class='pendingreviews-row $rowClass pendingreviews-row-$rowCount' pendingreviews-row-count='$rowCount'";
+
+		$html .= "<tr $classAndAttr><td class='pendingreviews-page-title pendingreviews-top-cell'>$displayTitle</td><td class='pendingreviews-review-links pendingreviews-bottom-cell pendingreviews-top-cell'>$acceptDeletionButton $talkToDeleterButton</td></tr>";
+		
+		$html .= "<tr $classAndAttr><td colspan='2' class='pendingreviews-bottom-cell'>$changes</td></tr>";
+
+		return $html;
 	}
 
 	/**

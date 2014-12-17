@@ -58,11 +58,12 @@ class WatchesQuery {
 	public $offset;
 	
 	/**
-	 * @var array $fieldNames: ???
+	 * @var array $fieldNames: property declared in child classes to bind a MW
+	 * message with a SQL database column
 	 * @todo FIXME: where is this used?
-	 * @example array( 'dbkey' => 'message-name', ... )
+	 * @example array( 'dbkey' => 'message-name', 'page_ns_and_title' => 'watchanalytics-special-header-page-title' )
 	 */
-	public $fieldNames;
+	protected $fieldNames;
 
 	/**
 	 * @var string|bool $userGroupFilter: defines which user group to be used to 
