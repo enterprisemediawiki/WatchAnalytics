@@ -1,4 +1,34 @@
 <?php
+/**
+ * Implements Special:PendingReviews, an alternative to Special:Watchlist.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ * http://www.gnu.org/copyleft/gpl.html
+ *
+ * @file
+ * @ingroup SpecialPage
+ */
+
+/**
+ * A special page that lists last changes made to the wiki that a user is
+ * watching. Pages are listed in reverse-chronological order or by priority;
+ * Priority is determined by how many people have already "reviewed" the 
+ * change.
+ *
+ * @ingroup SpecialPage
+ */
 
 class SpecialPendingReviews extends SpecialPage {
 
@@ -10,6 +40,11 @@ class SpecialPendingReviews extends SpecialPage {
 	);
 
 
+	/**
+	 * Constructor for Special Page.
+	 *
+	 * @return null
+	 */
 	public function __construct() {
 		parent::__construct(
 			"PendingReviews", // 
@@ -32,6 +67,11 @@ class SpecialPendingReviews extends SpecialPage {
 	 * query string it is possible to view others' Pending Reviews. FIXME: When
 	 * this extension is "released" this function should be limited only to
 	 * people with a special right.
+	 * 
+	 * @todo FIXME: break sections out into smaller functions - namely HTML writing (HTML templates?x)
+	 * 
+	 * @param Parser|null $parser
+	 * @return bool
 	 */
 	function execute( $parser = null ) {
 		global $wgRequest, $wgOut, $wgUser;
@@ -202,9 +242,14 @@ class SpecialPendingReviews extends SpecialPage {
 		$wgOut->addHTML( $html );
 
 	}
-	
-	public function getReviewButton ( $item ) {
 
+	/**
+	 * Creates a button bringing user to the diff page.
+	 * 
+	 * @param PendingReview $item
+	 * @return string HTML for button
+	 */
+	public function getReviewButton ( $item ) {
 
 		if ( count( $item->newRevisions ) > 0 ) {
 		
@@ -243,10 +288,16 @@ class SpecialPendingReviews extends SpecialPage {
 			);
 
 		}
-		
+
 		return $diffLink;
 	}
 	
+	/**
+	 * Creates a button bringing user to the history page.
+	 * 
+	 * @param PendingReview $item
+	 * @return string HTML for button
+	 */
 	public function getHistoryButton ( $item ) {
 		return Xml::element( 'a',
 			array(
@@ -257,21 +308,24 @@ class SpecialPendingReviews extends SpecialPage {
 		);
 	}
 	
-	/*
-	http://localhost/wiki/eva/api.php?
-	
-	action=setnotificationtimestamp
-	
-	&titles=ORU%20Temporary%20Stowage%20Device
-	
-	&format=jsonfm
-	
-	&token=ef93a5946cdd798274990bc31d804625%2B%5C
-	*/
+	/**
+	 * Creates a button which marks a deleted page as "reviewed" (e.g. nullifies
+	 * notification timestamp in watchlist).
+	 * 
+	 * Reference example for API:
+	 * http://example.com/wiki/api.php
+	 *     ?action=setnotificationtimestamp
+	 *     &titles=Some%20Page
+	 *     &format=jsonfm
+	 *     &token=ef93a5946cdd798274990bc31d804625%2B%5C
+	 *
+	 * @param string $titleText
+	 * @param string|int $namespace
+	 * @return string HTML for button
+	 */
 	public function getMarkDeleteReviewedButton ( $titleText, $namespace ) {
 		global $wgTitle;
-		
-		
+
 		return Xml::element( 'a',
 			array(
 				'href' => $this->getTitle()->getLocalURL( array( 
@@ -285,23 +339,28 @@ class SpecialPendingReviews extends SpecialPage {
 			wfMessage( 'pendingreviews-accept-deletion' )->text()
 		);
 	}
-	
+
+	/**
+	 * Creates a button bringing user to the talk page of the user who deleted
+	 * the page, allowing them to ask questions about why the page was deleted.
+	 * 
+	 * @param $deletionLog
+	 * @return string HTML for button
+	 */
 	public function getDeleterTalkButton ( $deletionLog ) {
 
-		// echo "<pre>" . print_r($deletionLog, true) . "</pre>"; return '';
 		$userId = $deletionLog[ count( $deletionLog ) - 1 ]->log_user;
 		$user = User::newFromId( $userId );
 
-
 		$userTalk = $user->getTalkPage();
-		
+
 		if ( $userTalk->exists() ) {
 			$talkQueryString = array();
 		}
 		else {
 			$talkQueryString = array( 'action' => 'edit' );
 		}
-		
+
 		return Xml::element( 'a',
 			array(
 				'href' => $userTalk->getLocalURL( $talkQueryString ),
@@ -310,7 +369,12 @@ class SpecialPendingReviews extends SpecialPage {
 			wfMessage( 'pendingreviews-page-deleted-talk', $user->getUserPage()->getFullText() )->text()
 		);
 	}
-	
+
+	/**
+	 * Creates simple header stating how many pending reviews the user has.
+	 * 
+	 * @return string HTML for header
+	 */
 	public function getPageHeader() {
 		// message like "You have X pending reviews"
 		$html = '<p>' . wfMessage( 'pendingreviews-num-reviews', count( $this->pendingReviewList ) )->text();
@@ -325,7 +389,18 @@ class SpecialPendingReviews extends SpecialPage {
 		
 		return $html;
 	}
-	
+
+	/**
+	 * Merges arrays. 
+	 * 
+	 * @todo FIXME: documentation...why does this do what it does?
+	 * @todo FIXME: cleanup temporary code
+	 * 
+	 * @param $log
+	 * @param $revisions
+	 * @param $title
+	 * @return array
+	 */	
 	protected function combineLogAndChanges( $log, $revisions, $title ) {
 	
 		// if ( $title->getNamespace() === NS_FILE ) {
@@ -363,6 +438,14 @@ class SpecialPendingReviews extends SpecialPage {
 	
 	}
 
+	/**
+	 * Creates and returns a Message object appropriate for the type of log entry.
+	 * 
+	 * @todo FIXME: what type is $logEntry
+	 * 
+	 * @param object $logEntry
+	 * @return Message HTML for button
+	 */
 	protected function getLogChangeMessage ( $logEntry ) {
 
 		// add pendingreviews-edited-by?
@@ -407,7 +490,15 @@ class SpecialPendingReviews extends SpecialPage {
 		}
 
 	}
-	
+
+	/**
+	 * Creates a time diff...not sure this is used.
+	 * 
+	 * @todo FIXME: is this used? if not, remove.
+	 * 
+	 * @param PendingReview $item
+	 * @return string
+	 */
 	public function getReviewTimeDiff ( $item ) {	
 			
 		$ts = new MWTimestamp( $item->notificationTimestamp );
@@ -424,12 +515,18 @@ class SpecialPendingReviews extends SpecialPage {
 			$timeDiff = wfMessage( 'pendingreviews-timediff-minutes', $timeDiff->format( '%i' ) );
 		}
 		else {
-			$timeDiff = wfMessage( 'pendingreviews-timediff-just-now' )->text();
+			$timeDiff = wfMessage( 'pendingreviews-timediff-just-now' )->text(); // FIXME: this is a string, others are Messages
 		}
 		
 		return $timeDiff;
 	}
 
+	/**
+	 * Creates list of changes for a given page.
+	 * 
+	 * @param array $combinedList
+	 * @return string HTML
+	 */
 	public function getPendingReviewChangesList ( $combinedList ) {
 		$changes = array();
 		foreach ( $combinedList as $change ) {
