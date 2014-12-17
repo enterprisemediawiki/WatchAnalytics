@@ -165,7 +165,7 @@ class SpecialPendingReviews extends SpecialPage {
 
 		PendingReview::clearByUserAndTitle( $this->getUser(), $clearNotifyTitle );
 		
-		$wgOut->addHTML(
+		$this->getOutput()->addHTML(
 			$this->msg(
 				'pendingreviews-clear-page-notification',
 				$clearNotifyTitle->getFullText(),
@@ -228,7 +228,7 @@ class SpecialPendingReviews extends SpecialPage {
 	 * Determines if user is attempting to clear a notification and returns
 	 * the appropriate title.
 	 * 
-	 * @return Title
+	 * @return Title|false
 	 */
 	public function getClearNotificationTitle () {
 
@@ -290,7 +290,6 @@ class SpecialPendingReviews extends SpecialPage {
 	 */
 	public function getDeletedPageRow ( PendingReview $item, $rowCount ) {
 		$html = '';
-		$changes = '';
 		$changes = $this->getPendingReviewChangesList( $item->deletionLog );
 
 		$acceptDeletionButton = $this->getMarkDeleteReviewedButton( $item->deletedTitle, $item->deletedNS );
@@ -562,36 +561,6 @@ class SpecialPendingReviews extends SpecialPage {
 			return wfMessage( 'pendingreviews-log-unknown-change', $userPage );
 		}
 
-	}
-
-	/**
-	 * Creates a time diff...not sure this is used.
-	 * 
-	 * @todo FIXME: is this used? if not, remove.
-	 * 
-	 * @param PendingReview $item
-	 * @return string
-	 */
-	public function getReviewTimeDiff ( $item ) {	
-			
-		$ts = new MWTimestamp( $item->notificationTimestamp );
-		$displayTime = '<small>' . $ts->getHumanTimestamp( new MWTimestamp() ) . '</small>';
-
-		$timeDiff = $ts->diff( new MWTimestamp() );
-		if ( $timeDiff->days > 0 ) {
-			$timeDiff = wfMessage( 'pendingreviews-timediff-days', $timeDiff->format( '%a' ) );
-		}
-		else if ( $timeDiff->h > 0 ) {
-			$timeDiff = wfMessage( 'pendingreviews-timediff-hours', $timeDiff->format( '%h' ) );
-		}
-		else if ( $timeDiff->i > 0 ) {
-			$timeDiff = wfMessage( 'pendingreviews-timediff-minutes', $timeDiff->format( '%i' ) );
-		}
-		else {
-			$timeDiff = wfMessage( 'pendingreviews-timediff-just-now' )->text(); // FIXME: this is a string, others are Messages
-		}
-		
-		return $timeDiff;
 	}
 
 	/**
