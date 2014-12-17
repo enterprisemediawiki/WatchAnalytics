@@ -42,7 +42,41 @@ class WatchesQuery {
 	public $join_conds;
 	public $conds;
 	public $options;
+
+	/**
+	 * @var int $limit: maximum number of database rows to return
+	 * @todo FIXME: who/what sets this?
+	 * @example 20
+	 */
+	public $limit;
+
+	/**
+	 * @var int $offset: used with $limit for pagination
+	 * @todo FIXME: who/what sets this?
+	 * @example 100
+	 */
+	public $offset;
+	
+	/**
+	 * @var array $fieldNames: ???
+	 * @todo FIXME: where is this used?
+	 * @example array( 'dbkey' => 'message-name', ... )
+	 */
+	public $fieldNames;
+
+	/**
+	 * @var string|bool $userGroupFilter: defines which user group to be used to 
+	 * filter for page-watches
+	 * @example 'sysop'
+	 */
 	protected $userGroupFilter = false;
+	
+	/**
+	 * @var string|bool $categoryFilter: defines which category to be used to 
+	 * filter for page-watches
+	 * @example 'Articles_with_unsourced_statements'
+	 */
+	protected $categoryFilter = false;
 
 	
 	public function __construct () {
