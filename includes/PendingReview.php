@@ -39,42 +39,42 @@ class PendingReview {
 	 * @var string $notificationTimestamp: time of oldest change user hasn't seen
 	 * @example 20141031072315
 	 */
-	$notificationTimestamp;
+	public $notificationTimestamp;
 	
 	/**
 	 * @var Title $title
 	 */
-	$title;
+	public $title;
 	
 	/**
 	 * @var array|false $newRevisions
 	 * @todo FIXME: document
 	 * @example 20
 	 */
-	$newRevisions;
+	public $newRevisions;
 
 	/**
 	 * @var string $deletedTitle: text of deleted title
 	 * @example "Main Page"
 	 */
-	$deletedTitle;
+	public $deletedTitle;
 	
 	/**
 	 * @var int $deletedNS
 	 */
-	$deletedNS;
+	public $deletedNS;
 
 	/**
 	 * @var array|false $deletionLog
 	 * @todo FIXME: document
 	 */
-	$deletionLog;
+	public $deletionLog;
 
 	/**
 	 * @var array|false $log
 	 * @todo FIXME: document
 	 */
-	$log;
+	public $log;
 
 	public function __construct ( $row ) {
 
