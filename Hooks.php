@@ -55,12 +55,12 @@ class WatchAnalyticsHooks {
 	}
 
 	/**
-	* Handler for BeforePageDisplay hook.
-	* @see http://www.mediawiki.org/wiki/Manual:Hooks/BeforePageDisplay
-	* @param $out OutputPage object
-	* @param $skin Skin being used.
-	* @return bool true in all cases
-	*/
+	 * Handler for BeforePageDisplay hook.
+	 * @see http://www.mediawiki.org/wiki/Manual:Hooks/BeforePageDisplay
+	 * @param $out OutputPage object
+	 * @param $skin Skin being used.
+	 * @return bool true in all cases
+	 */
 	static function onBeforePageDisplay( $out, $skin ) {
 		$user = $out->getUser();
 
@@ -83,6 +83,68 @@ class WatchAnalyticsHooks {
 		if ( $user->watchStats['max_pending_days'] > $egPendingReviewsEmphasizeDays ) {
 			$out->addModules( array( 'ext.watchanalytics.shakependingreviews' ) );
 		}
+		return true;
+	}
+
+	/**
+	 * Handler for TitleMoveComplete hook. This function makes it so page-moves
+	 * are handled correctly in the `watchlist` table. Prior to a MW 1.25 alpha
+	 * release when a page is moved, the new entries into the `watchlist` table
+	 * are given an notification timestamp of NULL; they should be identical to
+	 * the notification timestamps of the original title so users are notified 
+	 * of changes prior to the move. 
+	 * @todo document which commit fixes this issue specifically.
+	 * @see http://www.mediawiki.org/wiki/Manual:Hooks/TitleMoveComplete
+	 * @param &$originalTitle Title
+	 * @param &$newTitle Title
+	 * @param &$moverUser User
+	 * @param $oldid string|int
+	 * @param $newId string|int
+	 * @param $reason string
+	 * @return bool true in all cases
+	 */
+	static function onTitleMoveComplete ( Title &$originalTitle, Title &$newTitle, User &$moverUser, $oldid, $newId, $reason ) {
+
+		// query `watchlist` for all rows of $originalTitle (possibly multiple
+		// users watching the page)
+
+		$oldNS = $originalTitle->getNamespace();
+		$newNS = $newTitle->getNamespace();
+		$oldDBkey = $originalTitle->getDBkey();
+		$newDBkey = $newTitle->getDBkey();
+
+		$dbw = wfGetDB( DB_MASTER );
+		$results = $dbw->select( 'watchlist',
+			array( 'wl_user', 'wl_notificationtimestamp' ),
+			array( 'wl_namespace' => $oldNS, 'wl_title' => $oldDBkey ),
+			__METHOD__
+		);
+		# Construct array to replace into the watchlist
+		$values = array();
+		foreach ( $results as $oldRow ) {
+			$values[] = array(
+				'wl_user' => $oldRow->wl_user,
+				'wl_namespace' => $newNS,
+				'wl_title' => $newDBkey,
+				'wl_notificationtimestamp' => $oldRow->wl_notificationtimestamp,
+			);
+		}
+
+		if ( empty( $values ) ) {
+			// Nothing to do
+			return true;
+		}
+
+		# Perform replace
+		# Note that multi-row replace is very efficient for MySQL but may be inefficient for
+		# some other DBMSes, mostly due to poor simulation by us
+		$dbw->replace(
+			'watchlist',
+			array( array( 'wl_user', 'wl_namespace', 'wl_title' ) ),
+			$values,
+			__METHOD__
+		);
+
 		return true;
 	}
 }

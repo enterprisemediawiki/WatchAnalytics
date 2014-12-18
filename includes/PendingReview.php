@@ -241,7 +241,7 @@ class PendingReview {
 	}
 	
 	public function getDeletionLog ( $title, $ns, $notificationTimestamp ) {
-	
+
 		$dbr = wfGetDB( DB_SLAVE );
 		
 		$title = $dbr->addQuotes( $title );
