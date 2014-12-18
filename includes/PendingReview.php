@@ -35,8 +35,48 @@ EOT;
 
 class PendingReview {
 
-	public function __construct ( $row ) {
+	/**
+	 * @var string $notificationTimestamp: time of oldest change user hasn't seen
+	 * @example 20141031072315
+	 */
+	$notificationTimestamp;
+	
+	/**
+	 * @var Title $title
+	 */
+	$title;
+	
+	/**
+	 * @var array|false $newRevisions
+	 * @todo FIXME: document
+	 * @example 20
+	 */
+	$newRevisions;
 
+	/**
+	 * @var string $deletedTitle: text of deleted title
+	 * @example "Main Page"
+	 */
+	$deletedTitle;
+	
+	/**
+	 * @var int $deletedNS
+	 */
+	$deletedNS;
+
+	/**
+	 * @var array|false $deletionLog
+	 * @todo FIXME: document
+	 */
+	$deletionLog;
+
+	/**
+	 * @var array|false $log
+	 * @todo FIXME: document
+	 */
+	$log;
+
+	public function __construct ( $row ) {
 
 		$pageID = $row['page_id'];
 		$notificationTimestamp = $row['notificationtimestamp'];
