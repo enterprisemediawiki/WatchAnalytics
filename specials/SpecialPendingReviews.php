@@ -133,7 +133,7 @@ class SpecialPendingReviews extends SpecialPage {
 	
 		// loop through pending reviews
 		foreach ( $this->pendingReviewList as $item ) {
-			
+			//print_r( $item );
 			// if the title exists, then the page exists (and hence it has not
 			// been deleted)
 			if ( $item->title ) {
@@ -148,7 +148,7 @@ class SpecialPendingReviews extends SpecialPage {
 			if ( $rowCount >= $this->reviewLimit ) {
 				break;
 			}
-		}
+		}//die();
 		$html .= '</table>';
 		$this->getOutput()->addHTML( $html );
 
@@ -352,11 +352,10 @@ class SpecialPendingReviews extends SpecialPage {
 
 			$latest = Revision::newFromTitle( $item->title );
 			$diffURL = $item->title->getLocalURL( array( 'oldid' => $latest->getId() ) );
-			$linkText = 'No content changes - view latest';
 			
 			$diffLink = Xml::element( 'a',
 				array( 'href' => $diffURL, 'class' => 'pendingreviews-green-button' ),
-				$linkText
+				$this->msg( 'watchanalytics-pendingreviews-users-first-view' )->text()
 			);
 
 		}

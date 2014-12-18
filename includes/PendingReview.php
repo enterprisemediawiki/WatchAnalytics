@@ -49,13 +49,12 @@ class PendingReview {
 	/**
 	 * @var array|false $newRevisions
 	 * @todo FIXME: document
-	 * @example 20
 	 */
 	public $newRevisions;
 
 	/**
 	 * @var string $deletedTitle: text of deleted title
-	 * @example "Main Page"
+	 * @todo document is this "Main Page" or "Main_Page"
 	 */
 	public $deletedTitle;
 	

@@ -108,8 +108,6 @@ class WatchStateRecorder {
 
 		$now = new MWTimestamp();
 		$now = $now->format('YmdHis');
-		$totalWatches = 0;
-		$totalPending = 0;
 
 		$unwatched = 0;
 		$oneWatched = 0;
@@ -128,28 +126,32 @@ class WatchStateRecorder {
 		foreach( $pages as $key => $page ) {
 			$page['tracking_timestamp'] = $now;
 
-			if ( intval( $page['num_watches'] ) === 0 ) {
+			$numWatches = intval( $page['num_watches'] );
+			$numReviewed = intval( $page['num_reviewed'] );
+			$pageNS = $page['page_namespace'];
+
+			if ( $numWatches === 0 ) {
 				$unwatched++;
-				if ( $page['page_namespace'] === NS_MAIN ) {
+				if ( $pageNS === NS_MAIN ) {
 					$nsMainUnwatched++;
 				}
 			}
-			else if ( intval( $page['num_watches'] ) === 1 ) {
+			else if ( $numWatches === 1 ) {
 				$oneWatched++;
-				if ( $page['page_namespace'] === NS_MAIN ) {
+				if ( $pageNS === NS_MAIN ) {
 					$nsMainOneWatched++;
 				}
 			}
 
-			if ( intval( $page['num_reviewed'] ) === 0 ) {
+			if ( $numReviewed === 0 ) {
 				$unreviewed++;
-				if ( $page['page_namespace'] === NS_MAIN ) {
+				if ( $pageNS === NS_MAIN ) {
 					$nsMainUnreviewed++;
 				}
 			}
-			else if ( intval( $page['num_reviewed'] ) === 1 ) {
+			else if ( $numReviewed === 1 ) {
 				$oneReviewed++;
-				if ( $page['page_namespace'] === NS_MAIN ) {
+				if ( $pageNS === NS_MAIN ) {
 					$nsMainOneReviewed++;
 				}
 			}
