@@ -92,21 +92,19 @@ class WatchAnalyticsHooks {
 	 * release when a page is moved, the new entries into the `watchlist` table
 	 * are given an notification timestamp of NULL; they should be identical to
 	 * the notification timestamps of the original title so users are notified 
-	 * of changes prior to the move. 
+	 * of changes prior to the move. Code taken from MediaWiki core head branch
+	 * WatchedItem::doDuplicateEntries() method.
+	 *
+	 * Note: additional arguments &$moverUser User, $oldid string|int, $newId
+	 * string|int, and $reason string are also available per MW documenation.
+	 * 
 	 * @todo document which commit fixes this issue specifically.
 	 * @see http://www.mediawiki.org/wiki/Manual:Hooks/TitleMoveComplete
 	 * @param &$originalTitle Title
 	 * @param &$newTitle Title
-	 * @param &$moverUser User
-	 * @param $oldid string|int
-	 * @param $newId string|int
-	 * @param $reason string
 	 * @return bool true in all cases
 	 */
-	static function onTitleMoveComplete ( Title &$originalTitle, Title &$newTitle, User &$moverUser, $oldid, $newId, $reason ) {
-
-		// query `watchlist` for all rows of $originalTitle (possibly multiple
-		// users watching the page)
+	static function onTitleMoveComplete ( Title &$originalTitle, Title &$newTitle ) {
 
 		$oldNS = $originalTitle->getNamespace();
 		$newNS = $newTitle->getNamespace();

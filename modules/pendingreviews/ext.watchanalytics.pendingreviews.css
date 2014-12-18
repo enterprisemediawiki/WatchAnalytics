@@ -109,8 +109,6 @@ td.pendingreviews-review-links a:hover {
 	border-color: #269abc;
 }
 
-/* NOT USING THESE now? 
-This is bootstrap's orange button 
 .pendingreviews-orange-button {
 	background-color: #ec971f;
 	border-color: #d58512;
@@ -120,7 +118,6 @@ This is bootstrap's orange button
 	background-color: #ec971f;
 	border-color: #d58512;
 }
-*/
 
 .pendingreviews-red-button {
 	background-color: #d9534f;

@@ -133,7 +133,6 @@ class SpecialPendingReviews extends SpecialPage {
 	
 		// loop through pending reviews
 		foreach ( $this->pendingReviewList as $item ) {
-			//print_r( $item );
 			// if the title exists, then the page exists (and hence it has not
 			// been deleted)
 			if ( $item->title ) {
@@ -261,7 +260,12 @@ class SpecialPendingReviews extends SpecialPage {
 		$combinedList = $this->combineLogAndChanges( $item->log, $item->newRevisions, $item->title );
 		$changes = $this->getPendingReviewChangesList( $combinedList );
 		
-		$reviewButton = $this->getReviewButton( $item );
+		if ( $item->title->isRedirect() ) {
+			$reviewButton = $this->getAcceptRedirectButton( $item );
+		}
+		else {
+			$reviewButton = $this->getReviewButton( $item );
+		}
 
 		$historyButton = $this->getHistoryButton( $item );
 
@@ -282,17 +286,38 @@ class SpecialPendingReviews extends SpecialPage {
 	}
 
 	/**
-	 * Generates row for a particular page in PendingReviews - if page was deleted.
+	 * Generates row for a deleted page in PendingReviews. Pages could have
+	 * been explicitly deleted, or they could have been moved without leaving
+	 * a redirect behind.
 	 * 
 	 * @param PendingReview $item
 	 * @param int $rowCount used to determine if the row is odd or even
 	 * @return string HTML for row
 	 */
 	public function getDeletedPageRow ( PendingReview $item, $rowCount ) {
-		$html = '';
+		$html = '';//echo '<pre>';print_r($item);die('</pre>');
+
+		$pageWasMoved = false;
+		$deletionLogLength = count( $item->deletionLog );
+		for ( $i = $deletionLogLength - 1; $i >= 0; $i-- ) {
+			if ( $item->deletionLog[$i]->log_type == 'move' ) {
+				$pageWasMoved = true;
+				break;
+			}
+			else if ( $item->deletionLog[$i]->log_type == 'delete' ) {
+				$pageWasMoved = false;
+				break;
+			}
+		}
+
 		$changes = $this->getPendingReviewChangesList( $item->deletionLog );
 
-		$acceptDeletionButton = $this->getMarkDeleteReviewedButton( $item->deletedTitle, $item->deletedNS );
+		if ( $pageWasMoved ) {
+			$acceptDeletionButton = $this->getAcceptMoveWithoutRedirectButton( $item->deletedTitle, $item->deletedNS );
+		}
+		else {
+			$acceptDeletionButton = $this->getMarkDeleteReviewedButton( $item->deletedTitle, $item->deletedNS );
+		}
 
 		$talkToDeleterButton = $this->getDeleterTalkButton( $item->deletionLog );
 
@@ -408,6 +433,73 @@ class SpecialPendingReviews extends SpecialPage {
 				'pending-title' => $titleText,
 			),
 			wfMessage( 'pendingreviews-accept-deletion' )->text()
+		);
+	}
+
+	/**
+	 * Creates a button which marks the "deleted" page that is "created" when
+	 * a page is moved without leaving a redirect behind. Button allows the 
+	 * deleted page to be marked as "reviewed" (e.g. nullifies notification
+	 * timestamp in watchlist).
+	 * 
+	 * Reference example for API:
+	 * http://example.com/wiki/api.php
+	 *     ?action=setnotificationtimestamp
+	 *     &titles=Some%20Page
+	 *     &format=jsonfm
+	 *     &token=ef93a5946cdd798274990bc31d804625%2B%5C
+	 *
+	 * @param string $titleText
+	 * @param string|int $namespace
+	 * @return string HTML for button
+	 */
+	public function getAcceptMoveWithoutRedirectButton ( $titleText, $namespace ) {
+		global $wgTitle;
+
+		return Xml::element( 'a',
+			array(
+				'href' => $this->getTitle()->getLocalURL( array( 
+					'clearNotificationTitle' => $titleText,
+					'clearNotificationNS' => $namespace,
+				) ),
+				'class' => 'pendingreviews-orange-button pendingreviews-accept-deletion',
+				'pending-namespace' => $namespace,
+				'pending-title' => $titleText,
+			),
+			wfMessage( 'pendingreviews-accept-move-without-redirect' )->text()
+		);
+	}
+
+	/**
+	 * If a page is a redirect it should have a simple "accept" button
+	 * 
+	 * Reference example for API:
+	 * http://example.com/wiki/api.php
+	 *     ?action=setnotificationtimestamp
+	 *     &titles=Some%20Page
+	 *     &format=jsonfm
+	 *     &token=ef93a5946cdd798274990bc31d804625%2B%5C
+	 *
+	 * @param PendingReview $item
+	 * @return string HTML for button
+	 */
+	public function getAcceptRedirectButton ( $item ) {
+		global $wgTitle;
+
+		$titleText = $item->title->getDBkey();
+		$namespace = $item->title->getNamespace();
+
+		return Xml::element( 'a',
+			array(
+				'href' => $this->getTitle()->getLocalURL( array( 
+					'clearNotificationTitle' => $titleText,
+					'clearNotificationNS' => $namespace,
+				) ),
+				'class' => 'pendingreviews-orange-button pendingreviews-accept-deletion', //FIXME: this is not a deletion...but that's the class to make it so you don't have to go to the page.
+				'pending-namespace' => $namespace,
+				'pending-title' => $titleText,
+			),
+			wfMessage( 'pendingreviews-accept-redirect' )->text()
 		);
 	}
 
