@@ -156,3 +156,5 @@ $GLOBALS['wgResourceModules'] += array(
 );
 
 $GLOBALS['egPendingReviewsEmphasizeDays'] = 7;
+$GLOBALS['egPendingReviewsRedPagesThreshold'] = 2; // 0 or 1 reviewers BESIDES the person who made the change
+$GLOBALS['egPendingReviewsOrangePagesThreshold'] = 4; // 2 or 3 reviewers BESIDES the person who made the change

@@ -271,17 +271,7 @@ class SpecialPendingReviews extends SpecialPage {
 
 		$displayTitle = '<strong>' . $item->title->getFullText() . '</strong>';
 		
-
-		// FIXME: wow this is ugly
-		$rowClass = ( $rowCount % 2 === 0 ) ? 'pendingreviews-even-row' : 'pendingreviews-odd-row';
-		
-		$classAndAttr = "class='pendingreviews-row $rowClass pendingreviews-row-$rowCount' pendingreviews-row-count='$rowCount'";
-
-		$html .= "<tr $classAndAttr><td class='pendingreviews-page-title pendingreviews-top-cell'>$displayTitle</td><td class='pendingreviews-review-links pendingreviews-bottom-cell pendingreviews-top-cell'>$reviewButton $historyButton</td></tr>";
-		
-		$html .= "<tr $classAndAttr><td colspan='2' class='pendingreviews-bottom-cell'>$changes</td></tr>";
-
-		return $html;
+		return $this->getRowHTML( $item, $rowCount, $displayTitle, $reviewButton, $historyButton, $changes );
 
 	}
 
@@ -295,7 +285,6 @@ class SpecialPendingReviews extends SpecialPage {
 	 * @return string HTML for row
 	 */
 	public function getDeletedPageRow ( PendingReview $item, $rowCount ) {
-		$html = '';//echo '<pre>';print_r($item);die('</pre>');
 
 		$pageWasMoved = false;
 		$deletionLogLength = count( $item->deletionLog );
@@ -322,19 +311,39 @@ class SpecialPendingReviews extends SpecialPage {
 		$talkToDeleterButton = $this->getDeleterTalkButton( $item->deletionLog );
 
 		$title = Title::makeTitle( $item->deletedNS, $item->deletedTitle );
-		
 		$displayTitle = '<strong>' 
 			. wfMessage( 'pendingreviews-page-deleted', $title->getFullText() )->parse()
 			. '</strong>';
-		
 
+		return $this->getRowHTML( $item, $rowCount, $displayTitle, $acceptDeletionButton, $talkToDeleterButton, $changes );
+	}
+
+	/**
+	 * Creates a button bringing user to the diff page.
+	 * 
+	 * @param PendingReview $item
+	 * @return string HTML for button
+	 */
+	public function getRowHTML ( PendingReview $item, $rowCount, $displayTitle, $buttonOne, $buttonTwo, $changes ) {
+		
 		// FIXME: wow this is ugly
 		$rowClass = ( $rowCount % 2 === 0 ) ? 'pendingreviews-even-row' : 'pendingreviews-odd-row';
 		
-		$classAndAttr = "class='pendingreviews-row $rowClass pendingreviews-row-$rowCount' pendingreviews-row-count='$rowCount'";
+		if ( $item->numReviewers > $GLOBALS['egPendingReviewsOrangePagesThreshold'] ) {
+			$reviewCriticality = 'green'; // page is "green" because it has lots of reviewers
+		}
+		else if ( $item->numReviewers > $GLOBALS['egPendingReviewsRedPagesThreshold'] ) {
+			$reviewCriticality = 'orange';
+		}
+		else {
+			$reviewCriticality = 'red'; // page is red because it has very few reviewers
+		}
+		$reviewCriticalityClass = 'pendingreviews-criticality-' . $reviewCriticality;
 
-		$html .= "<tr $classAndAttr><td class='pendingreviews-page-title pendingreviews-top-cell'>$displayTitle</td><td class='pendingreviews-review-links pendingreviews-bottom-cell pendingreviews-top-cell'>$acceptDeletionButton $talkToDeleterButton</td></tr>";
-		
+		$classAndAttr = "class='pendingreviews-row $rowClass $reviewCriticalityClass pendingreviews-row-$rowCount' pendingreviews-row-count='$rowCount'";
+
+		$html = "<tr $classAndAttr><td class='pendingreviews-page-title pendingreviews-top-cell'>$displayTitle</td><td class='pendingreviews-review-links pendingreviews-bottom-cell pendingreviews-top-cell'>$buttonOne $buttonTwo</td></tr>";
+
 		$html .= "<tr $classAndAttr><td colspan='2' class='pendingreviews-bottom-cell'>$changes</td></tr>";
 
 		return $html;

@@ -154,6 +154,7 @@ class PendingReview {
 		$this->deletedNS = $deletedNS;
 		$this->deletionLog = $deletionLog;
 		$this->log = $logPending;
+		$this->numReviewers = $row['num_reviewed'];
 
 	}
 	
@@ -194,12 +195,18 @@ class PendingReview {
 			'w.wl_namespace AS namespace',
 			'w.wl_title AS title',
 			'w.wl_notificationtimestamp AS notificationtimestamp',
+			'(SELECT COUNT(*) FROM watchlist AS subwatch
+			  WHERE
+				subwatch.wl_namespace = w.wl_namespace
+				AND subwatch.wl_title = w.wl_title
+				AND subwatch.wl_notificationtimestamp IS NULL
+			) AS num_reviewed',
 		);
 
 		$conds = 'w.wl_user=' . $user->getId() . ' AND w.wl_notificationtimestamp IS NOT NULL';
 
 		$options = array(
-			'ORDER BY' => 'w.wl_notificationtimestamp ASC',
+			'ORDER BY' => 'num_reviewed ASC, w.wl_notificationtimestamp ASC',
 			// 'LIMIT' => $limit,
 		);
 
