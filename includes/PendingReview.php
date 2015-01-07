@@ -70,6 +70,11 @@ class PendingReview {
 	public $deletionLog;
 
 	/**
+	 * @var int $numReviewers: number of people who have reviewed this page
+	 */
+	public $numReviewers;
+
+	/**
 	 * @var array|false $log
 	 * @todo FIXME: document
 	 */
@@ -154,7 +159,7 @@ class PendingReview {
 		$this->deletedNS = $deletedNS;
 		$this->deletionLog = $deletionLog;
 		$this->log = $logPending;
-		$this->numReviewers = $row['num_reviewed'];
+		$this->numReviewers = intval( $row['num_reviewed'] );
 
 	}
 	
