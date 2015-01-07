@@ -15,7 +15,7 @@ class WatchAnalyticsHooks {
 	 * @param SkinTemplate $sk (not available yet in earlier versions of MW)
 	 * @return bool true in all cases
 	 */
-	static function onPersonalUrls( &$personal_urls, &$title /*,$sk*/ ) {
+	static function onPersonalUrls( &$personal_urls /*, &$title ,$sk*/ ) {
 		
 		global $wgUser, $wgOut;
 		$user = $wgUser;
@@ -61,7 +61,7 @@ class WatchAnalyticsHooks {
 	 * @param $skin Skin being used.
 	 * @return bool true in all cases
 	 */
-	static function onBeforePageDisplay( $out, $skin ) {
+	static function onBeforePageDisplay( $out /*, $skin*/ ) {
 		$user = $out->getUser();
 
 		$userWatch = new UserWatchesQuery();

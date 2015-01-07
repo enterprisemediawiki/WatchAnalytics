@@ -255,7 +255,6 @@ class SpecialPendingReviews extends SpecialPage {
 	 * @return string HTML for row
 	 */
 	public function getStandardChangeRow ( PendingReview $item, $rowCount ) {
-		$html = '';
 
 		$combinedList = $this->combineLogAndChanges( $item->log, $item->newRevisions, $item->title );
 		$changes = $this->getPendingReviewChangesList( $combinedList );
@@ -322,7 +321,12 @@ class SpecialPendingReviews extends SpecialPage {
 	 * Creates a button bringing user to the diff page.
 	 * 
 	 * @param PendingReview $item
-	 * @return string HTML for button
+	 * @param int $rowCount
+	 * @param string $displayTitle
+	 * @param string $buttonOne
+	 * @param string $buttonTwo
+	 * @param string $changes
+	 * @return string HTML for pending review of a given page
 	 */
 	public function getRowHTML ( PendingReview $item, $rowCount, $displayTitle, $buttonOne, $buttonTwo, $changes ) {
 		

@@ -88,6 +88,9 @@ class PendingReview {
 		if ( $pageID ) {
 			$title = Title::newFromID( $pageID );
 		}
+		else {
+			$title = false;
+		}
 		
 		if ( $pageID && $title->exists() ) {
 		
@@ -143,7 +146,6 @@ class PendingReview {
 
 		}
 		else {
-			$title = false;
 			$deletedNS = $row['namespace'];
 			$deletedTitle = $row['title'];
 			$deletionLog = $this->getDeletionLog( $deletedTitle, $deletedNS, $notificationTimestamp );
