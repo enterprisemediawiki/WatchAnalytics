@@ -12,7 +12,6 @@ class WatchAnalyticsHooks {
 	 * @see http://www.mediawiki.org/wiki/Manual:Hooks/PersonalUrls
 	 * @param &$personal_urls Array of URLs to append to.
 	 * @param &$title Title of page being visited.
-	 * @param SkinTemplate $sk (not available yet in earlier versions of MW)
 	 * @return bool true in all cases
 	 */
 	static function onPersonalUrls( &$personal_urls /*, &$title ,$sk*/ ) {
