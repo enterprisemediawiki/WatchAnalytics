@@ -60,7 +60,11 @@
 	"pendingreviews-timediff-just-now": "Changed just now",
 	"pendingreviews-no-revisions": "No page content changes",
 	"pendingreviews-num-reviews": "You have $1 pending {{PLURAL:$1|review|reviews}}.",
-	"pendingreviews-num-shown": "Showing the oldest {{PLURAL:$1|review|$1 reviews}}.",
+	"pendingreviews-num-shown": "Showing the most important {{PLURAL:$1|review|$1 reviews}}.",
+	"pendingreviews-reviewer-criticality-red": "Pages reviewed by {{PLURAL:$1|1 person|$1 people}} or fewer",
+	"pendingreviews-reviewer-criticality-orange": "Pages reviewed by {{PLURAL:$1|1 person|$1 people}} or fewer",
+	"pendingreviews-reviewer-criticality-green": "Pages reviewed by more than {{PLURAL:$1|1 person|$1 people}}",
+
 	"watchanalytics-view-user-pendingreviews": "pending reviews",
 
 	"pendingreviews-edited-by":            "[[$1]] made an edit '''without a summary'''",

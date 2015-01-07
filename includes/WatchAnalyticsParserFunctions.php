@@ -78,9 +78,10 @@ class WatchAnalyticsParserFunctions {
 
 	static function renderUnderwatchedCategories ( &$parser, $frame, $args ) {
 
-		$args = self::processArgs( $frame, $args, array(0) );
-		// $namespace  = $args[0]; <-- scrutinizer: not used, can be removed
-		// what was this going to be for?
+		// @TODO: currently these do nothing. The namespace arg needs to be text
+		// provided by the user, so this method needs to convert "Main" to zero, etc
+		// $args = self::processArgs( $frame, $args, array(0) );
+		// $namespace  = $args[0];
 		
 		$dbr = wfGetDB( DB_SLAVE );
 		

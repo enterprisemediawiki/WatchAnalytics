@@ -552,18 +552,59 @@ class SpecialPendingReviews extends SpecialPage {
 	 * @return string HTML for header
 	 */
 	public function getPageHeader() {
+		$numPendingReviews = count( $this->pendingReviewList );
+		$html = '';
+
+		if ( $numPendingReviews > 0 ) {
+			$html .= $this->getPendingReviewsLegend();
+		}
+
 		// message like "You have X pending reviews"
-		$html = '<p>' . wfMessage( 'pendingreviews-num-reviews', count( $this->pendingReviewList ) )->text();
+		$html .= '<p>' . wfMessage( 'pendingreviews-num-reviews', $numPendingReviews )->text();
 		
-		// message like "showing the oldest Y reviews"
+		// message like "showing the most important Y reviews"
 		if ( count( $this->pendingReviewList ) > $this->reviewLimit ) {
 			$html .= ' ' . wfMessage( 'pendingreviews-num-shown', $this->reviewLimit )->text();
 		}
 		
 		// close out header
 		$html .= '</p>';
-		
+
 		return $html;
+	}
+
+
+	/**
+	 * Creates a legend for PendingReviews showing what colors mean regarding priority of pages
+	 * 
+	 * @return string HTML for legend (table)
+	 */
+	public function getPendingReviewsLegend () {
+
+		$redMaxReviewers = $GLOBALS['egPendingReviewsRedPagesThreshold'] - 1;
+		$orangeMaxReviewers =  $GLOBALS['egPendingReviewsOrangePagesThreshold'] - 1;
+
+		$redReviewersMsg = $this->msg(
+			'pendingreviews-reviewer-criticality-red',
+			$redMaxReviewers
+		)->text();
+
+		$orangeReviewersMsg = $this->msg(
+			'pendingreviews-reviewer-criticality-orange',
+			$orangeMaxReviewers
+		)->text();
+
+		$greenReviewersMsg = $this->msg(
+			'pendingreviews-reviewer-criticality-green',
+			$orangeMaxReviewers
+		)->text();
+
+		return "<table class='pendingreviews-legend'>
+			<tr class='pendingreviews-criticality-red'><td>$redReviewersMsg</td></tr>
+			<tr class='pendingreviews-criticality-orange'><td>$orangeReviewersMsg</td></tr>
+			<tr class='pendingreviews-criticality-green'><td>$greenReviewersMsg</td></tr>
+		</table>";
+
 	}
 
 	/**

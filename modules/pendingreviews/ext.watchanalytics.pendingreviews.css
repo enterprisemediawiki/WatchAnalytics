@@ -60,6 +60,14 @@ tr.pendingreviews-criticality-green td:first-child {
 	border-left: solid green 5px;
 }
 
+.pendingreviews-legend {
+	float:right;
+	margin-bottom: 10px;
+}
+.pendingreviews-legend td {
+	padding-left: 5px;
+}
+
 td.pendingreviews-review-links a {
 	color: #fff;
 	border: 1px solid transparent;
