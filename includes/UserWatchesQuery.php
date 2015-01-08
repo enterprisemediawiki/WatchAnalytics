@@ -95,6 +95,13 @@ class UserWatchesQuery extends WatchesQuery {
 
 	}
 
+	/**
+	 * Gets watch statistics for a particular user.
+	 * 
+	 * @param User $user: the user to get watch-info on.
+	 * @return array returns user watch info in an array with keys the same as
+	 * $this->fieldNames.
+	 */
 	public function getUserWatchStats ( User $user ) {
 	
 		$qInfo = $this->getQueryInfo();
@@ -110,8 +117,19 @@ class UserWatchesQuery extends WatchesQuery {
 			$qInfo['join_conds']
 		);
 		
-		return $dbr->fetchRow( $res );
+		$row = $dbr->fetchRow( $res );
 
+		// if user doesn't have any pages in watchlist, then no data will be
+		// returned by this query. Create a "blank" row instead.
+		if ( $row === false ) {
+			$row = array();
+			foreach( $this->fieldNames as $name => $msg ) {
+				$row[ $name ] = 0;
+			}
+			$row[ 'user_name' ] = $user->getName();
+		}
+
+		return $row;
 	}
 
 }
