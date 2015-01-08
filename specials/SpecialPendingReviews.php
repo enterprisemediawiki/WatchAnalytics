@@ -563,7 +563,7 @@ class SpecialPendingReviews extends SpecialPage {
 		$html .= '<p>' . wfMessage( 'pendingreviews-num-reviews', $numPendingReviews )->text();
 		
 		// message like "showing the most important Y reviews"
-		if ( count( $this->pendingReviewList ) > $this->reviewLimit ) {
+		if ( $numPendingReviews > $this->reviewLimit ) {
 			$html .= ' ' . wfMessage( 'pendingreviews-num-shown', $this->reviewLimit )->text();
 		}
 		
@@ -728,8 +728,8 @@ class SpecialPendingReviews extends SpecialPage {
 
 				$comment = $rev->getComment();
 				if ( $comment ) {
-					$comment = '<nowiki>' . htmlspecialchars($comment) . "</nowiki>";
-					$changeText = ' ' . wfMessage( 'pendingreviews-with-comment', array( $userPage, $comment ) )->parse();
+					$comment = '<span class="comment">' . Linker::formatComment( $comment ) . '</span>';
+					$changeText = ' ' . wfMessage( 'pendingreviews-with-comment', array( $userPage ) )->parse() . ' ' . $comment;
 				}
 				else {
 					$changeText = ' ' . wfMessage( 'pendingreviews-edited-by', $userPage )->parse();
