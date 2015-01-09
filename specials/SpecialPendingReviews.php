@@ -305,6 +305,7 @@ class SpecialPendingReviews extends SpecialPage {
 			$queryInfo['tables'],
 			array(
 				'p.page_id AS page_id',
+				'p.page_counter AS num_views',
 				$pageWatchQuery->sqlNumWatches, // 'SUM( IF(w.wl_title IS NOT NULL, 1, 0) ) AS num_watches'
 			),
 			$queryInfo['conds'],
@@ -316,28 +317,38 @@ class SpecialPendingReviews extends SpecialPage {
 		// add newly found number of watchers to linkedPagesToKeep...
 		while ( $row = $pageWatchStats->fetchObject() ) {
 			$linkedPagesToKeep[ $row->page_id ][ 'num_watches' ] = $row->num_watches;
+			$linkedPagesToKeep[ $row->page_id ][ 'num_views' ] = $row->num_views;
 		}
 
 		$watches = array();
 		$links = array();
+		$watchNeedArray = array();
 		$sortableLinkedPages = array();
 		foreach( $linkedPagesToKeep as $pageId => $pageData ) {
 			if ( isset( $pageData[ 'num_watches' ] ) ) {
-				$numWatches = $pageData[ 'num_watches' ];
+				$numWatches = intval( $pageData[ 'num_watches' ] );
+				$numViews = intval( $pageData[ 'num_views' ] );
 			}
 			else {
 				$numWatches = 0;
+				$numViews = 0;
 			}
+			$numLinks = intval( $pageData[ 'num_links' ] );
+
+			$watchNeed = $numLinks * pow( $numViews, 2 );
 
 			$sortableLinkedPages[] = array(
 				'page_id' => $pageId,
 				'num_watches' => $numWatches,
-				'num_links' => $pageData[ 'num_links' ],
+				'num_links' => $numLinks,
+				'num_views' => $numViews,
+				'watch_need' => $watchNeed,
 			);
 			$watches[] = $numWatches;
-			$links[] = $pageData[ 'num_links' ];
+			$links[] = $numLinks;
+			$watchNeedArray[] = $watchNeed;
 		}
-		array_multisort( $watches, SORT_ASC, $links, SORT_DESC, $sortableLinkedPages );
+		array_multisort( $watches, SORT_ASC, $watchNeedArray, SORT_DESC, $sortableLinkedPages );
 
 
 
@@ -378,7 +389,10 @@ class SpecialPendingReviews extends SpecialPage {
 			$html .= '<li><a href="' . $suggestedTitle->getLinkURL() . '">' 
 				. $suggestedTitle->getFullText() . '</a>'
 				. ' (<strong>' . $watchLink . '</strong>)'
-				// . ' - watches: ' . $pageInfo[ 'num_watches' ] . ', links: ' . $pageInfo[ 'num_links' ]
+				// . ' - watches: ' . $pageInfo[ 'num_watches' ]
+				// 	. ', links: ' . $pageInfo[ 'num_links' ]
+				// 	. ', views: ' . $pageInfo[ 'num_views' ]
+				// 	. ', watch need: ' . $pageInfo[ 'watch_need' ]
 				. '</li>';
 			
 			$count++;
