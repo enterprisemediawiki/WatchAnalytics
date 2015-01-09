@@ -55,6 +55,7 @@ $GLOBALS['wgAutoloadClasses']['WatchAnalyticsUpdaterHooks'] = __DIR__ . '/schema
 
 // pending reviews
 $GLOBALS['wgAutoloadClasses']['PendingReview'] = __DIR__ . '/includes/PendingReview.php';
+$GLOBALS['wgAutoloadClasses']['WatchSuggest'] = __DIR__ . '/includes/WatchSuggest.php';
 
 // query classes
 $GLOBALS['wgAutoloadClasses']['WatchesQuery'] = __DIR__ . '/includes/WatchesQuery.php';
