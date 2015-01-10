@@ -96,5 +96,36 @@ class PageWatchesQuery extends WatchesQuery {
 		return parent::getQueryInfo();
 
 	}
+
+	public function getPageWatchesAndViews ( $pages ) {
+		
+		$dbr = wfGetDB( DB_SLAVE );
+
+		$pagesList = $dbr->makeList( $pages );
+
+		$queryInfo = $this->getQueryInfo( 'p.page_id IN (' . $pagesList . ')' );
+		$queryInfo['options'][ 'ORDER BY' ] = 'num_watches ASC';
+
+		$pageWatchStats = $dbr->select(
+			$queryInfo['tables'],
+			array(
+				'p.page_id AS page_id',
+				'p.page_counter AS num_views',
+				$this->sqlNumWatches, // 'SUM( IF(w.wl_title IS NOT NULL, 1, 0) ) AS num_watches'
+			),
+			$queryInfo['conds'],
+			__METHOD__,
+			$queryInfo['options'],
+			$queryInfo['join_conds']
+		);
+
+		$return = array();
+		while ( $row = $pageWatchStats->fetchObject() ) {
+			$return[] = $row;
+		}
+
+		return $return;
+
+	}
 	
 }

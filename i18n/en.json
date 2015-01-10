@@ -87,6 +87,11 @@
 	"pendingreviews-log-modify-protect":   "[[$1]] modified protection info",
 	"pendingreviews-log-upload-new":       "[[$1]] uploaded the initial version of the file",
 	"pendingreviews-log-upload-overwrite": "[[$1]] uploaded a new version of the file",
-	"pendingreviews-log-unknown-change":   "[[$1]] made an unknown change"
+	"pendingreviews-log-unknown-change":   "[[$1]] made an unknown change",
+
+	"pendingreviews-watch-suggestion-title": "This wiki needs your help watching pages",
+	"pendingreviews-watch-suggestion-description": "Few (if any) people are watching the pages below. They are related to other pages in your watchlist, and it'd real swell if you could help by watching some of them.",
+	"pendingreviews-watch-suggestion-watchlink": "Watch"
+
 }
 

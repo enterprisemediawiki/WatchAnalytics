@@ -150,8 +150,11 @@ class SpecialPendingReviews extends SpecialPage {
 		}//die();
 		$html .= '</table>';
 
-		$watchSuggest = new WatchSuggest( $this->mUser );
-		$html .= $watchSuggest->getWatchSuggestionList();
+		global $egPendingReviewsShowWatchSuggestionsIfReviewsUnder; // FIXME: crazy long name...
+		if ( $rowCount < $egPendingReviewsShowWatchSuggestionsIfReviewsUnder ) {
+			$watchSuggest = new WatchSuggest( $this->mUser );
+			$html .= $watchSuggest->getWatchSuggestionList();
+		}
 
 		$this->getOutput()->addHTML( $html );
 

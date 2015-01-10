@@ -42,10 +42,10 @@ class WatchSuggest {
 	 */
 	// public $limit;
 
-	
 	public function __construct ( User $user ) {
 	
 		$this->mUser = $user;
+		$this->dbr = wfGetDB( DB_SLAVE );
 
 	}
 
@@ -56,22 +56,124 @@ class WatchSuggest {
 	 */
 	public function getWatchSuggestionList () {
 
-		#
-		#
-		#
-		#	WARNING! Heinous code below...here be dragons...
-		#
-		#	(this code is in development and will be cleaned up after it's functional)
-		#
-		#
-		#
-
-
 		$html = '';
 
-		$dbr = wfGetDB( DB_SLAVE );
+		// gets id, NS and title of all pages in users watchlist in NS_MAIN
+		$userWatchlist = $this->getUserWatchlist( $this->mUser, NS_MAIN );
 
-		$userId = $this->mUser->getId();
+		$linkedPages = $this->getPagesRelatedByLinks( $userWatchlist );
+
+		$pageWatchQuery = new PageWatchesQuery;
+		$pageWatchesAndViews = $pageWatchQuery->getPageWatchesAndViews( array_keys( $linkedPages ) );
+
+		// add newly found number of watchers to linkedPages...
+		foreach ( $pageWatchesAndViews as $row ) {
+			$linkedPages[ $row->page_id ][ 'num_watches' ] = $row->num_watches;
+			$linkedPages[ $row->page_id ][ 'num_views' ] = $row->num_views;
+		}
+
+		$sortedPages = $this->sortPagesByWatchImportance( $linkedPages );
+
+
+		global $wgUser;
+		$userIsViewer = $wgUser->getId() == $this->mUser->getId();
+
+
+
+		$count = 1;
+		$watchSuggestionsTitle = wfMessage( 'pendingreviews-watch-suggestion-title' )->text();
+		$watchSuggestionsDescription = wfMessage( 'pendingreviews-watch-suggestion-description' )->text();
+
+
+
+		$html .= "<br /><br />"
+			. "<h3>$watchSuggestionsTitle</h3>"
+			. "<p>$watchSuggestionsDescription</p>"
+			. "<table class='pendingreviews-list'>"
+			. "<tr class='pendingreviews-row pendingreviews-row-suggest pendingreviews-criticality-green' pendingreviews-row-count='suggest'>"
+			. "<td class='pendingreviews-top-cell'>"
+			. "<ol>";
+
+		foreach( $sortedPages as $pageId => $pageInfo ) {
+
+			$suggestedTitle = Title::newFromID( $pageInfo[ 'page_id' ] );
+			if ( ! $suggestedTitle // for some reason some pages in the pagelinks table don't exist in either table page or table archive...
+				|| $suggestedTitle->getNamespace() !== 0 // skip pages not in the main namespace
+				|| $suggestedTitle->isRedirect() ) { // don't need redirects
+				continue;
+			}
+
+			// $cats = $suggestedTitle->getParentCategories();
+			// if (  )
+
+			if ( $userIsViewer ) {
+
+				// action=watch&token=9d1186bca6dd20866e607538b92be6c8%2B%5C
+				$watchLinkURL = $suggestedTitle->getLinkURL( array(
+					'action' => 'watch',
+					'token' => WatchAction::getWatchToken( $suggestedTitle, $wgUser ),
+				) );
+
+				$watchLink =
+					'<strong>'
+					. Xml::element(
+						'a',
+						array( 'href' => $watchLinkURL ),
+						wfMessage( 'pendingreviews-watch-suggestion-watchlink' )->text()
+					)
+					. ':</strong> ';
+
+			}
+			else {
+				$watchLink = '';
+			}
+
+			$pageLink = '<a href="' . $suggestedTitle->getLinkURL() . '">' . $suggestedTitle->getFullText() . '</a>';
+
+			$html .= '<li>' . $watchLink . $pageLink . '</li>';
+			// . ' - watches: ' . $pageInfo[ 'num_watches' ]
+			// 	. ', links: ' . $pageInfo[ 'num_links' ]
+			// 	. ', views: ' . $pageInfo[ 'num_views' ]
+			// 	. ', watch need: ' . $pageInfo[ 'watch_need' ]
+			
+			$count++;
+			global $egPendingReviewsNumberWatchSuggestions;
+			if ( $count > $egPendingReviewsNumberWatchSuggestions ) {
+				break;
+			}
+		
+		}
+		$html .= 
+			'</ol>' . 
+			'</td></tr>' .
+			'</table>';
+
+		return $html;
+
+	}
+
+
+
+	public function getUserWatchlist ( User $user, $namespaces = array() ) {
+
+		if ( ! is_array( $namespaces ) ) {
+			if ( intval( $namespaces ) < 0 ) {
+				throw new MWException( __METHOD__ . ' argument $namespace requires integer or array' );
+			}
+			$namespaces = array( $namespaces );
+		}
+		
+		if ( count( $namespaces ) > 1 ) {
+			$namespaceCondition = 'AND p.page_namespace IN (' . $this->dbr->makeList( $namespaces ) . ')';
+		}
+		else if ( count( $namespaces ) === 1 ) {
+			$namespaceCondition = 'AND p.page_namespace = ' . $namespaces[0];
+		}
+		else {
+			$namespaceCondition = '';
+		}
+
+		$userId = $user->getId();
 
 		// SELECT
 		// 	p.page_id AS p_id,
@@ -85,16 +187,17 @@ class WatchSuggest {
 		// WHERE
 		// 	w.wl_user = $userId
 		// 	AND p.page_namespace = 0
-		$userWatchlist = $dbr->select(
+		$userWatchlist = $this->dbr->select(
 			array(
 				'p' => 'page',
 				'w' => 'watchlist',
 			),
 			array(
 				'p.page_id AS p_id',
+				'w.wl_namespace AS p_namespace',
 				'w.wl_title AS p_title',
  			),
-			"w.wl_user=$userId AND p.page_namespace=0",
+			"w.wl_user=$userId " . $namespaceCondition,
 			__METHOD__,
 			array(), // options
 			array(
@@ -105,20 +208,31 @@ class WatchSuggest {
 			)
 		);
 
+		$return = array();
+		while ( $row = $userWatchlist->fetchObject() ) {
+			$return[] = $row;
+		}
+
+
+		return $userWatchlist;
+	}
+	
+	
+	public function getPagesRelatedByLinks ( $userWatchlist ) {
+
+
 		$pagesIds = array();
 		$pageTitles = array();
-		while ( $row = $userWatchlist->fetchObject() ) {
+		foreach ( $userWatchlist as $row ) {
 			$userWatchlistPageIds[] = $row->p_id;
+
+			// FIXME: for now this will only work in NS_MAIN since the next query
+			// these are used in assumes NS_MAIN
 			$userWatchlistPageTitles[] = $row->p_title;
 		}
 
-		$ids = $dbr->makeList( $userWatchlistPageIds );
-		$titles = $dbr->makeList( $userWatchlistPageTitles );
-
-		// $html .= "<pre>" . print_r( $pageIds, true ) . "</pre>";
-		// $html .= "<pre>" . print_r( $titles, true ) . "</pre>";
-
-
+		$ids = $this->dbr->makeList( $userWatchlistPageIds );
+		$titles = $this->dbr->makeList( $userWatchlistPageTitles );
 
 		// SELECT
 		// 	pl.pl_from AS pl_from_id,
@@ -137,7 +251,7 @@ class WatchSuggest {
 			" OR ( pl.pl_namespace = 0 AND pl.pl_title IN ($titles) )";
 
 
-		$linkedPagesResult = $dbr->select(
+		$linkedPagesResult = $this->dbr->select(
 			array(
 				'pl' => 'pagelinks',
 				'p_to' => 'page',
@@ -174,54 +288,24 @@ class WatchSuggest {
 		}
 
 		$linkedPagesToKeep = array();
-		$linkedPagesList = array();
 		foreach ( $linkedPages as $pageId => $numLinks ) {
 			if ( ! in_array( $pageId, $userWatchlistPageIds ) ) {
 				$linkedPagesToKeep[ $pageId ] = array( 'num_links' => $numLinks );
-				$linkedPagesList[] = $pageId;
 			}
 		}
 
-		// arsort( $linkedPagesToKeep );
-		// $html .= "<h1>linked pages before watch query</h1><pre>" . print_r( $linkedPagesToKeep, true ) . "</pre>";
+		return $linkedPagesToKeep;
 
-		// $html .= 
-		// 	"linked: " . count( $linkedPages ) 
-		// 	. '<br />linked to keep:' . count($linkedPagesToKeep)
-		// 	. '<br />watchlist: ' . count($userWatchlistPageIds);
+	}
 
-		unset( $linkedPages );
 
-		// arsort( $linkedPagesToKeep );
-
-		$pageWatchQuery = new PageWatchesQuery;
-		$queryInfo = $pageWatchQuery->getQueryInfo( 'p.page_id IN (' . $dbr->makeList( $linkedPagesList ) . ')' );
-		$queryInfo['options'][ 'ORDER BY' ] = 'num_watches ASC';
-
-		$pageWatchStats = $dbr->select(
-			$queryInfo['tables'],
-			array(
-				'p.page_id AS page_id',
-				'p.page_counter AS num_views',
-				$pageWatchQuery->sqlNumWatches, // 'SUM( IF(w.wl_title IS NOT NULL, 1, 0) ) AS num_watches'
-			),
-			$queryInfo['conds'],
-			__METHOD__,
-			$queryInfo['options'],
-			$queryInfo['join_conds']
-		);
-
-		// add newly found number of watchers to linkedPagesToKeep...
-		while ( $row = $pageWatchStats->fetchObject() ) {
-			$linkedPagesToKeep[ $row->page_id ][ 'num_watches' ] = $row->num_watches;
-			$linkedPagesToKeep[ $row->page_id ][ 'num_views' ] = $row->num_views;
-		}
+	public function sortPagesByWatchImportance ( $pages ) {
 
 		$watches = array();
 		$links = array();
 		$watchNeedArray = array();
-		$sortableLinkedPages = array();
-		foreach( $linkedPagesToKeep as $pageId => $pageData ) {
+		$sortedPages = array();
+		foreach( $pages as $pageId => $pageData ) {
 			if ( isset( $pageData[ 'num_watches' ] ) ) {
 				$numWatches = intval( $pageData[ 'num_watches' ] );
 				$numViews = intval( $pageData[ 'num_views' ] );
@@ -234,7 +318,7 @@ class WatchSuggest {
 
 			$watchNeed = $numLinks * pow( $numViews, 2 );
 
-			$sortableLinkedPages[] = array(
+			$sortedPages[] = array(
 				'page_id' => $pageId,
 				'num_watches' => $numWatches,
 				'num_links' => $numLinks,
@@ -245,75 +329,8 @@ class WatchSuggest {
 			$links[] = $numLinks;
 			$watchNeedArray[] = $watchNeed;
 		}
-		array_multisort( $watches, SORT_ASC, $watchNeedArray, SORT_DESC, $sortableLinkedPages );
+		array_multisort( $watches, SORT_ASC, $watchNeedArray, SORT_DESC, $sortedPages );
 
-
-
-		// $html .= "<h1>watchlist</h1><pre>" . print_r( $userWatchlistPageIds, true ) . "</pre>";
-		// $html .= "<h1>linked pages</h1><pre>" . print_r( $sortableLinkedPages, true ) . "</pre>";
-
-		global $wgUser;
-		$userIsViewer = $wgUser->getId() == $this->mUser->getId();
-
-
-
-		$count = 1;
-		$html .= "<h2>This wiki needs your help watching pages</h2>"
-			. "<p>Few (if any) people are watching the pages below. They are related to other pages in your watchlist, and it'd be really great if you could help by watching some of them."
-			. "<ol>";
-		foreach( $sortableLinkedPages as $pageId => $pageInfo ) {
-
-			$suggestedTitle = Title::newFromID( $pageInfo[ 'page_id' ] );
-			if ( ! $suggestedTitle // for some reason some pages in the pagelinks table don't exist in either table page or table archive...
-				|| $suggestedTitle->getNamespace() !== 0 // skip pages not in the main namespace
-				|| $suggestedTitle->isRedirect() ) { // don't need redirects
-				continue;
-			}
-
-			// $cats = $suggestedTitle->getParentCategories();
-			// if (  )
-
-			if ( $userIsViewer ) {
-
-				// action=watch&token=9d1186bca6dd20866e607538b92be6c8%2B%5C
-				$watchLinkURL = $suggestedTitle->getLinkURL( array(
-					'action' => 'watch',
-					'token' => WatchAction::getWatchToken( $suggestedTitle, $wgUser ),
-				) );
-
-				$watchLink = ' (<strong>' . Xml::element(
-					'a',
-					array( 'href' => $watchLinkURL ),
-					'watch' //FIXME: use a message
-				) . '</strong>)';
-
-			}
-			else {
-				$watchLink = '';
-			}
-
-			$html .= '<li><a href="' . $suggestedTitle->getLinkURL() . '">' 
-				. $suggestedTitle->getFullText() . '</a>'
-				. $watchLink
-				// . ' - watches: ' . $pageInfo[ 'num_watches' ]
-				// 	. ', links: ' . $pageInfo[ 'num_links' ]
-				// 	. ', views: ' . $pageInfo[ 'num_views' ]
-				// 	. ', watch need: ' . $pageInfo[ 'watch_need' ]
-				. '</li>';
-			
-			$count++;
-			if ( $count > 20 ) {
-				break;
-			}
-		
-		}
-		$html .= '</ol>';
-
-		return $html;
-
+		return $sortedPages;
 	}
-
-
-	
-	
 }
