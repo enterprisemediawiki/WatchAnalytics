@@ -128,7 +128,7 @@ class WatchStateRecorder {
 
 			$numWatches = intval( $page['num_watches'] );
 			$numReviewed = intval( $page['num_reviewed'] );
-			$pageNS = $page['page_namespace'];
+			$pageNS = intval( $page['page_namespace'] );
 
 			if ( $numWatches === 0 ) {
 				$unwatched++;
