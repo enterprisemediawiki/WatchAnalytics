@@ -309,16 +309,18 @@ class SpecialPendingReviews extends SpecialPage {
 
 		if ( $pageWasMoved ) {
 			$acceptDeletionButton = $this->getAcceptMoveWithoutRedirectButton( $item->deletedTitle, $item->deletedNS );
+			$displayMessage = 'pendingreviews-page-moved-no-redirect';
 		}
 		else {
 			$acceptDeletionButton = $this->getMarkDeleteReviewedButton( $item->deletedTitle, $item->deletedNS );
+			$displayMessage = 'pendingreviews-page-deleted';
 		}
 
 		$talkToDeleterButton = $this->getDeleterTalkButton( $item->deletionLog );
 
 		$title = Title::makeTitle( $item->deletedNS, $item->deletedTitle );
 		$displayTitle = '<strong>' 
-			. wfMessage( 'pendingreviews-page-deleted', $title->getFullText() )->parse()
+			. wfMessage( $displayMessage, $title->getFullText() )->parse()
 			. '</strong>';
 
 		return $this->getRowHTML( $item, $rowCount, $displayTitle, $acceptDeletionButton, $talkToDeleterButton, $changes );

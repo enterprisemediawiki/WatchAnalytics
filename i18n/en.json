@@ -70,6 +70,7 @@
 	"pendingreviews-edited-by":            "[[$1]] made an edit '''without a summary'''",
 	"pendingreviews-with-comment":         "[[$1]] made an edit with summary: ",
 	"pendingreviews-page-deleted":         "Deleted page: $1",
+	"pendingreviews-page-moved-no-redirect": "Moved page: $1",	
 	"pendingreviews-page-deleted-talk":    "Ask $1 about deletion",
 	"pendingreviews-accept-deletion":      "Accept deletion",
 	"pendingreviews-accept-move-without-redirect": "Accept move without redirect",
