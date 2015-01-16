@@ -66,6 +66,7 @@
 	"pendingreviews-reviewer-criticality-green": "Pages reviewed by more than {{PLURAL:$1|1 person|$1 people}}",
 
 	"watchanalytics-view-user-pendingreviews": "pending reviews",
+	"pendingreviews-watch-suggestion-thanks": "Thanks for watching!",
 
 	"pendingreviews-edited-by":            "[[$1]] made an edit '''without a summary'''",
 	"pendingreviews-with-comment":         "[[$1]] made an edit with summary: ",

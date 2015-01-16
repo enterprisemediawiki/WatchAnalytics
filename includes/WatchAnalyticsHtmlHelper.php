@@ -53,7 +53,9 @@ class WatchAnalyticsHtmlHelper {
 		}
 
 		if ( $numLI > $perCol ) {
-			$html = "<table style='width:100%;'><tr><td>" . $html; // prepend the start of a table
+			$colWidth = floor( 100 / $columns );
+
+			$html = "<table style='width:100%;'><tr><td style='width:$colWidth%;'>" . $html; // prepend the start of a table
 		}
 
 		// $html .= '<pre>' . print_r( $list, true ) . '</pre>';
@@ -64,7 +66,7 @@ class WatchAnalyticsHtmlHelper {
 			$colCount++;
 			$totalCount++;
 			if ( $colCount == $perCol ) {
-				$html .= "</$listType></td><td><$listType start='$totalCount'>"; // start new table cell
+				$html .= "</$listType></td><td style='width:$colWidth%;'><$listType start='$totalCount'>"; // start new table cell
 				$colCount = 0; // reset column counter
 			}
 

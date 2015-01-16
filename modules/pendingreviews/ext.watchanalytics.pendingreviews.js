@@ -38,4 +38,23 @@
 		
 	});
 
+	$('.pendingreviews-watch-suggest-link').click( function ( event ) {
+
+		event.preventDefault();
+
+		var button = this;
+		var titleText = $( button ).attr( 'suggest-title-prefixed-text' ),
+			thanks = $( button ).attr( 'thanks-msg' );
+
+		new mw.Api().postWithToken( 'watch', {
+			action: 'watch',
+			titles: titleText
+		} ).done( function ( data ) {
+
+			$( button ).closest( 'li' ).html( thanks );
+						
+		} );
+
+	});
+
 } )( jQuery, mediaWiki );
