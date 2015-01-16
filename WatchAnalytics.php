@@ -72,6 +72,10 @@ $GLOBALS['wgAutoloadClasses']['WatchAnalyticsWikiTablePager'] = __DIR__ . '/incl
 // parser functions
 $GLOBALS['wgAutoloadClasses']['WatchAnalyticsParserFunctions'] = __DIR__ . '/includes/WatchAnalyticsParserFunctions.php';
 
+// helper functions
+$GLOBALS['wgAutoloadClasses']['WatchAnalyticsHtmlHelper'] = __DIR__ . '/includes/WatchAnalyticsHtmlHelper.php';
+
+
 // state recorder
 $GLOBALS['wgAutoloadClasses']['WatchStateRecorder'] = __DIR__ . '/includes/WatchStateRecorder.php';
 

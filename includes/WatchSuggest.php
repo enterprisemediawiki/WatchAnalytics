@@ -84,7 +84,11 @@ class WatchSuggest {
 		$watchSuggestionsTitle = wfMessage( 'pendingreviews-watch-suggestion-title' )->text();
 		$watchSuggestionsDescription = wfMessage( 'pendingreviews-watch-suggestion-description' )->text();
 
-
+		// determine suggestion limit, and halfway point.
+		$numTotalSuggestions = count( $sortedPages );
+		global $egPendingReviewsNumberWatchSuggestions;
+		$suggestionLimit = min( $numTotalSuggestions, $egPendingReviewsNumberWatchSuggestions );
+		$halfway = ceil( $suggestionLimit / 2 );
 
 		$html .= "<br /><br />"
 			. "<h3>$watchSuggestionsTitle</h3>"
@@ -130,6 +134,10 @@ class WatchSuggest {
 
 			$pageLink = '<a href="' . $suggestedTitle->getLinkURL() . '">' . $suggestedTitle->getFullText() . '</a>';
 
+			if ( $count == ($halfway + 1) ) {
+				$html .= "</ol></td><td class='pendingreviews-top-cell'><ol start='$count'>";
+			}
+
 			$html .= '<li>' . $watchLink . $pageLink . '</li>';
 			// . ' - watches: ' . $pageInfo[ 'num_watches' ]
 			// 	. ', links: ' . $pageInfo[ 'num_links' ]
@@ -137,7 +145,6 @@ class WatchSuggest {
 			// 	. ', watch need: ' . $pageInfo[ 'watch_need' ]
 			
 			$count++;
-			global $egPendingReviewsNumberWatchSuggestions;
 			if ( $count > $egPendingReviewsNumberWatchSuggestions ) {
 				break;
 			}
@@ -147,8 +154,10 @@ class WatchSuggest {
 
 		$html .= 
 			'</ol>' . 
-			'</td><td class="pendingreviews-top-cell">' . $this->getMostWatchesList( 20 ) . '</td></tr>' .
+			'</td></tr>' .
 			'</table>';
+
+		$html .= '<h3>Watch Leaders</h3>' .  WatchAnalyticsHtmlHelper::formatListArray( $this->getMostWatchesListArray( 20 ), 2 );
 
 		return $html;
 
@@ -350,7 +359,7 @@ class WatchSuggest {
 	// 	p.page_is_redirect = 0
 	// GROUP BY w.wl_user
 	// ORDER BY user_watches DESC
-	public function getMostWatchesList ( $limit ) {
+	public function getMostWatchesListArray ( $limit = 20 ) {
 
 		$mostWatches = $this->dbr->select(
 			array(
@@ -382,8 +391,10 @@ class WatchSuggest {
 			)
 		);
 
-		$list = '';
+		$return = array();
+		$count = 0;
 		while ( $user = $mostWatches->fetchObject() ) {
+			$count++;
 			// CONSIDERING usering real name
 			// if ( $user->real_name ) {
 			// 	$displayName = $user->real_name;
@@ -393,14 +404,17 @@ class WatchSuggest {
 			// }
 
 			$userPage = User::newFromName( $user->user_name )->getUserPage();
-			$userPageLink = Linker::link( $userPage, $userPage->getFullText() );
+			$userPageLink = Linker::link( $userPage, htmlspecialchars( $userPage->getFullText() ) );
 
 			$watches = '<strong>' . $user->user_watches . '</strong> pages watched';
 
-			$list .= "<li>$userPageLink - $watches</li>";
+			$return[] = "<li>$userPageLink - $watches</li>";
 		}
 
-		return "<ol>$list</ol>";
+		return $return;
 
 	}
+
+
+
 }
