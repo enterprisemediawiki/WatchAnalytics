@@ -84,16 +84,9 @@ class WatchSuggest {
 		$watchSuggestionsTitle = wfMessage( 'pendingreviews-watch-suggestion-title' )->text();
 		$watchSuggestionsDescription = wfMessage( 'pendingreviews-watch-suggestion-description' )->text();
 
+		global $egPendingReviewsNumberWatchSuggestions;
 
-
-		$html .= "<br /><br />"
-			. "<h3>$watchSuggestionsTitle</h3>"
-			. "<p>$watchSuggestionsDescription</p>"
-			. "<table class='pendingreviews-list'>"
-			. "<tr class='pendingreviews-row pendingreviews-row-suggest pendingreviews-criticality-green' pendingreviews-row-count='suggest'>"
-			. "<td class='pendingreviews-top-cell'>"
-			. "<ol>";
-
+		$watchSuggestionsLIs = array();
 		foreach( $sortedPages as $pageId => $pageInfo ) {
 
 			$suggestedTitle = Title::newFromID( $pageInfo[ 'page_id' ] );
@@ -118,7 +111,12 @@ class WatchSuggest {
 					'<strong>'
 					. Xml::element(
 						'a',
-						array( 'href' => $watchLinkURL ),
+						array(
+							'href' => $watchLinkURL,
+							'class' => 'pendingreviews-watch-suggest-link',
+							'suggest-title-prefixed-text' => $suggestedTitle->getPrefixedDBkey(),
+							'thanks-msg' => wfMessage( 'pendingreviews-watch-suggestion-thanks' )->text()// FIXME: there's a better way
+						),
 						wfMessage( 'pendingreviews-watch-suggestion-watchlink' )->text()
 					)
 					. ':</strong> ';
@@ -130,23 +128,24 @@ class WatchSuggest {
 
 			$pageLink = '<a href="' . $suggestedTitle->getLinkURL() . '">' . $suggestedTitle->getFullText() . '</a>';
 
-			$html .= '<li>' . $watchLink . $pageLink . '</li>';
-			// . ' - watches: ' . $pageInfo[ 'num_watches' ]
-			// 	. ', links: ' . $pageInfo[ 'num_links' ]
-			// 	. ', views: ' . $pageInfo[ 'num_views' ]
-			// 	. ', watch need: ' . $pageInfo[ 'watch_need' ]
-			
+			$watchSuggestionsLIs[] = '<li>' . $watchLink . $pageLink . '</li>';
+
 			$count++;
-			global $egPendingReviewsNumberWatchSuggestions;
 			if ( $count > $egPendingReviewsNumberWatchSuggestions ) {
 				break;
 			}
 		
 		}
-		$html .= 
-			'</ol>' . 
-			'</td></tr>' .
-			'</table>';
+
+		$numTopWatchers = 20;
+
+		$html .= "<br /><br />"
+			. "<h3>$watchSuggestionsTitle</h3>"
+			. "<p>$watchSuggestionsDescription</p>"
+			. WatchAnalyticsHtmlHelper::formatListArray( $watchSuggestionsLIs, 2 )
+			. '<br /><h3>Watch Leaders</h3>'
+			. "<p>The following $numTopWatchers users are watching the most pages.</p>"
+			. WatchAnalyticsHtmlHelper::formatListArray( $this->getMostWatchesListArray( $numTopWatchers ), 2 );
 
 		return $html;
 
@@ -333,4 +332,77 @@ class WatchSuggest {
 
 		return $sortedPages;
 	}
+
+	// SELECT 
+	// 	u.user_name AS uname,
+	// 	u.user_real_name AS name,
+	// 	COUNT( * ) AS user_watches
+	// FROM
+	// 	watchlist AS w
+	// RIGHT JOIN page AS p ON
+	// 	(w.wl_namespace = p.page_namespace AND w.wl_title = p.page_title)
+	// LEFT JOIN user AS u ON
+	// 	(w.wl_user = u.user_id)
+	// WHERE
+	// 	p.page_is_redirect = 0
+	// GROUP BY w.wl_user
+	// ORDER BY user_watches DESC
+	public function getMostWatchesListArray ( $limit = 20 ) {
+
+		$mostWatches = $this->dbr->select(
+			array(
+				'w' => 'watchlist',
+				'p' => 'page',
+				'u' => 'user',
+			),
+			array(
+				'u.user_name AS user_name',
+				'u.user_real_name AS real_name',
+				'COUNT( * ) AS user_watches',
+ 			),
+			'p.page_is_redirect = 0',
+			__METHOD__,
+			array(
+				'GROUP BY' => 'w.wl_user',
+				'ORDER BY' => 'user_watches DESC',
+				'LIMIT' => $limit,
+			),
+			array(
+				'p' => array(
+					'RIGHT JOIN', 
+					'w.wl_namespace = p.page_namespace AND w.wl_title = p.page_title'
+				),
+				'u' => array(
+					'LEFT JOIN', 
+					'w.wl_user = u.user_id'
+				),
+			)
+		);
+
+		$return = array();
+		$count = 0;
+		while ( $user = $mostWatches->fetchObject() ) {
+			$count++;
+			// CONSIDERING usering real name
+			// if ( $user->real_name ) {
+			// 	$displayName = $user->real_name;
+			// }
+			// else {
+			// 	$displayName = $user->user_name;
+			// }
+
+			$userPage = User::newFromName( $user->user_name )->getUserPage();
+			$userPageLink = Linker::link( $userPage, htmlspecialchars( $userPage->getFullText() ) );
+
+			$watches = '<strong>' . $user->user_watches . '</strong> pages watched';
+
+			$return[] = "<li>$userPageLink - $watches</li>";
+		}
+
+		return $return;
+
+	}
+
+
+
 }
