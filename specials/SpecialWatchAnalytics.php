@@ -244,6 +244,7 @@ class SpecialWatchAnalytics extends SpecialPage {
 			array(
 				'w' => 'watchlist',
 				'u' => 'user',
+				'p' => 'page',
 			),
 			array(
 				'w.wl_title AS title',
@@ -251,7 +252,7 @@ class SpecialWatchAnalytics extends SpecialPage {
 				'u.user_name as user_name',
 				'u.user_real_name AS real_name',
 			),
-			'wl_namespace = 0',
+			'w.wl_namespace = 0 AND p.page_is_redirect = 0',
 			__METHOD__,
 			array(
 				"LIMIT" => "100000",
@@ -259,6 +260,9 @@ class SpecialWatchAnalytics extends SpecialPage {
 			array(
 				'u' => array(
 					'LEFT JOIN', 'u.user_id = w.wl_user'
+				),
+				'p' => array(
+					'RIGHT JOIN', 'w.wl_title = p.page_title AND w.wl_namespace = p.page_namespace'
 				),
 			)
 		);
