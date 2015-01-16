@@ -143,9 +143,11 @@ class WatchSuggest {
 			}
 		
 		}
+
+
 		$html .= 
 			'</ol>' . 
-			'</td></tr>' .
+			'</td><td class="pendingreviews-top-cell">' . $this->getMostWatchesList( 20 ) . '</td></tr>' .
 			'</table>';
 
 		return $html;
@@ -332,5 +334,73 @@ class WatchSuggest {
 		array_multisort( $watches, SORT_ASC, $watchNeedArray, SORT_DESC, $sortedPages );
 
 		return $sortedPages;
+	}
+
+	// SELECT 
+	// 	u.user_name AS uname,
+	// 	u.user_real_name AS name,
+	// 	COUNT( * ) AS user_watches
+	// FROM
+	// 	watchlist AS w
+	// RIGHT JOIN page AS p ON
+	// 	(w.wl_namespace = p.page_namespace AND w.wl_title = p.page_title)
+	// LEFT JOIN user AS u ON
+	// 	(w.wl_user = u.user_id)
+	// WHERE
+	// 	p.page_is_redirect = 0
+	// GROUP BY w.wl_user
+	// ORDER BY user_watches DESC
+	public function getMostWatchesList ( $limit ) {
+
+		$mostWatches = $this->dbr->select(
+			array(
+				'w' => 'watchlist',
+				'p' => 'page',
+				'u' => 'user',
+			),
+			array(
+				'u.user_name AS user_name',
+				'u.user_real_name AS real_name',
+				'COUNT( * ) AS user_watches',
+ 			),
+			'p.page_is_redirect = 0',
+			__METHOD__,
+			array(
+				'GROUP BY' => 'w.wl_user',
+				'ORDER BY' => 'user_watches DESC',
+				'LIMIT' => $limit,
+			),
+			array(
+				'p' => array(
+					'RIGHT JOIN', 
+					'w.wl_namespace = p.page_namespace AND w.wl_title = p.page_title'
+				),
+				'u' => array(
+					'LEFT JOIN', 
+					'w.wl_user = u.user_id'
+				),
+			)
+		);
+
+		$list = '';
+		while ( $user = $mostWatches->fetchObject() ) {
+			// CONSIDERING usering real name
+			// if ( $user->real_name ) {
+			// 	$displayName = $user->real_name;
+			// }
+			// else {
+			// 	$displayName = $user->user_name;
+			// }
+
+			$userPage = User::newFromName( $user->user_name )->getUserPage();
+			$userPageLink = Linker::link( $userPage, $userPage->getFullText() );
+
+			$watches = '<strong>' . $user->user_watches . '</strong> pages watched';
+
+			$list .= "<li>$userPageLink - $watches</li>";
+		}
+
+		return "<ol>$list</ol>";
+
 	}
 }
