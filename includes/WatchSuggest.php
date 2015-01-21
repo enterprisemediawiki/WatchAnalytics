@@ -360,7 +360,7 @@ class WatchSuggest {
 				'u.user_real_name AS real_name',
 				'COUNT( * ) AS user_watches',
  			),
-			'p.page_is_redirect = 0',
+			'p.page_is_redirect = 0 AND w.wl_user != 0', // no redirects, and don't include maintenance scripts and other non-users
 			__METHOD__,
 			array(
 				'GROUP BY' => 'w.wl_user',
@@ -391,12 +391,16 @@ class WatchSuggest {
 			// 	$displayName = $user->user_name;
 			// }
 
-			$userPage = User::newFromName( $user->user_name )->getUserPage();
-			$userPageLink = Linker::link( $userPage, htmlspecialchars( $userPage->getFullText() ) );
+			$watchUser = User::newFromName( $user->user_name );
+			if ( $watchUser ) {
+				$userPage = $watchUser->getUserPage();
+				$userPageLink = Linker::link( $userPage, htmlspecialchars( $userPage->getFullText() ) );
 
-			$watches = '<strong>' . $user->user_watches . '</strong> pages watched';
+				$watches = '<strong>' . $user->user_watches . '</strong> pages watched';
 
-			$return[] = "<li>$userPageLink - $watches</li>";
+				$return[] = "<li>$userPageLink - $watches</li>";
+			}
+
 		}
 
 		return $return;

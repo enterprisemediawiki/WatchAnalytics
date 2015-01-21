@@ -48,7 +48,7 @@
 
 		new mw.Api().postWithToken( 'watch', {
 			action: 'watch',
-			titles: titleText
+			title: titleText
 		} ).done( function ( data ) {
 
 			$( button ).closest( 'li' ).html( thanks );
