@@ -100,27 +100,7 @@ class WatchSuggest {
 			// if (  )
 
 			if ( $userIsViewer ) {
-
-				// action=watch&token=9d1186bca6dd20866e607538b92be6c8%2B%5C
-				$watchLinkURL = $suggestedTitle->getLinkURL( array(
-					'action' => 'watch',
-					'token' => WatchAction::getWatchToken( $suggestedTitle, $wgUser ),
-				) );
-
-				$watchLink =
-					'<strong>'
-					. Xml::element(
-						'a',
-						array(
-							'href' => $watchLinkURL,
-							'class' => 'pendingreviews-watch-suggest-link',
-							'suggest-title-prefixed-text' => $suggestedTitle->getPrefixedDBkey(),
-							'thanks-msg' => wfMessage( 'pendingreviews-watch-suggestion-thanks' )->text()// FIXME: there's a better way
-						),
-						wfMessage( 'pendingreviews-watch-suggestion-watchlink' )->text()
-					)
-					. ':</strong> ';
-
+				$watchLink = '<strong>' . self::getWatchLink( $suggestedTitle ) . ':</strong> ';
 			}
 			else {
 				$watchLink = '';
@@ -407,6 +387,30 @@ class WatchSuggest {
 
 	}
 
+	public static function getWatchLink ( Title $title ) {
 
+		global $wgUser;
+
+		// action=watch&token=9d1186bca6dd20866e607538b92be6c8%2B%5C
+		$watchLinkURL = $title->getLinkURL( array(
+			'action' => 'watch',
+			'token' => WatchAction::getWatchToken( $title, $wgUser ),
+		) );
+
+		$watchLink =
+			Xml::element(
+				'a',
+				array(
+					'href' => $watchLinkURL,
+					'class' => 'pendingreviews-watch-suggest-link',
+					'suggest-title-prefixed-text' => $title->getPrefixedDBkey(),
+					'thanks-msg' => wfMessage( 'pendingreviews-watch-suggestion-thanks' )->text()// FIXME: there's a better way
+				),
+				wfMessage( 'pendingreviews-watch-suggestion-watchlink' )->text()
+			);
+
+		return $watchLink;
+
+	}
 
 }

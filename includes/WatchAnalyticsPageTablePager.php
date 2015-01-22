@@ -69,17 +69,22 @@ class WatchAnalyticsPageTablePager extends WatchAnalyticsTablePager {
 				$titleFullText
 			);
 			
-			$url = Title::newFromText('Special:WatchAnalytics')->getLocalUrl(
-				array( 'page' => $value )
-			);
-			$msg = wfMsg( 'watchanalytics-view-page-stats' );
+
+			// FIXME: page stats not currently enabled. Uncomment when enabled
+			// $url = Title::newFromText('Special:WatchAnalytics')->getLocalUrl(
+			// 	array( 'page' => $value )
+			// );
+			// $msg = wfMsg( 'watchanalytics-view-page-stats' );
+			// $pageStatsLink = ' (' . Xml::element(
+			// 	'a',
+			// 	array( 'href' => $url ),
+			// 	$msg
+			// ) . ')';
+			// $pageLink .= $pageStatsLink;
 			
-			$pageLink .= ' (' . Xml::element(
-				'a',
-				array( 'href' => $url ),
-				$msg
-			) . ')';
-			
+			$pageLink .= ' (' . WatchSuggest::getWatchLink( $title ) . ')';
+
+
 			return $pageLink;
 		}
 		else if ( $fieldName === 'max_pending_minutes' || $fieldName === 'avg_pending_minutes' ) {
