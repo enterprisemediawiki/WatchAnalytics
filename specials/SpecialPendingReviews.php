@@ -534,6 +534,10 @@ class SpecialPendingReviews extends SpecialPage {
 	 */
 	public function getDeleterTalkButton ( $deletionLog ) {
 
+		if ( count( $deletionLog ) == 0 ){
+			return '';
+		}
+
 		$userId = $deletionLog[ count( $deletionLog ) - 1 ]->log_user;
 		$user = User::newFromId( $userId );
 

@@ -49,7 +49,7 @@ class SpecialWatchAnalytics extends SpecialPage {
 		
 		$wgOut->addHTML( $this->getPageHeader() );
 		if ($this->mMode == 'users') {
-			$this->usersList();
+			$this->usersList( $filters );
 		}
 		else if ( $this->mMode == 'wikihistory' ) {
 			$this->wikiHistory();
@@ -170,18 +170,19 @@ class SpecialWatchAnalytics extends SpecialPage {
 		$wgOut->addHTML( $html );
 	}
 
-	public function usersList () {
+	public function usersList ( $filters ) {
 		global $wgOut, $wgRequest;
 
 		$wgOut->setPageTitle( wfMessage( 'watchanalytics-special-users-pagetitle' )->text() );
 
-		$pager = new WatchAnalyticsUserTablePager( $this, array() );
+		$pager = new WatchAnalyticsUserTablePager( $this, array(), $filters );
 		
 		// $form = $pager->getForm();
 		$body = $pager->getBody();
 		$html = '';
 		// $html = $form;
 		if ( $body ) {
+			$html .= $pager->buildForm();
 			$html .= $pager->getNavigationBar();
 			$html .= $body;
 			$html .= $pager->getNavigationBar();

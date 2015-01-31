@@ -87,6 +87,31 @@ class UserWatchesQuery extends WatchesQuery {
 
 		);
 
+		// optionally join the 'user_groups' table to filter by user group
+		if ( $this->userGroupFilter ) {
+			$this->tables['ug'] = 'user_groups';
+			$this->join_conds['ug'] = array(
+				'RIGHT JOIN', "w.wl_user = ug.ug_user AND ug.ug_group = \"{$this->userGroupFilter}\""
+			);
+
+			$noNullUsers = 'w.wl_user IS NOT NULL';
+			if ( is_array( $this->conds ) ) {
+				$this->conds[] = $noNullUsers;
+			}
+			else if ( is_string( $this->conds ) ) {
+				$this->conds .= ' AND ' . $noNullUsers;
+			}
+		}
+
+		// optionally join the 'categorylinks' table to filter by page category
+		if ( $this->categoryFilter ) {
+			$this->tables['cat'] = 'categorylinks';
+			$this->join_conds['cat'] = array(
+				'RIGHT JOIN', "cat.cl_from = p.page_id AND cat.cl_to = \"{$this->categoryFilter}\""
+			);
+		}
+
+
 		$this->options = array(
 			'GROUP BY' => 'w.wl_user'
 		);

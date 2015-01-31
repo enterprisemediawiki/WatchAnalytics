@@ -11,9 +11,9 @@ class WatchAnalyticsUserTablePager extends WatchAnalyticsTablePager {
 		'avg_pending_minutes' => true,
 	);
 
-	function __construct( $page, $conds ) {
+	function __construct( $page, $conds, $filters=array() ) {
 		$this->watchQuery = new UserWatchesQuery();
-		parent::__construct( $page, $conds );
+		parent::__construct( $page, $conds, $filters );
 	}
 
 	function getQueryInfo() {

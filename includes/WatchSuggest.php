@@ -60,8 +60,38 @@ class WatchSuggest {
 
 		// gets id, NS and title of all pages in users watchlist in NS_MAIN
 		$userWatchlist = $this->getUserWatchlist( $this->mUser, NS_MAIN );
+		$linkedPages = array();
 
-		$linkedPages = $this->getPagesRelatedByLinks( $userWatchlist );
+		// if the user has pages from NS_MAIN in their watchlist then find all
+		// pages linked to/from those pages
+		if ( count( $userWatchlist ) > 0 ) {
+			$linkedPages = $this->getPagesRelatedByLinks( $userWatchlist );
+		}
+		
+
+		if ( count( $linkedPages ) == 0 ) {
+
+			// if the users watchlist in NS_MAIN is empty (e.g. probably a new user)
+			// create a list of all pages in NS_MAIN as an approximation. Ideally it'd
+			// find some other way to suggest pages (by pages the person has viewed, perhaps)
+			$noWatchlist = $this->dbr->select(
+				'page',
+				'page_id',
+				'page_namespace = 0',
+				__METHOD__
+			);
+
+			$linkedPages = array();
+
+			// create "fake" $linkedPages where all pages in NS_MAIN are given the same number
+			// of inbound/outbound links from the users watchlist
+			while ( $row = $noWatchlist->fetchObject() ) {
+				$linkedPages[ $row->page_id ] = array( 'num_links' => 1 );
+			}
+
+		}
+
+
 
 		$pageWatchQuery = new PageWatchesQuery;
 		$pageWatchesAndViews = $pageWatchQuery->getPageWatchesAndViews( array_keys( $linkedPages ) );
@@ -193,7 +223,7 @@ class WatchSuggest {
 		}
 
 
-		return $userWatchlist;
+		return $return;
 	}
 	
 	
@@ -202,6 +232,8 @@ class WatchSuggest {
 
 		$pagesIds = array();
 		$pageTitles = array();
+		$userWatchlistPageIds = array();
+		$userWatchlistPageTitles = array();
 		foreach ( $userWatchlist as $row ) {
 			$userWatchlistPageIds[] = $row->p_id;
 
