@@ -79,7 +79,7 @@
 	"pendingreviews-clear-page-notification": "Page \"$1\" has been marked reviewed. Return to $2",
 	"pendingreviews-log-approved":         "[[$1]] approved a revision",
 	"pendingreviews-log-unapproved":       "[[$1]] removed all revision approvals",
-	"pendingreviews-log-delete":           "[[$1]] deleted this page",
+	"pendingreviews-log-delete":           "[[$1]] deleted this page with rationale: $2",
 	"pendingreviews-log-restore":          "[[$1]] un-deleted this page",
 	"pendingreviews-log-import-upload":    "[[$1]] uploaded this file",
 	"pendingreviews-log-move":             "[[$1]] moved this page to the new title '''[[:$2]]'''",
