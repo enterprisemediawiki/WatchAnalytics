@@ -70,7 +70,12 @@ class WatchStateRecorder {
 			),
 			null // join_conds
 		);
-		return new MWTimestamp( $result->tracking_timestamp );
+		if ( $result && $result->tracking_timestamp ) {
+			return new MWTimestamp( $result->tracking_timestamp );
+		}
+		else {
+			return new MWTimestamp( '19700101000000' );
+		}
 		
 	}
 
