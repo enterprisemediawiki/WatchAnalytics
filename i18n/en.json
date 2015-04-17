@@ -6,6 +6,7 @@
     },
     "watchanalytics-desc": "Encouraging good distribution of watchers",
 	"watchanalytics-personal-url": "My pending reviews ($1)",
+	"watchanalytics-personal-url-old": "My pending reviews ({{PLURAL:$1|1 review|$2 reviews}}, oldest = {{PLURAL:$2|1 day|$1 days}})",
 	"watchanalytics-view": "View:",
 	"pendingreviews": "Pending reviews",
 	"watchanalytics": "Watch analytics",

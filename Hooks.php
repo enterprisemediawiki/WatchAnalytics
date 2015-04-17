@@ -30,11 +30,7 @@ class WatchAnalyticsHooks {
 		$watchStats = $user->watchStats; // set in onBeforePageDisplay() hook
 		
 		$numPending = $watchStats['num_pending'];
-		
-		// when $sk (third arg) available, replace wfMessage with $sk->msg()
-		$text = wfMessage( 'watchanalytics-personal-url' )->params( $numPending )->text();		
-		
-		$personal_urls['watchlist']['text'] = $text;
+				
 		$maxPendingDays = $watchStats['max_pending_days'];
 		
 		if ( $numPending == 0 ) {
@@ -48,7 +44,14 @@ class WatchAnalyticsHooks {
 		global $egPendingReviewsEmphasizeDays;
 		if ( $maxPendingDays > $egPendingReviewsEmphasizeDays ) {
 			$personal_urls['watchlist']['class'][] = 'mw-watchanalytics-watchlist-pending-old';
+			$text = wfMessage( 'watchanalytics-personal-url-old' )->params( $numPending, $maxPendingDays )->text();
 		}
+		else {
+			// when $sk (third arg) available, replace wfMessage with $sk->msg()
+			$text = wfMessage( 'watchanalytics-personal-url' )->params( $numPending )->text();
+		}
+
+		$personal_urls['watchlist']['text'] = $text;
 		$personal_urls['watchlist']['href'] = SpecialPage::getTitleFor( 'PendingReviews' )->getLocalURL();
 		return true;
 	}
