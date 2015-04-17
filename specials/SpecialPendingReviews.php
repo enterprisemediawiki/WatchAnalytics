@@ -681,40 +681,54 @@ class SpecialPendingReviews extends SpecialPage {
 		// add pendingreviews-edited-by?
 		$messages = array(
 			'approval' => array( 
-				'approve' => 'pendingreviews-log-approved',
-				'unapprove' => 'pendingreviews-log-unapproved'
+				'approve'    => 'pendingreviews-log-approved',
+				'unapprove'  => 'pendingreviews-log-unapproved'
 			),
 			'delete' => array(
-				'delete' => 'pendingreviews-log-delete',
-				'restore' => 'pendingreviews-log-restore',
+				'delete'     => 'pendingreviews-log-delete',
+				'restore'    => 'pendingreviews-log-restore',
 			),
 			'import' => array(
-				'upload' => 'pendingreviews-log-import-upload',
+				'upload'     => 'pendingreviews-log-import-upload',
 			),
 			'move' => array(
-				'move' => 'pendingreviews-log-move',
+				'move'       => 'pendingreviews-log-move',
 				'move_redir' => 'pendingreviews-log-move-redir',
 			),
 			'protect' => array(
-				'protect' => 'pendingreviews-log-protect',
-				'unprotect' => 'pendingreviews-log-unprotect',
-				'modify' => 'pendingreviews-log-modify-protect',
+				'protect'    => 'pendingreviews-log-protect',
+				'unprotect'  => 'pendingreviews-log-unprotect',
+				'modify'     => 'pendingreviews-log-modify-protect',
 			),
 			'upload' => array(
-				'upload' => 'pendingreviews-log-upload-new',
-				'overwrite' => 'pendingreviews-log-upload-overwrite',
+				'upload'     => 'pendingreviews-log-upload-new',
+				'overwrite'  => 'pendingreviews-log-upload-overwrite',
 			),
 		);
 
+		// get user page of user who created the log entry
 		$userPage = Title::makeTitle( NS_USER , $logEntry->log_user_text )->getFullText();
 
+		// if a message exists for the particular log type, handle it as follows
 		if ( isset( $messages[ $logEntry->log_type ][ $logEntry->log_action ] ) ) {
+
+			// all messages will use the executing users user-page
 			$messageParams = array( $userPage );
+
+			// if the log action is move or move_redir, the move target is in the message
 			if ( $logEntry->log_action == 'move' || $logEntry->log_action == 'move_redir' ) {
 				$messageParams[] = PendingReview::getMoveTarget( $logEntry->log_params );
 			}
+
+			if ( $logEntry->log_action == 'delete' ) { // $logEntry->log_comment ) {
+				$messageParams[] = $logEntry->log_comment;
+			}
+
 			return wfMessage( $messages[ $logEntry->log_type ][ $logEntry->log_action ], $messageParams );
+		
 		}
+
+		// if no message exists for the log type and action, handling with "unknown change"
 		else {
 			return wfMessage( 'pendingreviews-log-unknown-change', $userPage );
 		}
