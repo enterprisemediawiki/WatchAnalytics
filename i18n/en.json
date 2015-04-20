@@ -48,6 +48,7 @@
 	"watchanalytics-special-header-main-num-one-watched": "# content watched once",
 	"watchanalytics-special-header-main-num-unreviewed": "# content unreviewed",
 	"watchanalytics-special-header-main-num-one-reviewed": "# content reviewed once",
+	"watchanalytics-special-header-rev-frequency": "Revision frequency score",
 	"watchanalytics-watch-forcegraph-header": "Force-directed graph of user-to-page watch relationships",
 	"watchanalytics-watch-forcegraph-description": "Orange dots represent users. Blue dots represent pages. Lines between the dots represent the user being a watcher of the page. Lines are gray if the latest page revision has been reviewed. Lines are red if reviews are pending. Move your mouse over a dot to see the user or page name.",
 	"watchanalytics-pause-visualization": "Pause visualization",

@@ -9,6 +9,7 @@ class WatchAnalyticsUserTablePager extends WatchAnalyticsTablePager {
 		'percent_pending' => true,
 		'max_pending_minutes' => true,
 		'avg_pending_minutes' => true,
+		'rev_frequency_score' => true,
 	);
 
 	function __construct( $page, $conds, $filters=array() ) {
