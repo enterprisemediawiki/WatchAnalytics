@@ -39,7 +39,8 @@ class PageWatchesQuery extends WatchesQuery {
 	public $sqlNumWatches = 'SUM( IF(w.wl_title IS NOT NULL, 1, 0) ) AS num_watches';
 	public $sqlNumReviewed = 'SUM( IF(w.wl_title IS NOT NULL AND w.wl_notificationtimestamp IS NULL, 1, 0) ) AS num_reviewed';
 	public $sqlPercentPending = 'SUM( IF(w.wl_title IS NOT NULL AND w.wl_notificationtimestamp IS NULL, 0, 1) ) * 100 / COUNT(*) AS percent_pending';
-	
+	public $sqlWatchQuality = 'SUM( user_watch_scores.engagement_score ) AS watch_quality';
+
 	protected $fieldNames = array(
 		'page_ns_and_title'       => 'watchanalytics-special-header-page-title',
 		'num_watches'             => 'watchanalytics-special-header-watches',
@@ -59,7 +60,7 @@ class PageWatchesQuery extends WatchesQuery {
 			$this->sqlPercentPending,
 			$this->sqlMaxPendingMins,
 			$this->sqlAvgPendingMins,
-			'SUM( user_watch_scores.engagement_score ) AS watch_quality',
+			$this->sqlWatchQuality,
 		);
 
 		$this->conds = $conds ? $conds : array( 'p.page_namespace IS NOT NULL' );
@@ -157,6 +158,32 @@ class PageWatchesQuery extends WatchesQuery {
 		}
 
 		return $return;
+
+	}
+
+	public function getPageWatchQuality ( Title $title ) {
+
+		$dbr = wfGetDB( DB_SLAVE );
+
+		$queryInfo = $this->getQueryInfo( array(
+			'p.page_namespace' => $title->getNamespace(),
+			'p.page_title' => $title->getDBkey(),
+		) );
+
+		$pageData = $dbr->selectRow(
+			$queryInfo['tables'],
+			array(
+				$this->sqlWatchQuality
+			),
+			$queryInfo['conds'],
+			__METHOD__,
+			$queryInfo['options'],
+			$queryInfo['join_conds']
+		);
+
+		// $row = $pageData->fetchObject();
+
+		return $pageData->watch_quality;
 
 	}
 	

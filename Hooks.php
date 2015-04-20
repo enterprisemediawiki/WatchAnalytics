@@ -147,4 +147,15 @@ class WatchAnalyticsHooks {
 
 		return true;
 	}
+
+	public static function setArticleHeader ( Article &$article, &$outputDone, &$useParserCache ) {
+		global $wgOut, $wgRequest;
+		
+		$watchQuery = new PageWatchesQuery();
+		$watchQuality = $watchQuery->getPageWatchQuality( $article->getTitle() );
+
+		$wgOut->addHTML( "<div style='float:right;'>This page has a watch quality of $watchQuality</div>" );
+
+		return true;
+	}
 }
