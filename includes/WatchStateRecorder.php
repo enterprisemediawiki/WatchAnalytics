@@ -241,8 +241,8 @@ class WatchStateRecorder {
 		$sqlNumPages = "COUNT( DISTINCT p.page_id ) AS {$prefix}num_pages";
 		$sqlNumWatches = "SUM( IF( w.wl_title IS NOT NULL,             1, 0) ) AS {$prefix}num_watches";
 		$sqlNumPending = "SUM( IF( w.wl_notificationtimestamp IS NULL, 0, 1) ) AS {$prefix}num_pending";
-		$sqlMaxPendingMins = "MAX( TIMESTAMPDIFF(MINUTE, w.wl_notificationtimestamp, UTC_TIMESTAMP()) ) AS {$prefix}max_pending_minutes";
-		$sqlAvgPendingMins = "AVG( TIMESTAMPDIFF(MINUTE, w.wl_notificationtimestamp, UTC_TIMESTAMP()) ) AS {$prefix}avg_pending_minutes";
+		$sqlMaxPendingMins = "IFNULL( MAX( TIMESTAMPDIFF(MINUTE, w.wl_notificationtimestamp, UTC_TIMESTAMP()) ), 0 ) AS {$prefix}max_pending_minutes";
+		$sqlAvgPendingMins = "IFNULL( AVG( TIMESTAMPDIFF(MINUTE, w.wl_notificationtimestamp, UTC_TIMESTAMP()) ), 0 ) AS {$prefix}avg_pending_minutes";
 
 
 		$tables = array(
