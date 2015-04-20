@@ -47,6 +47,7 @@ class PageWatchesQuery extends WatchesQuery {
 		'percent_pending'         => 'watchanalytics-special-header-pending-percent',
 		'max_pending_minutes'     => 'watchanalytics-special-header-pending-maxtime',
 		'avg_pending_minutes'     => 'watchanalytics-special-header-pending-averagetime',
+		'watch_quality'           => 'watchanalytics-special-header-watch-quality',
 	);
 
 	function getQueryInfo( $conds = null ) {
@@ -58,6 +59,7 @@ class PageWatchesQuery extends WatchesQuery {
 			$this->sqlPercentPending,
 			$this->sqlMaxPendingMins,
 			$this->sqlAvgPendingMins,
+			'SUM( user_watch_scores.engagement_score ) AS watch_quality',
 		);
 
 		$this->conds = $conds ? $conds : array( 'p.page_namespace IS NOT NULL' );
@@ -87,6 +89,36 @@ class PageWatchesQuery extends WatchesQuery {
 				'RIGHT JOIN', "cat.cl_from = p.page_id AND cat.cl_to = \"{$this->categoryFilter}\""
 			);
 		}
+
+		// add user watch scores join
+		$this->tables['user_watch_scores'] = '(
+			SELECT
+				w2.wl_user AS user_name,
+				(
+					ROUND( IFNULL(
+						EXP(
+							-0.01 * SUM( 
+								IF(w2.wl_notificationtimestamp IS NULL, 0, 1)
+							)
+						)
+						*
+						EXP(
+							-0.01 * FLOOR(
+								AVG( 
+									TIMESTAMPDIFF( DAY, w2.wl_notificationtimestamp, UTC_TIMESTAMP() )
+								)
+							) 
+						),
+					1), 3)
+				) AS engagement_score
+
+			FROM watchlist AS w2
+			GROUP BY w2.wl_user
+
+		)';
+		$this->join_conds['user_watch_scores'] = array(
+			'LEFT JOIN', 'user_watch_scores.user_name = w.wl_user'
+		);
 		
 		$this->options = array(
 			// 'GROUP BY' => 'w.wl_title, w.wl_namespace'
