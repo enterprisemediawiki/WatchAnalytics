@@ -186,10 +186,28 @@ class WatchStateRecorder {
 		$allNamespaces = $this->fetchAllFromQueryInfo( $allWikiQueryInfo, array(
 			'num_pages', 'num_watches', 'num_pending', 'max_pending_minutes', 'avg_pending_minutes'
 		) );
+
+		$allNamespaces[0][ 'max_pending_minutes' ] = 
+			$allNamespaces[0][ 'max_pending_minutes' ]
+			? $allNamespaces[0][ 'max_pending_minutes' ] : 0;
+		
+		$allNamespaces[0][ 'avg_pending_minutes' ] =
+			$allNamespaces[0][ 'avg_pending_minutes' ]
+			? $allNamespaces[0][ 'avg_pending_minutes' ] : 0;
+
 		$contentOnly = $this->fetchAllFromQueryInfo( $mainWikiQueryInfo, array(
 			'content_num_pages', 'content_num_watches', 'content_num_pending',
 			'content_max_pending_minutes', 'content_avg_pending_minutes'
 		) );
+
+		$contentOnly[0][ 'content_max_pending_minutes' ] = 
+			$contentOnly[0][ 'content_max_pending_minutes' ] 
+			? $contentOnly[0][ 'content_max_pending_minutes' ] : 0;
+		
+		$contentOnly[0][ 'content_avg_pending_minutes' ] = 
+			$contentOnly[0][ 'content_avg_pending_minutes' ]
+			? $contentOnly[0][ 'content_avg_pending_minutes' ] : 0;
+
 
 		$allWikiAnalytics = $allNamespaces[0] + $contentOnly[0] + array(
 			'tracking_timestamp' => $now,
@@ -241,8 +259,8 @@ class WatchStateRecorder {
 		$sqlNumPages = "COUNT( DISTINCT p.page_id ) AS {$prefix}num_pages";
 		$sqlNumWatches = "SUM( IF( w.wl_title IS NOT NULL,             1, 0) ) AS {$prefix}num_watches";
 		$sqlNumPending = "SUM( IF( w.wl_notificationtimestamp IS NULL, 0, 1) ) AS {$prefix}num_pending";
-		$sqlMaxPendingMins = "IFNULL( MAX( TIMESTAMPDIFF(MINUTE, w.wl_notificationtimestamp, UTC_TIMESTAMP()) ), 0 ) AS {$prefix}max_pending_minutes";
-		$sqlAvgPendingMins = "IFNULL( AVG( TIMESTAMPDIFF(MINUTE, w.wl_notificationtimestamp, UTC_TIMESTAMP()) ), 0 ) AS {$prefix}avg_pending_minutes";
+		$sqlMaxPendingMins = "MAX( TIMESTAMPDIFF(MINUTE, w.wl_notificationtimestamp, UTC_TIMESTAMP()) ) AS {$prefix}max_pending_minutes";
+		$sqlAvgPendingMins = "AVG( TIMESTAMPDIFF(MINUTE, w.wl_notificationtimestamp, UTC_TIMESTAMP()) ) AS {$prefix}avg_pending_minutes";
 
 
 		$tables = array(
