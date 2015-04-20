@@ -39,7 +39,22 @@ class UserWatchesQuery extends WatchesQuery {
 	public $sqlNumWatches = 'COUNT(*) AS num_watches';
 	public $sqlNumPending = 'SUM( IF(w.wl_notificationtimestamp IS NULL, 0, 1) ) AS num_pending';
 	public $sqlPercentPending = 'SUM( IF(w.wl_notificationtimestamp IS NULL, 0, 1) ) * 100 / COUNT(*) AS percent_pending';
-	public $sqlRevisionFrequencyScore = 'IFNULL( rev.rev_frequency_score, 0 ) AS rev_frequency_score';
+	public $sqlEngagementScore = 
+		'ROUND( IFNULL( 
+			EXP(
+				-0.01 * SUM( 
+					IF(w.wl_notificationtimestamp IS NULL, 0, 1)
+				)
+			)
+			*
+			EXP(
+				-0.01 * FLOOR(
+					AVG( 
+						TIMESTAMPDIFF( DAY, w.wl_notificationtimestamp, UTC_TIMESTAMP() )
+					)
+				) 
+			),
+		1), 3) AS engagement_score';
 
 	protected $fieldNames = array(
 		'user_name'               => 'watchanalytics-special-header-user',
@@ -48,52 +63,16 @@ class UserWatchesQuery extends WatchesQuery {
 		'percent_pending'         => 'watchanalytics-special-header-pending-percent',
 		'max_pending_minutes'     => 'watchanalytics-special-header-pending-maxtime',
 		'avg_pending_minutes'     => 'watchanalytics-special-header-pending-averagetime',
-		'rev_frequency_score'     => 'watchanalytics-special-header-rev-frequency',
+		'engagement_score'        => 'watchanalytics-special-header-engagement-score',
 	);
 
-	public function getMaxRevisions () {
-
-		$dbr = wfGetDB( DB_SLAVE );
-
-		$res = $dbr->select(
-			'revision',
-			array( 'rev_user', 'COUNT(*) AS num_revisions' ),
-			null,
-			__METHOD__,
-			array(
-				'GROUP BY' => 'rev_user',
-				'ORDER BY' => 'num_revisions DESC',
-			)
-			// array() // need to join user table to make sure user exists?
-		);
-		
-		$row = $dbr->fetchRow( $res );
-
-		if ( $row === false ) {
-			// there are literally no revisions by any users....I don't think
-			// this is possible, but return 1 for good measure (so as not to
-			// divide by zero)
-			return 1;
-		}
-
-		return $row[ 'num_revisions' ];
-
-	}
-
 	public function getQueryInfo( $conds = null ) {
-
-		$maxRevisions = $this->getMaxRevisions();
 
 		$this->tables = array(
 			'w' => 'watchlist',
 			'u' => 'user',
 			'p' => 'page',
 			'log' => 'logging',
-			'rev' => 
-				"(SELECT rev_user, COUNT( * ) / $maxRevisions AS rev_frequency_score"
-				. ' FROM revision'
-				. ' WHERE rev_timestamp >= 19000000000000'
-				. ' GROUP BY rev_user)',
 		);
 
 		$this->fields = array(
@@ -103,7 +82,7 @@ class UserWatchesQuery extends WatchesQuery {
 			$this->sqlPercentPending,
 			$this->sqlMaxPendingMins,
 			$this->sqlAvgPendingMins,
-			$this->sqlRevisionFrequencyScore,
+			$this->sqlEngagementScore,
 		);
 		
 		$this->conds = $conds ? $conds : array();
@@ -122,9 +101,6 @@ class UserWatchesQuery extends WatchesQuery {
 				. ' AND p.page_namespace IS NULL'
 				. ' AND p.page_title IS NULL'
 				. ' AND log.log_action = "delete"'
-			),
-			'rev' => array(
-				'LEFT JOIN', 'rev.rev_user = u.user_id'
 			),
 		);
 
