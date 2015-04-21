@@ -90,7 +90,8 @@ $GLOBALS['wgHooks']['PersonalUrls'][] = 'WatchAnalyticsHooks::onPersonalUrls';
 $GLOBALS['wgHooks']['BeforePageDisplay'][] = 'WatchAnalyticsHooks::onBeforePageDisplay';
 $GLOBALS['wgHooks']['ParserFirstCallInit'][] = 'WatchAnalyticsParserFunctions::setup';
 $GLOBALS['wgHooks']['TitleMoveComplete'][] = 'WatchAnalyticsHooks::onTitleMoveComplete';
-$GLOBALS['wgHooks']['ArticleViewHeader'][] = 'WatchAnalyticsHooks::setArticleHeader';
+// $GLOBALS['wgHooks']['ArticleViewHeader'][] = 'WatchAnalyticsHooks::setArticleHeader';
+$GLOBALS['wgHooks']['SkinTemplateNavigation'][] = 'WatchAnalyticsHooks::onSkinTemplateNavigation';
 
 // update database
 $GLOBALS['wgHooks']['LoadExtensionSchemaUpdates'][] = 'WatchAnalyticsUpdaterHooks::addSchemaUpdates';

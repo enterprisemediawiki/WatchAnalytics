@@ -148,13 +148,45 @@ class WatchAnalyticsHooks {
 		return true;
 	}
 
-	public static function setArticleHeader ( Article &$article, &$outputDone, &$useParserCache ) {
-		global $wgOut, $wgRequest;
+	// public static function setArticleHeader ( Article &$article, &$outputDone, &$useParserCache ) {
+	// 	global $wgOut, $wgRequest;
 		
-		$watchQuery = new PageWatchesQuery();
-		$watchQuality = $watchQuery->getPageWatchQuality( $article->getTitle() );
+	// 	$watchQuery = new PageWatchesQuery();
+	// 	$watchQuality = $watchQuery->getPageWatchQuality( $article->getTitle() );
 
-		$wgOut->addHTML( "<div style='float:right;'>This page has a watch quality of $watchQuality</div>" );
+	// 	$wgOut->addHTML( "<div style='float:right;'>This page has a watch quality of $watchQuality</div>" );
+
+	// 	return true;
+	// }
+
+	// Add a "Score" tab with action=score
+	public static function onSkinTemplateNavigation( SkinTemplate &$sktemplate, array &$links ) {
+		$request = $sktemplate->getRequest();
+		$action = $request->getText( 'action' );
+
+
+		$watchQuery = new PageWatchesQuery();
+		$watchQuality = $watchQuery->getPageWatchQuality( $sktemplate->getTitle() );
+
+		$threeStars = 2.5; // watch score at which a page gets three stars
+
+		// not sure this belongs here...probably in setup somewhere?
+		// note: coeff is negative
+		$coeff = log( 0.4 ) / $threeStars;
+
+		$score = number_format( 5 * (1 - exp( $coeff * $watchQuality ) ), 1 );
+
+		$temp = $links['views'];
+
+		$links['views'] = array();
+		$links['views']['score'] = array(
+			'class' => ( $action == 'score') ? 'selected' : false,
+			'text' => "Score: $score",
+			// 'href' => $sktemplate->makeArticleUrlDetails(
+			// 	$sktemplate->getTitle()->getFullText(), 'action=chat' )['href']
+			'href' => '#',
+		);
+		$links['views'] += $temp;
 
 		return true;
 	}
