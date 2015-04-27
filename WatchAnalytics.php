@@ -158,6 +158,13 @@ $GLOBALS['wgResourceModules'] += array(
 			'jquery.effects.shake',
 		),
 	),
+
+	'ext.watchanalytics.pagescores' => $watchAnalyticsResourceTemplate + array(
+		'styles' => 'pagescores/pagescores.css',
+		'scripts' => array(
+			'pagescores/pagescores.js',
+		),
+	),
 );
 
 $GLOBALS['egPendingReviewsEmphasizeDays'] = 7;

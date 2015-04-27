@@ -85,6 +85,9 @@ class WatchAnalyticsHooks {
 		if ( $user->watchStats['max_pending_days'] > $egPendingReviewsEmphasizeDays ) {
 			$out->addModules( array( 'ext.watchanalytics.shakependingreviews' ) );
 		}
+
+		$out->addModules( array( 'ext.watchanalytics.pagescores' ) );
+
 		return true;
 	}
 

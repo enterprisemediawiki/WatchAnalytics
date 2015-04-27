@@ -1,0 +1,66 @@
+.ext-watchanalytics-pagescores-danger > div {
+	background-color: darkred;
+	border-color: darkred;
+	color: white;
+}
+.ext-watchanalytics-pagescores-warning > div {
+	background-color: orangered;
+	border-color: orangered;
+	color: white;
+}
+.ext-watchanalytics-pagescores-okay > div {
+	background-color: khaki;
+	border-color: khaki;
+	color: #333;
+}
+.ext-watchanalytics-pagescores-good > div {
+	background-color: greenyellow;
+	border-color: greenyellow;
+	color: #333;
+}
+.ext-watchanalytics-pagescores-excellent > div {
+	background-color: green;
+	border-color: green;
+	color: white;
+}
+.ext-watchanalytics-pagescores-badge {
+	border: 1px solid transparent;
+	position: relative;
+	display: inline-block;
+	vertical-align: middle;
+	box-sizing: border-box;
+	float: right;
+	margin: 0 5px;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+.ext-watchanalytics-pagescores-badge > div {
+	padding: 5px 10px;
+
+	/*
+	Normal size
+	font-size: 18px;
+	line-height: 1.33;
+	border-radius: 6px;
+	*/
+	font-size: 12px;
+	line-height: 1.3;
+	border-radius: 3px;
+
+	margin: 0;
+	float: left;
+	border-radius: 4px;
+}
+.ext-watchanalytics-pagescores-left {
+	border-top-right-radius: 0 !important;
+	border-bottom-right-radius: 0 !important;
+	background-color: white !important;
+	color: #333 !important;
+}
+.ext-watchanalytics-pagescores-right {
+	border-top-left-radius: 0 !important;
+	border-bottom-left-radius: 0 !important;
+}
