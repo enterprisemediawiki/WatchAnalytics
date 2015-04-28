@@ -7,7 +7,7 @@
 		$("#firstHeading").append(
 			$("#ext-watchanalytics-pagescores")[0].innerHTML
 		);
-	
+
 	});
 
 } )( jQuery, mediaWiki );

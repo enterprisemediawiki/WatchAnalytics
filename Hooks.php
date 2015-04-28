@@ -88,7 +88,8 @@ class WatchAnalyticsHooks {
 		}
 
 		if ( in_array( $title->getNamespace() , $GLOBALS['egWatchAnalyticsPageScoreNamespaces'] )
-			&& $user->isAllowed( 'viewpagescore' ) ) {
+			&& $user->isAllowed( 'viewpagescore' ) 
+			&& PageScore::pageScoreIsEnabled() ) {
 			
 			$pageScore = new PageScore( $title );
 			$out->addScript( $pageScore->getPageScoreTemplate() );
@@ -170,6 +171,7 @@ class WatchAnalyticsHooks {
 	// }
 
 	// Add a "Score" tab with action=score
+	// FIXME: remove this maybe
 	public static function onSkinTemplateNavigation( SkinTemplate &$sktemplate, array &$links ) {
 		$request = $sktemplate->getRequest();
 		$action = $request->getText( 'action' );
@@ -200,4 +202,27 @@ class WatchAnalyticsHooks {
 
 		return true;
 	}
+
+
+	/**
+	 * Register magic-word variable IDs
+	 */
+	static function addMagicWordVariableIDs( &$magicWordVariableIDs ) {
+		$magicWordVariableIDs[] = 'MAG_NOPAGESCORE';
+		return true;
+	}
+
+	/**
+	 * Set values in the page_props table based on the presence of the
+	 * 'NOPAGESCORE' magic word in a page
+	 */
+	static function handleMagicWords( &$parser, &$text ) {
+		$magicWord = MagicWord::get( 'MAG_NOPAGESCORE' );
+		if ( $magicWord->matchAndRemove( $text ) ) {
+			// $parser->mOutput->setProperty( 'approvedrevs', 'y' );
+			PageScore::noPageScore();
+		}
+		return true;
+	}
+
 }

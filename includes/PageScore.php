@@ -35,6 +35,8 @@ EOT;
 
 class PageScore {
 
+	public static $displayPageScore = true; // assume true until magic word says otherwise
+
 	/**
 	 * @var int $limit: maximum number of database rows to return
 	 * @todo FIXME: who/what sets this?
@@ -47,11 +49,19 @@ class PageScore {
 		$this->mTitle = $title;
 		$this->cssColorClasses = array(
 			'excellent',
-			'good',
+			//'good',
 			'okay',
-			'warning',
+			//'warning',
 			'danger',
 		);
+	}
+
+	static public function noPageScore () {
+		self::$displayPageScore = false;
+	}
+
+	static public function pageScoreIsEnabled () {
+		return self::$displayPageScore;
 	}
 
 	/**
@@ -67,7 +77,6 @@ class PageScore {
 	public function getReviewStatus () {
 		return $this->getNumReviews();
 	}
-
 
 	public function getNumReviews () {
 
@@ -91,15 +100,22 @@ class PageScore {
 	
 	public function getScoreColor ( $score, $configVariable ) {
 
-		$score = intval( $score );
 		$cssIndex = 4;
-		foreach( $GLOBALS[ $configVariable ] as $index => $upperBound ) {
-			if ( $score > $upperBound ) {
-				$cssIndex = $index;
-				break;
+		$scoreArr = $GLOBALS[ $configVariable ];
+
+		// echo $configVariable . "<br />";
+		// print_r( $scoreArr );
+		// echo "<br />score = $i: " . $this->cssColorClasses[ $i ] . "<br />";
+
+
+		for( $i = 0; $i < count( $scoreArr ); $i++ ) { //  ) as $index => $upperBound
+			if ( $score > $scoreArr[ $i ] ) {
+				// echo "returning $i: " . $this->cssColorClasses[ $i ] . "<br />";
+				return $this->cssColorClasses[ $i ];
 			}
 		}
-		return $this->cssColorClasses[ $cssIndex ];
+		// echo "no loop, returning 4: " . $this->cssColorClasses[ 4 ] . "<br />";
+		return $this->cssColorClasses[ count( $scoreArr ) ];
 
 	}
 
@@ -109,25 +125,31 @@ class PageScore {
 		$watchQuality = $this->getWatchQuality();
 		$watchQualityColorClass = $this->getScoreColor( $watchQuality, 'egWatchAnalyticsWatchQualityColors' );
 		$reviewStatus = $this->getReviewStatus();
-		$reviewStatusColorClass = $this->getScoreColor( $watchQuality, 'egWatchAnalyticsReviewStatusColors' );
+		$reviewStatusColorClass = $this->getScoreColor( $reviewStatus, 'egWatchAnalyticsReviewStatusColors' );
 		
+		$watchQualityMsg = wfMessage( 'watch-analytics-watch-quality-tooltip' )->text();
+		$reviewStatusMsg = wfMessage( 'watch-analytics-review-status-tooltip' )->text();
+
+		$pageScoresHelpPageLink = Title::makeTitle( NS_HELP, "Page Scores" )->getInternalURL();
+
 		// when MW 1.25 is released (very soon) replace this with a mustache template
-		$template = "<div class='ext-watchanalytics-pagescores-badge ext-watchanalytics-pagescores-$reviewStatusColorClass'>
-				<div class='ext-watchanalytics-pagescores-badge ext-watchanalytics-pagescores-left'>
+		$template = 
+			"<a title='$reviewStatusMsg' class='ext-watchanalytics-pagescores-badge ext-watchanalytics-pagescores-$reviewStatusColorClass'>
+				<div href='$pageScoresHelpPageLink' class='ext-watchanalytics-pagescores-badge ext-watchanalytics-pagescores-left'>
 					Review Status
 				</div>
 				<div class='ext-watchanalytics-pagescores-badge ext-watchanalytics-pagescores-right'>
 					$reviewStatus
 				</div>
-			</div>
-			<div class='ext-watchanalytics-pagescores-badge ext-watchanalytics-pagescores-$watchQualityColorClass'>
+			</a>
+			<a href='$pageScoresHelpPageLink' title='$watchQualityMsg' class='ext-watchanalytics-pagescores-badge ext-watchanalytics-pagescores-$watchQualityColorClass'>
 				<div class='ext-watchanalytics-pagescores-badge ext-watchanalytics-pagescores-left'>
 					Watch Quality
 				</div>
 				<div class='ext-watchanalytics-pagescores-badge ext-watchanalytics-pagescores-right'>
 					$watchQuality
 				</div>
-			</div>";
+			</a>";
 
 		return "<script type='text/template' id='ext-watchanalytics-pagescores'>$template</script>";
 

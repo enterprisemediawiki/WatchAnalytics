@@ -68,6 +68,9 @@
 	"pendingreviews-reviewer-criticality-orange": "Pages reviewed by {{PLURAL:$1|1 person|$1 people}} or fewer",
 	"pendingreviews-reviewer-criticality-green": "Pages reviewed by more than {{PLURAL:$1|1 person|$1 people}}",
 
+	"watch-analytics-watch-quality-tooltip": "How well is this page being watched? Having more watchers is better. Watchers reviewing in a timely manner is better.",
+	"watch-analytics-review-status-tooltip": "How many people have reviewed the latest version of this page? More people having reviewed the latest version is better.",
+
 	"watchanalytics-view-user-pendingreviews": "pending reviews",
 	"pendingreviews-watch-suggestion-thanks": "Thanks for watching!",
 

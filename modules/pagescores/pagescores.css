@@ -1,11 +1,11 @@
 .ext-watchanalytics-pagescores-danger > div {
-	background-color: darkred;
-	border-color: darkred;
+	background-color: red; /* was darkred */
+	border-color: red;
 	color: white;
 }
 .ext-watchanalytics-pagescores-warning > div {
-	background-color: orangered;
-	border-color: orangered;
+	background-color: orange; /* was orangered */
+	border-color: orange;
 	color: white;
 }
 .ext-watchanalytics-pagescores-okay > div {
@@ -28,9 +28,11 @@
 	position: relative;
 	display: inline-block;
 	vertical-align: middle;
+	background-color: transparent;
 	box-sizing: border-box;
 	float: right;
 	margin: 0 5px;
+	cursor: pointer;
 	-webkit-user-select: none;
 	-moz-user-select: none;
 	-ms-user-select: none;

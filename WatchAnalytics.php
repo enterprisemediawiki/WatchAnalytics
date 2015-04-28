@@ -95,7 +95,12 @@ $GLOBALS['wgHooks']['BeforePageDisplay'][] = 'WatchAnalyticsHooks::onBeforePageD
 $GLOBALS['wgHooks']['ParserFirstCallInit'][] = 'WatchAnalyticsParserFunctions::setup';
 $GLOBALS['wgHooks']['TitleMoveComplete'][] = 'WatchAnalyticsHooks::onTitleMoveComplete';
 // $GLOBALS['wgHooks']['ArticleViewHeader'][] = 'WatchAnalyticsHooks::setArticleHeader';
-$GLOBALS['wgHooks']['SkinTemplateNavigation'][] = 'WatchAnalyticsHooks::onSkinTemplateNavigation';
+// $GLOBALS['wgHooks']['SkinTemplateNavigation'][] = 'WatchAnalyticsHooks::onSkinTemplateNavigation';
+
+// Page Score magic word
+$GLOBALS['wgHooks']['MagicWordwgVariableIDs'][] = 'WatchAnalyticsHooks::addMagicWordVariableIDs';
+$GLOBALS['wgHooks']['ParserBeforeTidy'][] = 'WatchAnalyticsHooks::handleMagicWords';
+
 
 // update database
 $GLOBALS['wgHooks']['LoadExtensionSchemaUpdates'][] = 'WatchAnalyticsUpdaterHooks::addSchemaUpdates';
@@ -182,18 +187,26 @@ $GLOBALS['egWatchAnalyticsPageScoreNamespaces'] = array(
 	NS_MAIN
 );
 $GLOBALS['egWatchAnalyticsWatchQualityColors'] = array(
-	6,   // score over 6   = excellent
-	4,   // score over 4   = good
-	1.5, // score over 1.5 = okay
-	0.5, // score over 0.5 = not so good
+	// 6,   // score over 6   = excellent
+	// 4,   // score over 4   = good
+	// 1.5, // score over 1.5 = okay
+	// 0.5, // score over 0.5 = not so good
 	     // score < 0.5    = bad
+
+	5,   // score over 5   = excellent
+	1.5, // score over 1.5 = okay
+	// score < 1.5
 );
 $GLOBALS['egWatchAnalyticsReviewStatusColors'] = array(
-	4, // 5+ reviews = excellent
-	3, // 4 reviews  = good
-	2, // 3 reviews  = okay
-	1, // 2 reviews  = not so good
-	   // 0 or 1     = BAD
+	// 4, // 5+ reviews = excellent
+	// 3, // 4 reviews  = good
+	// 2, // 3 reviews  = okay
+	// 1, // 2 reviews  = not so good
+	//    // 0 or 1     = BAD
+
+	4, // score over 4 = good
+	2, // score over 2 = okay
+	// 0 or 1 = BAD
 );
 
 
