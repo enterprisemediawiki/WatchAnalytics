@@ -39,6 +39,22 @@ class UserWatchesQuery extends WatchesQuery {
 	public $sqlNumWatches = 'COUNT(*) AS num_watches';
 	public $sqlNumPending = 'SUM( IF(w.wl_notificationtimestamp IS NULL, 0, 1) ) AS num_pending';
 	public $sqlPercentPending = 'SUM( IF(w.wl_notificationtimestamp IS NULL, 0, 1) ) * 100 / COUNT(*) AS percent_pending';
+	public $sqlEngagementScore = 
+		'ROUND( IFNULL( 
+			EXP(
+				-0.01 * SUM( 
+					IF(w.wl_notificationtimestamp IS NULL, 0, 1)
+				)
+			)
+			*
+			EXP(
+				-0.01 * FLOOR(
+					AVG( 
+						TIMESTAMPDIFF( DAY, w.wl_notificationtimestamp, UTC_TIMESTAMP() )
+					)
+				) 
+			),
+		1), 3) AS engagement_score';
 
 	protected $fieldNames = array(
 		'user_name'               => 'watchanalytics-special-header-user',
@@ -47,6 +63,7 @@ class UserWatchesQuery extends WatchesQuery {
 		'percent_pending'         => 'watchanalytics-special-header-pending-percent',
 		'max_pending_minutes'     => 'watchanalytics-special-header-pending-maxtime',
 		'avg_pending_minutes'     => 'watchanalytics-special-header-pending-averagetime',
+		'engagement_score'        => 'watchanalytics-special-header-engagement-score',
 	);
 
 	public function getQueryInfo( $conds = null ) {
@@ -65,6 +82,7 @@ class UserWatchesQuery extends WatchesQuery {
 			$this->sqlPercentPending,
 			$this->sqlMaxPendingMins,
 			$this->sqlAvgPendingMins,
+			$this->sqlEngagementScore,
 		);
 		
 		$this->conds = $conds ? $conds : array();
@@ -84,7 +102,6 @@ class UserWatchesQuery extends WatchesQuery {
 				. ' AND p.page_title IS NULL'
 				. ' AND log.log_action = "delete"'
 			),
-
 		);
 
 		// optionally join the 'user_groups' table to filter by user group

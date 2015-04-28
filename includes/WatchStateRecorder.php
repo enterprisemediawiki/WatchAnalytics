@@ -186,10 +186,28 @@ class WatchStateRecorder {
 		$allNamespaces = $this->fetchAllFromQueryInfo( $allWikiQueryInfo, array(
 			'num_pages', 'num_watches', 'num_pending', 'max_pending_minutes', 'avg_pending_minutes'
 		) );
+
+		$allNamespaces[0][ 'max_pending_minutes' ] = 
+			$allNamespaces[0][ 'max_pending_minutes' ]
+			? $allNamespaces[0][ 'max_pending_minutes' ] : 0;
+		
+		$allNamespaces[0][ 'avg_pending_minutes' ] =
+			$allNamespaces[0][ 'avg_pending_minutes' ]
+			? $allNamespaces[0][ 'avg_pending_minutes' ] : 0;
+
 		$contentOnly = $this->fetchAllFromQueryInfo( $mainWikiQueryInfo, array(
 			'content_num_pages', 'content_num_watches', 'content_num_pending',
 			'content_max_pending_minutes', 'content_avg_pending_minutes'
 		) );
+
+		$contentOnly[0][ 'content_max_pending_minutes' ] = 
+			$contentOnly[0][ 'content_max_pending_minutes' ] 
+			? $contentOnly[0][ 'content_max_pending_minutes' ] : 0;
+		
+		$contentOnly[0][ 'content_avg_pending_minutes' ] = 
+			$contentOnly[0][ 'content_avg_pending_minutes' ]
+			? $contentOnly[0][ 'content_avg_pending_minutes' ] : 0;
+
 
 		$allWikiAnalytics = $allNamespaces[0] + $contentOnly[0] + array(
 			'tracking_timestamp' => $now,
