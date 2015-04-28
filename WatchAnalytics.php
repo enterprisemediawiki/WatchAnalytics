@@ -57,6 +57,10 @@ $GLOBALS['wgAutoloadClasses']['WatchAnalyticsUpdaterHooks'] = __DIR__ . '/schema
 $GLOBALS['wgAutoloadClasses']['PendingReview'] = __DIR__ . '/includes/PendingReview.php';
 $GLOBALS['wgAutoloadClasses']['WatchSuggest'] = __DIR__ . '/includes/WatchSuggest.php';
 
+// page score
+$GLOBALS['wgAutoloadClasses']['PageScore'] = __DIR__ . '/includes/PageScore.php';
+
+
 // query classes
 $GLOBALS['wgAutoloadClasses']['WatchesQuery'] = __DIR__ . '/includes/WatchesQuery.php';
 $GLOBALS['wgAutoloadClasses']['PageWatchesQuery'] = __DIR__ . '/includes/PageWatchesQuery.php';
@@ -174,3 +178,26 @@ $GLOBALS['egPendingReviewsRedPagesThreshold'] = 2; // 0 or 1 reviewers BESIDES t
 $GLOBALS['egPendingReviewsOrangePagesThreshold'] = 4; // 2 or 3 reviewers BESIDES the person who made the change
 $GLOBALS['egPendingReviewsNumberWatchSuggestions'] = 20;
 $GLOBALS['egPendingReviewsShowWatchSuggestionsIfReviewsUnder'] = 5;
+$GLOBALS['egWatchAnalyticsPageScoreNamespaces'] = array(
+	NS_MAIN
+);
+$GLOBALS['egWatchAnalyticsWatchQualityColors'] = array(
+	6,   // score over 6   = excellent
+	4,   // score over 4   = good
+	1.5, // score over 1.5 = okay
+	0.5, // score over 0.5 = not so good
+	     // score < 0.5    = bad
+);
+$GLOBALS['egWatchAnalyticsReviewStatusColors'] = array(
+	4, // 5+ reviews = excellent
+	3, // 4 reviews  = good
+	2, // 3 reviews  = okay
+	1, // 2 reviews  = not so good
+	   // 0 or 1     = BAD
+);
+
+
+
+// allows showing page score for each page
+$GLOBALS['wgAvailableRights'][] = 'viewpagescore';
+$GLOBALS['wgGroupPermissions']['sysop']['viewpagescore'] = true;

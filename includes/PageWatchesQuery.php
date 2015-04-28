@@ -186,5 +186,5 @@ class PageWatchesQuery extends WatchesQuery {
 		return $pageData->watch_quality;
 
 	}
-	
+
 }

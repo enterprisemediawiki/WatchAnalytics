@@ -65,6 +65,7 @@ class WatchAnalyticsHooks {
 	 */
 	static function onBeforePageDisplay( $out /*, $skin*/ ) {
 		$user = $out->getUser();
+		$title = $out->getTitle();
 
 		$userWatch = new UserWatchesQuery();
 
@@ -86,7 +87,13 @@ class WatchAnalyticsHooks {
 			$out->addModules( array( 'ext.watchanalytics.shakependingreviews' ) );
 		}
 
-		$out->addModules( array( 'ext.watchanalytics.pagescores' ) );
+		if ( in_array( $title->getNamespace() , $GLOBALS['egWatchAnalyticsPageScoreNamespaces'] )
+			&& $user->isAllowed( 'viewpagescore' ) ) {
+			
+			$pageScore = new PageScore( $title );
+			$out->addScript( $pageScore->getPageScoreTemplate() );
+			$out->addModules( array( 'ext.watchanalytics.pagescores' ) );
+		}	
 
 		return true;
 	}
