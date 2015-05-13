@@ -3,7 +3,8 @@
 	float: right;
 	font-size: 12px;
 	padding: 5px 0 0 0;
-	opacity: 0.5;
+	transition: opacity 0.5s ease;
+	opacity: 0.6;
 	text-decoration: none;
 }
 #ext-watchanalytics-pagescores:hover {
@@ -66,10 +67,11 @@
 }
 
 
-#ext-watchanalytics-pagescores:hover .ext-watchanalytics-pagescores-left {
+/*#ext-watchanalytics-pagescores:hover .ext-watchanalytics-pagescores-left {
 	border-radius: 4px 0 0 4px;
 	display: inherit;
 }
 #ext-watchanalytics-pagescores:hover .ext-watchanalytics-pagescores-right {
 	border-radius: 0 4px 4px 0;
 }
+*/
