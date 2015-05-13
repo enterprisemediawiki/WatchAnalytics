@@ -122,36 +122,45 @@ class PageScore {
 
 	public function getPageScoreTemplate () {
 
-		$watchQuality = $this->getWatchQuality();
-		$watchQualityColorClass = $this->getScoreColor( $watchQuality, 'egWatchAnalyticsWatchQualityColors' );
-		$reviewStatus = $this->getReviewStatus();
-		$reviewStatusColorClass = $this->getScoreColor( $reviewStatus, 'egWatchAnalyticsReviewStatusColors' );
+		$scrutinyScore = $this->getWatchQuality();
+		$scrutinyLabel = wfMessage( 'watch-analytics-page-score-scrutiny-label' )->text();
+		$scrutinyColor = $this->getScoreColor( $scrutinyScore, 'egWatchAnalyticsWatchQualityColors' );
 		
-		$watchQualityMsg = wfMessage( 'watch-analytics-watch-quality-tooltip' )->text();
-		$reviewStatusMsg = wfMessage( 'watch-analytics-review-status-tooltip' )->text();
+		$reviewsScore = $this->getReviewStatus();
+		$reviewsLabel = wfMessage( 'watch-analytics-page-score-reviews-label' )->text();
+		$reviewsColor = $this->getScoreColor( $reviewsScore, 'egWatchAnalyticsReviewStatusColors' );
 
+		// simple explanation of what PageScores are		
+		$pageScoresTooltip = wfMessage( 'watch-analytics-page-score-tooltip' )->text();
+
+		// @FIXME: Replace with special page showing page stats
 		$pageScoresHelpPageLink = Title::makeTitle( NS_HELP, "Page Scores" )->getInternalURL();
 
 		// when MW 1.25 is released (very soon) replace this with a mustache template
 		$template = 
-			"<a title='$reviewStatusMsg' class='ext-watchanalytics-pagescores-badge ext-watchanalytics-pagescores-$reviewStatusColorClass'>
-				<div href='$pageScoresHelpPageLink' class='ext-watchanalytics-pagescores-badge ext-watchanalytics-pagescores-left'>
-					Review Status
+			"<a title='$pageScoresTooltip' id='ext-watchanalytics-pagescores' href='$pageScoresHelpPageLink'>
+
+				<div class='ext-watchanalytics-pagescores-$scrutinyColor'>
+					<div class='ext-watchanalytics-pagescores-left'>
+						$scrutinyLabel
+					</div>
+					<div class='ext-watchanalytics-pagescores-right'>
+						$scrutinyScore
+					</div>
 				</div>
-				<div class='ext-watchanalytics-pagescores-badge ext-watchanalytics-pagescores-right'>
-					$reviewStatus
+
+				<div class='ext-watchanalytics-pagescores-$reviewsColor'>
+					<div class='ext-watchanalytics-pagescores-left'>
+						$reviewsLabel
+					</div>
+					<div class='ext-watchanalytics-pagescores-right'>
+						$reviewsScore
+					</div>
 				</div>
-			</a>
-			<a href='$pageScoresHelpPageLink' title='$watchQualityMsg' class='ext-watchanalytics-pagescores-badge ext-watchanalytics-pagescores-$watchQualityColorClass'>
-				<div class='ext-watchanalytics-pagescores-badge ext-watchanalytics-pagescores-left'>
-					Watch Quality
-				</div>
-				<div class='ext-watchanalytics-pagescores-badge ext-watchanalytics-pagescores-right'>
-					$watchQuality
-				</div>
+
 			</a>";
 
-		return "<script type='text/template' id='ext-watchanalytics-pagescores'>$template</script>";
+		return "<script type='text/template' id='ext-watchanalytics-pagescores-template'>$template</script>";
 
 	}
 

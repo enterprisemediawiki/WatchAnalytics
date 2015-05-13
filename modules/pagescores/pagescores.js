@@ -5,7 +5,7 @@
 	$(document).ready( function () {
 
 		$("#firstHeading").append(
-			$("#ext-watchanalytics-pagescores")[0].innerHTML
+			$("#ext-watchanalytics-pagescores-template")[0].innerHTML
 		);
 
 	});

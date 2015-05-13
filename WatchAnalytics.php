@@ -94,8 +94,6 @@ $GLOBALS['wgHooks']['PersonalUrls'][] = 'WatchAnalyticsHooks::onPersonalUrls';
 $GLOBALS['wgHooks']['BeforePageDisplay'][] = 'WatchAnalyticsHooks::onBeforePageDisplay';
 $GLOBALS['wgHooks']['ParserFirstCallInit'][] = 'WatchAnalyticsParserFunctions::setup';
 $GLOBALS['wgHooks']['TitleMoveComplete'][] = 'WatchAnalyticsHooks::onTitleMoveComplete';
-// $GLOBALS['wgHooks']['ArticleViewHeader'][] = 'WatchAnalyticsHooks::setArticleHeader';
-// $GLOBALS['wgHooks']['SkinTemplateNavigation'][] = 'WatchAnalyticsHooks::onSkinTemplateNavigation';
 
 // Page Score magic word
 $GLOBALS['wgHooks']['MagicWordwgVariableIDs'][] = 'WatchAnalyticsHooks::addMagicWordVariableIDs';
