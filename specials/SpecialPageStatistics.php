@@ -25,7 +25,9 @@ class SpecialPageStatistics extends SpecialPage {
 		$this->setHeaders();
 		$wgOut->addModuleStyles( 'ext.watchanalytics.specials' ); // @todo FIXME: check if this is necessary
 
-		$this->mTitle = Title::newFromText( $wgRequest->getVal( 'page', '' ) );
+		$requestedPage = $wgRequest->getVal( 'page', '' );
+
+		$this->mTitle = Title::newFromText( $requestedPage );
 
 		// @todo: probably don't need filters, but may want to show stats just
 		// from a certain group of users
@@ -41,19 +43,31 @@ class SpecialPageStatistics extends SpecialPage {
 		
 		// @todo: delete if multiple views not needed (thus, not requiring header call here)
 		$wgOut->addHTML( $this->getPageHeader() );
-		if ( $this->mTitle ) {
+		if ( $this->mTitle && $this->mTitle->isKnown() && $this->mTitle->isWatchable() ) {
 			$this->renderPageStats();
 		}
-		else if ( $wgRequest->getVal( 'page', '' ) != '' ) {
+		else if ( $requestedPage ) {
 			// @todo FIXME: internationalize
-			$wgOut->addHTML( $wgRequest->getVal( 'page', '' ) . " is an invalid page name" );
+			$wgOut->addHTML( "<p>\"$requestedPage\" is either not a page or is not watchable</p>" );
 		}
 
 	}
 	
 	public function getPageHeader() {
 
-		return "<p>Insert form to select page</p>";
+		// @todo FIXME: This should have the single-input form to look up pages, maybe.
+		// for now it's just an explanation of what should be here.
+		return "<p>Welcome to page statistics. This page is under construction. In the future 
+			it will show how well a page is being watched, reviewed, and how much traffic it
+			is getting. For now, just some definitions to explain the colored \"badges\" on
+			each page:</p>
+
+			<ul>
+				<li><strong>Scrutiny:</strong> This is a function of how many people are
+				watching a page and how good those people are at reviewing pages.</li>
+				<li><strong>Reviews:</strong> This is simply the number of people who have
+				reviewed a page.</li>
+			</ul>";
 
 	}
 	
@@ -106,8 +120,8 @@ class SpecialPageStatistics extends SpecialPage {
 		// // $html .= "<pre>$json</pre>"; // easy testing
 		// $html .= "<script type='text/template' id='mw-ext-watchAnalytics-forceGraph'>$json</script>";
 		
-
-		$html = "This page doesn't exist yet...";
+		$pageTitle = $this->mTitle->getPrefixedText();
+		$html = "<p>While the page \"$pageTitle\" does exist, this Special Page is not yet operational.</p>";
 		$wgOut->addHTML( $html );
 
 	}

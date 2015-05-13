@@ -134,7 +134,8 @@ class PageScore {
 		$pageScoresTooltip = wfMessage( 'watch-analytics-page-score-tooltip' )->text();
 
 		// @FIXME: Replace with special page showing page stats
-		$pageScoresHelpPageLink = Title::makeTitle( NS_HELP, "Page Scores" )->getInternalURL();
+		// $pageScoresHelpPageLink = Title::makeTitle( NS_HELP, "Page Scores" )->getInternalURL();
+		$pageScoresHelpPageLink = SpecialPage::getTitleFor( 'PageStatistics' )->getInternalURL();
 
 		// when MW 1.25 is released (very soon) replace this with a mustache template
 		$template = 
