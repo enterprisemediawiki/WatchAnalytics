@@ -88,6 +88,9 @@ $GLOBALS['wgSpecialPages']['WatchAnalytics'] = 'SpecialWatchAnalytics';
 $GLOBALS['wgAutoloadClasses']['SpecialWatchAnalytics'] = __DIR__ . '/specials/SpecialWatchAnalytics.php';
 $GLOBALS['wgSpecialPages']['PendingReviews'] = 'SpecialPendingReviews';
 $GLOBALS['wgAutoloadClasses']['SpecialPendingReviews'] = __DIR__ . '/specials/SpecialPendingReviews.php';
+$GLOBALS['wgSpecialPages']['PageStatistics'] = 'SpecialPageStatistics';
+$GLOBALS['wgAutoloadClasses']['SpecialPageStatistics'] = __DIR__ . '/specials/SpecialPageStatistics.php';
+
 
 // add watchlist notification system
 $GLOBALS['wgHooks']['PersonalUrls'][] = 'WatchAnalyticsHooks::onPersonalUrls';
