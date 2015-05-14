@@ -142,7 +142,7 @@ class PageScore {
 
 	}
 
-	public function getBadge ( $label, $score, $color, $showLabel=true ) {
+	public function getBadge ( $label, $score, $color, $showLabel=false ) {
 
 		// @todo FIXME: make the javascript apply a class to handle this, so this can just apply a class
 		if ( $showLabel ) {
@@ -166,20 +166,20 @@ class PageScore {
 
 	}
 
-	public function getScrutinyBadge () {
+	public function getScrutinyBadge ( $showLabel=false ) {
 		$scrutinyScore = $this->getWatchQuality();
 		$scrutinyLabel = wfMessage( 'watch-analytics-page-score-scrutiny-label' )->text();
 		$scrutinyColor = $this->getScoreColor( $scrutinyScore, 'egWatchAnalyticsWatchQualityColors' );
 
-		return $this->getBadge( $scrutinyLabel, $scrutinyScore, $scrutinyColor );
+		return $this->getBadge( $scrutinyLabel, $scrutinyScore, $scrutinyColor, $showLabel );
 	}
 
-	public function getReviewsBadge () {
+	public function getReviewsBadge ( $showLabel=false ) {
 		$reviewsScore = $this->getReviewStatus();
 		$reviewsLabel = wfMessage( 'watch-analytics-page-score-reviews-label' )->text();
 		$reviewsColor = $this->getScoreColor( $reviewsScore, 'egWatchAnalyticsReviewStatusColors' );
 
-		return $this->getBadge( $reviewsLabel, $reviewsScore, $reviewsColor );
+		return $this->getBadge( $reviewsLabel, $reviewsScore, $reviewsColor, $showLabel );
 	}
 
 }

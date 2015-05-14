@@ -66,12 +66,12 @@ class SpecialPageStatistics extends SpecialPage {
 
 		$scrutinyBadge .= 
 			"<div id='ext-watchanalytics-pagescores' style='float:left; opacity:1.0; margin-right: 10px;'>"
-				. $pageScore->getScrutinyBadge()
+				. $pageScore->getScrutinyBadge( true )
 			. "</div>";
 
 		$reviewsBadge .= 
 			"<div id='ext-watchanalytics-pagescores' style='float:left; opacity:1.0; margin-right: 10px;'>"
-				. $pageScore->getReviewsBadge()
+				. $pageScore->getReviewsBadge( true )
 			. "</div>";
 
 		$pageLink = Linker::link( $this->mTitle, $this->mTitle->getPrefixedText() );
