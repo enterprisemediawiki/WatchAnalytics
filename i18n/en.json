@@ -31,8 +31,8 @@
 	"watchanalytics-special-header-pending-percent": "% pending",
 	"watchanalytics-special-header-pending-maxtime": "Max pending time",
 	"watchanalytics-special-header-pending-averagetime": "Average pending time",
-	"watchanalytics-view-user-stats": "view user stats",
-	"watchanalytics-view-page-stats": "view page stats",
+	"watchanalytics-view-user-stats": "User stats",
+	"watchanalytics-view-page-stats": "Page stats",
 	"watchanalytics-all-wiki-stats-recorded": "Wiki watch statistics recorded",
 	"watchanalytics-special-header-timestamp": "Date/time",
 	"watchanalytics-special-header-num-pages": "# pages",
@@ -72,6 +72,15 @@
 	"watch-analytics-page-score-tooltip": "Scores indicate how well this page is being reviewed",
 	"watch-analytics-page-score-scrutiny-label": "Scrutiny",
 	"watch-analytics-page-score-reviews-label": "Reviews",
+
+
+	"watchanalytics-pagestats-editors-list-title": "Page editors",
+	"watchanalytics-pagestats-editors-list-item": "$1 - {{PLURAL:$2|1 revision|$2 revisions}}",
+	"watchanalytics-pagestats-watchers-title": "Page watchers",
+	"watchanalytics-pagestats-watchers-list-item-reviewed": "$1 - <span style='color:green;'>reviewed latest</span>",
+	"watchanalytics-pagestats-watchers-list-item-unreviewed": "$1 - <span style='color:red;'>review pending</span>",
+
+
 
 	"watchanalytics-view-user-pendingreviews": "pending reviews",
 	"pendingreviews-watch-suggestion-thanks": "Thanks for watching!",

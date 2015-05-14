@@ -72,18 +72,18 @@ class WatchAnalyticsPageTablePager extends WatchAnalyticsTablePager {
 			
 
 			// FIXME: page stats not currently enabled. Uncomment when enabled
-			// $url = Title::newFromText('Special:WatchAnalytics')->getLocalUrl(
-			// 	array( 'page' => $value )
-			// );
-			// $msg = wfMsg( 'watchanalytics-view-page-stats' );
-			// $pageStatsLink = ' (' . Xml::element(
-			// 	'a',
-			// 	array( 'href' => $url ),
-			// 	$msg
-			// ) . ')';
-			// $pageLink .= $pageStatsLink;
+			$url = SpecialPage::getTitleFor( 'PageStatistics' )->getInternalURL( array(
+				'page' => $title->getPrefixedText()
+			) );
+			$msg = wfMsg( 'watchanalytics-view-page-stats' );
+			$pageStatsLink = Xml::element(
+				'a',
+				array( 'href' => $url ),
+				$msg
+			);
+
 			
-			$pageLink .= ' (' . WatchSuggest::getWatchLink( $title ) . ')';
+			$pageLink .= ' <small>(' . $pageStatsLink . ' | ' . WatchSuggest::getWatchLink( $title ) . ')</small>';
 
 
 			return $pageLink;

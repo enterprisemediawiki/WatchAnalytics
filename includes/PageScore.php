@@ -122,47 +122,64 @@ class PageScore {
 
 	public function getPageScoreTemplate () {
 
-		$scrutinyScore = $this->getWatchQuality();
-		$scrutinyLabel = wfMessage( 'watch-analytics-page-score-scrutiny-label' )->text();
-		$scrutinyColor = $this->getScoreColor( $scrutinyScore, 'egWatchAnalyticsWatchQualityColors' );
-		
-		$reviewsScore = $this->getReviewStatus();
-		$reviewsLabel = wfMessage( 'watch-analytics-page-score-reviews-label' )->text();
-		$reviewsColor = $this->getScoreColor( $reviewsScore, 'egWatchAnalyticsReviewStatusColors' );
-
 		// simple explanation of what PageScores are		
 		$pageScoresTooltip = wfMessage( 'watch-analytics-page-score-tooltip' )->text();
 
 		// @FIXME: Replace with special page showing page stats
 		// $pageScoresHelpPageLink = Title::makeTitle( NS_HELP, "Page Scores" )->getInternalURL();
-		$pageScoresHelpPageLink = SpecialPage::getTitleFor( 'PageStatistics' )->getInternalURL();
+		$pageScoresHelpPageLink = SpecialPage::getTitleFor( 'PageStatistics' )->getInternalURL( array(
+			'page' => $this->mTitle->getPrefixedText()
+		) );
 
 		// when MW 1.25 is released (very soon) replace this with a mustache template
 		$template = 
-			"<a title='$pageScoresTooltip' id='ext-watchanalytics-pagescores' href='$pageScoresHelpPageLink'>
-
-				<div class='ext-watchanalytics-pagescores-$scrutinyColor'>
-					<div class='ext-watchanalytics-pagescores-left'>
-						$scrutinyLabel
-					</div>
-					<div class='ext-watchanalytics-pagescores-right'>
-						$scrutinyScore
-					</div>
-				</div>
-
-				<div class='ext-watchanalytics-pagescores-$reviewsColor'>
-					<div class='ext-watchanalytics-pagescores-left'>
-						$reviewsLabel
-					</div>
-					<div class='ext-watchanalytics-pagescores-right'>
-						$reviewsScore
-					</div>
-				</div>
-
-			</a>";
+			"<a title='$pageScoresTooltip' id='ext-watchanalytics-pagescores' href='$pageScoresHelpPageLink'>"
+				. $this->getScrutinyBadge()
+				. $this->getReviewsBadge()
+			. "</a>";
 
 		return "<script type='text/template' id='ext-watchanalytics-pagescores-template'>$template</script>";
 
+	}
+
+	public function getBadge ( $label, $score, $color, $showLabel=true ) {
+
+		// @todo FIXME: make the javascript apply a class to handle this, so this can just apply a class
+		if ( $showLabel ) {
+			$leftStyle = " style='display:inherit; border-radius: 4px 0 0 4px;'";
+			$rightStyle = " style='border-radius: 0 4px 4px 0;'";
+		}
+		else {
+			$leftStyle = "";
+			$rightStyle = "";
+		}
+
+		return 
+			"<div class='ext-watchanalytics-pagescores-$color'>
+				<div class='ext-watchanalytics-pagescores-left'$leftStyle>
+					$label
+				</div>
+				<div class='ext-watchanalytics-pagescores-right'$rightStyle>
+					$score
+				</div>
+			</div>";
+
+	}
+
+	public function getScrutinyBadge () {
+		$scrutinyScore = $this->getWatchQuality();
+		$scrutinyLabel = wfMessage( 'watch-analytics-page-score-scrutiny-label' )->text();
+		$scrutinyColor = $this->getScoreColor( $scrutinyScore, 'egWatchAnalyticsWatchQualityColors' );
+
+		return $this->getBadge( $scrutinyLabel, $scrutinyScore, $scrutinyColor );
+	}
+
+	public function getReviewsBadge () {
+		$reviewsScore = $this->getReviewStatus();
+		$reviewsLabel = wfMessage( 'watch-analytics-page-score-reviews-label' )->text();
+		$reviewsColor = $this->getScoreColor( $reviewsScore, 'egWatchAnalyticsReviewStatusColors' );
+
+		return $this->getBadge( $reviewsLabel, $reviewsScore, $reviewsColor );
 	}
 
 }
