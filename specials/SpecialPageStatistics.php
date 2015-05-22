@@ -20,7 +20,7 @@ class SpecialPageStatistics extends SpecialPage {
 	}
 	
 	function execute( $parser = null ) {
-		global $wgRequest, $wgOut;
+		global $wgRequest, $wgOut, $wgUser;
 
 		$this->setHeaders();
 		$wgOut->addModuleStyles( 'ext.watchanalytics.specials' ); // @todo FIXME: check if this is necessary
@@ -43,6 +43,14 @@ class SpecialPageStatistics extends SpecialPage {
 		
 		// @todo: delete if multiple views not needed (thus, not requiring header call here)
 		if ( $this->mTitle && $this->mTitle->isKnown() && $this->mTitle->isWatchable() ) {
+
+			$unReviewTimestamp = $wgRequest->getVal( 'unreview' );
+			if ( $unReviewTimestamp ) {
+				$rh = new ReviewHandler( $wgUser, $this->mTitle );
+				$rh->resetNotificationTimestamp( $unReviewTimestamp );
+			}
+
+
 			$wgOut->addHTML( $this->getPageHeader() );
 			$this->renderPageStats();
 		}
@@ -64,12 +72,12 @@ class SpecialPageStatistics extends SpecialPage {
 		$pageScore = new PageScore( $this->mTitle );
 		// $out->addScript( $pageScore->getPageScoreTemplate() );
 
-		$scrutinyBadge .= 
+		$scrutinyBadge = 
 			"<div id='ext-watchanalytics-pagescores' style='float:left; opacity:1.0; margin-right: 10px;'>"
 				. $pageScore->getScrutinyBadge( true )
 			. "</div>";
 
-		$reviewsBadge .= 
+		$reviewsBadge = 
 			"<div id='ext-watchanalytics-pagescores' style='float:left; opacity:1.0; margin-right: 10px;'>"
 				. $pageScore->getReviewsBadge( true )
 			. "</div>";

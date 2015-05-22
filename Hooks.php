@@ -97,6 +97,17 @@ class WatchAnalyticsHooks {
 			$out->addModules( array( 'ext.watchanalytics.pagescores' ) );
 		}	
 
+
+		// determine if a change happened
+		$reviewHandler = ReviewHandler::pageHasBeenReviewed();
+		if ( $reviewHandler ) {
+
+			$out->addScript( $reviewHandler->getTemplate() );
+			$out->addModules( array( 'ext.watchanalytics.reviewhandler' ) );
+
+		}
+
+
 		return true;
 	}
 
@@ -180,5 +191,22 @@ class WatchAnalyticsHooks {
 		}
 		return true;
 	}
+
+	/**
+	 * Early in page generation determines if the user is watching the page,
+	 * and if so determines what their review status is.
+	 */
+	static public function onArticlePageDataBefore ( $wikiPage ) {
+
+		global $wgUser;
+
+		// $egWatchAnalyticsUserWatchStatus = WatchesQuery::UserTitleWatchStatus( $wgUser, $wikiPage->getTitle() );
+		ReviewHandler::setup( $wgUser, $wikiPage->getTitle() );
+
+		return true;
+
+	}
+
+
 
 }

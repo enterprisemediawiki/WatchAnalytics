@@ -157,5 +157,6 @@ class WatchesQuery {
 			$this->categoryFilter = $cf;
 		}
 	}
+
 	
 }

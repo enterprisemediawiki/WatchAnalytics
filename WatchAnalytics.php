@@ -57,6 +57,9 @@ $GLOBALS['wgAutoloadClasses']['WatchAnalyticsUpdaterHooks'] = __DIR__ . '/schema
 $GLOBALS['wgAutoloadClasses']['PendingReview'] = __DIR__ . '/includes/PendingReview.php';
 $GLOBALS['wgAutoloadClasses']['WatchSuggest'] = __DIR__ . '/includes/WatchSuggest.php';
 
+// review handler
+$GLOBALS['wgAutoloadClasses']['ReviewHandler'] = __DIR__ . '/includes/ReviewHandler.php';
+
 // page score
 $GLOBALS['wgAutoloadClasses']['PageScore'] = __DIR__ . '/includes/PageScore.php';
 
@@ -97,6 +100,11 @@ $GLOBALS['wgHooks']['PersonalUrls'][] = 'WatchAnalyticsHooks::onPersonalUrls';
 $GLOBALS['wgHooks']['BeforePageDisplay'][] = 'WatchAnalyticsHooks::onBeforePageDisplay';
 $GLOBALS['wgHooks']['ParserFirstCallInit'][] = 'WatchAnalyticsParserFunctions::setup';
 $GLOBALS['wgHooks']['TitleMoveComplete'][] = 'WatchAnalyticsHooks::onTitleMoveComplete';
+
+// un-review
+$GLOBALS['wgHooks']['ArticlePageDataBefore'][] = 'WatchAnalyticsHooks::onArticlePageDataBefore';
+
+
 
 // Page Score magic word
 $GLOBALS['wgHooks']['MagicWordwgVariableIDs'][] = 'WatchAnalyticsHooks::addMagicWordVariableIDs';
@@ -175,6 +183,13 @@ $GLOBALS['wgResourceModules'] += array(
 		'styles' => 'pagescores/pagescores.css',
 		'scripts' => array(
 			'pagescores/pagescores.js',
+		),
+	),
+
+	'ext.watchanalytics.reviewhandler' => $watchAnalyticsResourceTemplate + array(
+		'styles' => 'reviewhandler/reviewhandler.css',
+		'scripts' => array(
+			'reviewhandler/reviewhandler.js',
 		),
 	),
 );
