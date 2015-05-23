@@ -111,7 +111,7 @@ class ReviewHandler {
 		// either $newStatus is 0 or -1 meaning they don't have a pending review
 		// or $newStatus is a timestamp greater than the original timestamp, meaning
 		// they have reviewed a more recent version of the page than they had originally
-		if ( $newStatus < 1 || $newStatus > $egWatchAnalyticsUserWatchStatus ) {
+		if ( $newStatus < 1 || $newStatus > self::$pageLoadHandler->initial ) {
 			self::$pageLoadHandler->final = $newStatus;
 			return self::$pageLoadHandler;
 		}

@@ -174,4 +174,51 @@ class UserWatchesQuery extends WatchesQuery {
 		return $row;
 	}
 
+	/**
+	 * Gets watch statistics for a list of users.
+	 * 
+	 * @param Array $userIds: array of integer user IDs.
+	 * @return Array returns user watch info in an array with user IDs as keys
+	 * and values being objects with params num_watches and num_pending.
+	 */
+	public function getMultiUserWatchStats ( Array $userIds ) {
+
+		if ( ! count( $userIds ) ) {
+			return array();
+		}
+
+		$fields = array(
+			'w.wl_user',
+			$this->sqlNumWatches,
+			$this->sqlNumPending,
+		);
+
+		$dbr = wfGetDB( DB_SLAVE );
+
+		$res = $dbr->select(
+			array(
+				'w' => 'watchlist'
+			),
+			$fields,
+			array(
+				'w.wl_user' => $userIds
+			),
+			__METHOD__,
+			array(
+				'GROUP BY' => 'w.wl_user'
+			), // no options
+			null // no joins
+		);
+		
+		$return = array();
+		while ( $row = $res->fetchObject() ) {
+			$return[ $row->wl_user ] = (object)array(
+				'num_watches' => $row->num_watches,
+				'num_pending' => $row->num_pending,
+			);
+		}
+
+		return $return;
+	}
+
 }

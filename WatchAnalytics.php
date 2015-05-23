@@ -104,6 +104,8 @@ $GLOBALS['wgHooks']['TitleMoveComplete'][] = 'WatchAnalyticsHooks::onTitleMoveCo
 // un-review
 $GLOBALS['wgHooks']['ArticlePageDataBefore'][] = 'WatchAnalyticsHooks::onArticlePageDataBefore';
 
+// watch tracking
+$GLOBALS['wgHooks']['PageContentSaveComplete'][] = 'WatchAnalyticsHooks::onPageContentSaveComplete';
 
 
 // Page Score magic word

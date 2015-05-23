@@ -303,4 +303,99 @@ class WatchStateRecorder {
 		return $return;
 	}
 
+	/**
+	 * Record relevant info in watch_tracking_page and watch_tracking_user
+	 * after a change to a page (e.g. an edit, a move, etc)
+	 */
+	static public function recordPageChange ( $article ) {
+
+		$timestamp = date( "YmdHis", time() );
+		$title = $article->getTitle();
+
+		// query for page watchers
+		$pageWQ = new PageWatchesQuery();
+		$watchers = $pageWQ->getPageWatchers( $title->getDBkey(), $title->getNamespace() );
+
+		// PHP count num watchers and reviewers (watchers could change if user (un)checks "watch this page" box)
+		$numWatchers = count( $watchers );
+		$numReviewed = 0;
+		$userIdArray = array();
+		foreach( $watchers as $w ) {
+			if ( $w->wl_notificationtimestamp === NULL ) {
+				$numReviewed++;
+			}
+			$userIdArray[] = $w->wl_user;
+		}
+
+		// query for each users' total watches/reviews
+		$userWQ = new UserWatchesQuery();
+		$userWatchStats = $userWQ->getMultiUserWatchStats( $userIdArray );
+		$userInsertData = array();
+		foreach ( $userWatchStats as $uID => $uData ) {
+			$userInsertData[] = array(
+				'tracking_timestamp' => $timestamp,
+				'user_id' => $uID,
+				'num_watches' => $uData->num_watches,
+				'num_pending' => $uData->num_pending,
+			);
+		}
+
+
+		$dbw = wfGetDB( DB_MASTER );
+
+		// insert into watch_tracking_page: $timestamp, $title->getId(), $numWatchers, $numReviewed
+		$dbw->replace(
+			'watch_tracking_page',
+			array( array( 'tracking_timestamp', 'page_id' ) ),
+			array(
+				array(
+					'tracking_timestamp' => $timestamp,
+					'page_id' => $title->getArticleID(),
+					'num_watches' => $numWatchers,
+					'num_reviewed' => $numReviewed,
+				),
+			),
+			__METHOD__
+		);
+
+		// insert into watch_tracking_user: timestamp, user ID, num watches, num reviews
+		// @todo FIXME: this incorrectly records the editors watch state if they change from 
+		// watched to unwatched or unwatched to watched during the edit...maybe.
+		$dbw->replace(
+			'watch_tracking_user',
+			array( array( 'tracking_timestamp', 'user_id' ) ),
+			$userInsertData,
+			__METHOD__
+		);
+
+		// do a full wiki record?
+		// take too long? excessive?
+		// all buildable by page table, except avg/max time
+
+		return true;
+
+	}
+
+	// static public function recordReview ( $userId, $titleDBkey, $ns = NS_MAIN ) {
+
+	// 	$timestamp = date( 'YmdHis', time() );
+
+	// 	$userWQ = new UserWatchesQuery();
+	// 	$userWatchStats = $userWQ->getMultiUserWatchStats( array( $userId ) );
+		
+
+
+	// 	$dbw->replace(
+	// 		'watch_tracking_user',
+	// 		array( array( 'tracking_timestamp', 'user_id' ) ),
+	// 		array(
+	// 			'tracking_timestamp' => $timestamp,
+	// 			'user_id' => $uID,
+	// 			'num_watches' => $userWatchStats->num_watches,
+	// 			'num_pending' => $userWatchStats->num_pending,
+	// 		);,
+	// 		__METHOD__
+	// 	);
+	// }
+
 }

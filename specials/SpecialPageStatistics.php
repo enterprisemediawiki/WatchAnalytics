@@ -48,6 +48,8 @@ class SpecialPageStatistics extends SpecialPage {
 			if ( $unReviewTimestamp ) {
 				$rh = new ReviewHandler( $wgUser, $this->mTitle );
 				$rh->resetNotificationTimestamp( $unReviewTimestamp );
+				$wgOut->addModuleStyles( array( 'ext.watchanalytics.reviewhandler' ) );
+				$wgOut->addHTML( $this->unReviewMessage() );
 			}
 
 
@@ -242,6 +244,16 @@ class SpecialPageStatistics extends SpecialPage {
 
 
 		$wgOut->addHTML( $html );
+
+	}
+
+	public function unReviewMessage () {
+
+		// FIXME: this shouldn't use the same CSS ID.
+		return 
+			"<div id='watch-analytics-review-handler'>
+				<p>This page has been un-reviewed.</p>
+			</div>";
 
 	}
 }

@@ -161,6 +161,31 @@ class PageWatchesQuery extends WatchesQuery {
 
 	}
 
+	public function getPageWatchers ( $titleKey, $ns = NS_MAIN ) {
+		
+		$dbr = wfGetDB( DB_SLAVE );
+
+		$pageWatchStats = $dbr->select(
+			array( 'w' => 'watchlist' ),
+			array( 'wl_user', 'wl_notificationtimestamp' ),
+			array(
+				'w.wl_namespace' => $ns,
+				'w.wl_title' => $titleKey,
+			),
+			__METHOD__,
+			null, // no options
+			null // no join conds (no other tables)
+		);
+
+		$return = array();
+		while ( $row = $pageWatchStats->fetchObject() ) {
+			$return[] = $row;
+		}
+
+		return $return;
+
+	}
+
 	public function getPageWatchQuality ( Title $title ) {
 
 		$dbr = wfGetDB( DB_SLAVE );

@@ -102,8 +102,12 @@ class WatchAnalyticsHooks {
 		$reviewHandler = ReviewHandler::pageHasBeenReviewed();
 		if ( $reviewHandler ) {
 
+			// display "unreview" button
 			$out->addScript( $reviewHandler->getTemplate() );
 			$out->addModules( array( 'ext.watchanalytics.reviewhandler' ) );
+
+			// record change in user/page stats
+			// @todo IMPLEMENT: WatchStateRecorder::recordReview
 
 		}
 
@@ -123,14 +127,30 @@ class WatchAnalyticsHooks {
 	 * Note: additional arguments &$moverUser User, $oldid string|int, $newId
 	 * string|int, and $reason string are also available per MW documenation.
 	 * 
+	 * @todo FIXME: handle what to do if have MW 1.25...don't need this
+	 *
 	 * @todo document which commit fixes this issue specifically.
 	 * @see http://www.mediawiki.org/wiki/Manual:Hooks/TitleMoveComplete
 	 * @param &$originalTitle Title
 	 * @param &$newTitle Title
 	 * @return bool true in all cases
 	 */
-	static function onTitleMoveComplete ( Title &$originalTitle, Title &$newTitle ) {
+	static function onTitleMoveComplete ( Title &$originalTitle, Title &$newTitle,
+			User &$user, $oldid, $newid, $reason = null) {
 
+		#
+		# Record move in watch stats
+		#
+		WatchStateRecorder::recordPageChange( Article::newFromID( $oldid ) );
+		
+		// if a redirect was created, record data for the "new" page (the redirect)
+		if ( $newid > 0 ) {
+			WatchStateRecorder::recordPageChange( Article::newFromID( $newid ) );
+		}
+
+		#
+		# BELOW IS THE pre-MW 1.25 FIX.
+		#
 		$oldNS = $originalTitle->getNamespace();
 		$newNS = $newTitle->getNamespace();
 		$oldDBkey = $originalTitle->getDBkey();
@@ -200,13 +220,33 @@ class WatchAnalyticsHooks {
 
 		global $wgUser;
 
-		// $egWatchAnalyticsUserWatchStatus = WatchesQuery::UserTitleWatchStatus( $wgUser, $wikiPage->getTitle() );
 		ReviewHandler::setup( $wgUser, $wikiPage->getTitle() );
 
 		return true;
 
 	}
 
-
+	/**
+	 * Occurs after the save page request has been processed.
+	 * @see https://www.mediawiki.org/wiki/Manual:Hooks/PageContentSaveComplete
+	 *
+	 * @param WikiPage $article
+	 * @param User $user
+	 * @param Content $content
+	 * @param string $summary
+	 * @param boolean $isMinor
+	 * @param boolean $isWatch
+	 * @param $section Deprecated
+	 * @param integer $flags
+	 * @param {Revision|null} $revision
+	 * @param Status $status
+	 * @param integer $baseRevId
+	 *
+	 * @return boolean
+	 */
+	static public function onPageContentSaveComplete ( $article ) {
+		WatchStateRecorder::recordPageChange( $article );
+		return true;
+	}
 
 }
