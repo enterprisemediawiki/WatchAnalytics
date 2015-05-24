@@ -107,7 +107,7 @@ class WatchAnalyticsHooks {
 			$out->addModules( array( 'ext.watchanalytics.reviewhandler' ) );
 
 			// record change in user/page stats
-			// @todo IMPLEMENT: WatchStateRecorder::recordReview
+			WatchStateRecorder::recordReview( $user, $title );
 
 		}
 

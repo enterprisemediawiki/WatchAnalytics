@@ -312,29 +312,18 @@ class WatchStateRecorder {
 		$timestamp = date( "YmdHis", time() );
 		$title = $article->getTitle();
 
-		// query for page watchers
-		$pageWQ = new PageWatchesQuery();
-		$watchers = $pageWQ->getPageWatchers( $title->getDBkey(), $title->getNamespace() );
+		// page watch stats
+		list( $numWatchers, $numReviewed, $userIdArray ) = self::getPageWatchInfo( $title );
 
-		// PHP count num watchers and reviewers (watchers could change if user (un)checks "watch this page" box)
-		$numWatchers = count( $watchers );
-		$numReviewed = 0;
-		$userIdArray = array();
-		foreach( $watchers as $w ) {
-			if ( $w->wl_notificationtimestamp === NULL ) {
-				$numReviewed++;
-			}
-			$userIdArray[] = $w->wl_user;
-		}
 
 		// query for each users' total watches/reviews
 		$userWQ = new UserWatchesQuery();
 		$userWatchStats = $userWQ->getMultiUserWatchStats( $userIdArray );
 		$userInsertData = array();
-		foreach ( $userWatchStats as $uID => $uData ) {
+		foreach ( $userWatchStats as $uData ) {
 			$userInsertData[] = array(
 				'tracking_timestamp' => $timestamp,
-				'user_id' => $uID,
+				'user_id' => $uData->wl_user,
 				'num_watches' => $uData->num_watches,
 				'num_pending' => $uData->num_pending,
 			);
@@ -376,26 +365,68 @@ class WatchStateRecorder {
 
 	}
 
-	// static public function recordReview ( $userId, $titleDBkey, $ns = NS_MAIN ) {
+	static public function recordReview ( User $user, Title $title ) {
 
-	// 	$timestamp = date( 'YmdHis', time() );
+		$timestamp = date( 'YmdHis', time() );
 
-	// 	$userWQ = new UserWatchesQuery();
-	// 	$userWatchStats = $userWQ->getMultiUserWatchStats( array( $userId ) );
-		
+		$userWQ = new UserWatchesQuery();
+		$userWatchStats = $userWQ->getMultiUserWatchStats( array( $user->getId() ) );
 
+		$dbw = wfGetDB( DB_MASTER );
 
-	// 	$dbw->replace(
-	// 		'watch_tracking_user',
-	// 		array( array( 'tracking_timestamp', 'user_id' ) ),
-	// 		array(
-	// 			'tracking_timestamp' => $timestamp,
-	// 			'user_id' => $uID,
-	// 			'num_watches' => $userWatchStats->num_watches,
-	// 			'num_pending' => $userWatchStats->num_pending,
-	// 		);,
-	// 		__METHOD__
-	// 	);
-	// }
+		// necessary to use replace here? probably, in case two requests
+		// are made in rapid succession such that the second gets a read
+		// request from the database saying that the notification timestamp
+		// hasn't been cleared yet, suggesting it should be cleared again
+		$dbw->replace(
+			'watch_tracking_user',
+			array( array( 'tracking_timestamp', 'user_id' ) ),
+			array(
+				'tracking_timestamp' => $timestamp,
+				'user_id' => $userWatchStats[0]->wl_user,
+				'num_watches' => $userWatchStats[0]->num_watches,
+				'num_pending' => $userWatchStats[0]->num_pending,
+			),
+			__METHOD__
+		);
+
+		// page watch stats (disregarding third var, array of user IDs)
+		list( $numWatchers, $numReviewed ) = self::getPageWatchInfo( $title );
+
+		$dbw->replace(
+			'watch_tracking_page',
+			array( array( 'tracking_timestamp', 'page_id' ) ),
+			array(
+				'tracking_timestamp' => $timestamp,
+				'page_id' => $title->getArticleID(),
+				'num_watches' => $numWatchers,
+				'num_reviewed' => $numReviewed,
+			),
+			__METHOD__
+		);
+
+		return true;
+
+	}
+
+	static public function getPageWatchInfo ( Title $title ) {
+
+		// query for page watchers
+		$pageWQ = new PageWatchesQuery();
+		$watchers = $pageWQ->getPageWatchers( $title->getDBkey(), $title->getNamespace() );
+
+		// PHP count num watchers and reviewers (watchers could change if user (un)checks "watch this page" box)
+		$numWatchers = count( $watchers );
+		$numReviewed = 0;
+		$userIdArray = array();
+		foreach( $watchers as $w ) {
+			if ( $w->wl_notificationtimestamp === NULL ) {
+				$numReviewed++;
+			}
+			$userIdArray[] = $w->wl_user;
+		}
+
+		return array( $numWatchers, $numReviewed, $userIdArray );
+	}
 
 }

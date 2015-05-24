@@ -212,7 +212,8 @@ class UserWatchesQuery extends WatchesQuery {
 		
 		$return = array();
 		while ( $row = $res->fetchObject() ) {
-			$return[ $row->wl_user ] = (object)array(
+			$return[] = (object)array(
+				'wl_user' => $row->wl_user,
 				'num_watches' => $row->num_watches,
 				'num_pending' => $row->num_pending,
 			);
