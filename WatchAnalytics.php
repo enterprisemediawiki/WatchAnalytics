@@ -194,6 +194,16 @@ $GLOBALS['wgResourceModules'] += array(
 			'reviewhandler/reviewhandler.js',
 		),
 	),
+
+	'ext.watchanalytics.charts' => $watchAnalyticsResourceTemplate + array(
+		'styles' => 'charts/ext.watchanalytics.charts.css',
+		'scripts' => array(
+			'charts/Chart.js',
+			'charts/ext.watchanalytics.charts.js',
+		),
+	),
+
+
 );
 
 $GLOBALS['egPendingReviewsEmphasizeDays'] = 7;

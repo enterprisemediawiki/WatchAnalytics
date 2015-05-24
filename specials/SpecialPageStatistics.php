@@ -245,6 +245,8 @@ class SpecialPageStatistics extends SpecialPage {
 
 		$wgOut->addHTML( $html );
 
+		$this->pageChart();
+
 	}
 
 	public function unReviewMessage () {
@@ -254,6 +256,45 @@ class SpecialPageStatistics extends SpecialPage {
 			"<div id='watch-analytics-review-handler'>
 				<p>This page has been un-reviewed.</p>
 			</div>";
+
+	}
+
+
+
+	public function pageChart () {
+
+		global $wgOut;
+		$wgOut->addModules( 'ext.watchanalytics.charts' );
+
+		$html = '<h2>'. wfMessage( 'watchanalytics-pagestats-chart-header' )->text() .'</h2>';
+		$html .= '<canvas id="page-reviews-chart" width="400" height="400"></canvas>';
+		
+		$dbr = wfGetDB( DB_SLAVE );
+		$res = $dbr->select(
+			array('wtp' => 'watch_tracking_page'),
+			array(
+				"DATE_FORMAT( wtp.tracking_timestamp, '%Y-%m-%d %H:%i:%s' ) AS timestamp", 
+				"wtp.num_reviewed AS num_reviewed",
+			),
+			array(
+				'page_id' => $this->mTitle->getArticleID()
+			),
+			__METHOD__,
+			array(
+				"ORDER BY" => "wtp.tracking_timestamp DESC",
+				"LIMIT" => "1000", // MOST RECENT 1000 changes
+			),
+			null // join conditions
+		);
+
+		$data = array();
+		while( $row = $dbr->fetchObject( $res ) ) {
+			$data[ $row->timestamp ] = $row->num_reviewed;
+		}
+		$data = array_reverse( $data );
+
+		$html .= "<script type='text/template-json' id='ext-watchanalytics-page-stats-data'>" . json_encode( $data ) . "</script>";
+		$wgOut->addHTML( $html );
 
 	}
 }

@@ -79,7 +79,7 @@
 	"watchanalytics-pagestats-watchers-title": "Page watchers",
 	"watchanalytics-pagestats-watchers-list-item-reviewed": "$1 - <span style='color:green;'>reviewed latest</span>",
 	"watchanalytics-pagestats-watchers-list-item-unreviewed": "$1 - <span style='color:red;'>review pending</span>",
-
+	"watchanalytics-pagestats-chart-header": "Number of reviewers over time",
 
 
 	"watchanalytics-view-user-pendingreviews": "pending reviews",
