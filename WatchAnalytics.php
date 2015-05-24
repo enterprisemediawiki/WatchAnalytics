@@ -199,6 +199,7 @@ $GLOBALS['wgResourceModules'] += array(
 		'styles' => 'charts/ext.watchanalytics.charts.css',
 		'scripts' => array(
 			'charts/Chart.js',
+			'charts/Chart.Scatter.min.js',
 			'charts/ext.watchanalytics.charts.js',
 		),
 	),
