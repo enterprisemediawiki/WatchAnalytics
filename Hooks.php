@@ -33,7 +33,7 @@ class WatchAnalyticsHooks {
 		
 		// Determine CSS class of Watchlist/PendingReviews link
 		$personal_urls['watchlist']['class'] = array( 'mw-watchanalytics-watchlist-badge' );
-		if ( $numPending !== 0 ) {
+		if ( $numPending != 0 ) {
 			$personal_urls['watchlist']['class'] = array( 'mw-watchanalytics-watchlist-pending' );
 		}
 
