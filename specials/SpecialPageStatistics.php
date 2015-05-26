@@ -291,6 +291,8 @@ class SpecialPageStatistics extends SpecialPage {
 		while( $row = $dbr->fetchObject( $res ) ) {
 			$data[ $row->timestamp ] = $row->num_reviewed;
 		}
+
+		// data queried in reverse order in order to use LIMIT
 		$data = array_reverse( $data );
 
 		$html .= "<script type='text/template-json' id='ext-watchanalytics-page-stats-data'>" . json_encode( $data ) . "</script>";

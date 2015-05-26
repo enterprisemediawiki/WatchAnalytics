@@ -199,7 +199,7 @@ $GLOBALS['wgResourceModules'] += array(
 		'styles' => 'charts/ext.watchanalytics.charts.css',
 		'scripts' => array(
 			'charts/Chart.js',
-			'charts/Chart.Scatter.min.js',
+			'charts/Chart.Scatter.js',
 			'charts/ext.watchanalytics.charts.js',
 		),
 	),
@@ -213,7 +213,7 @@ $GLOBALS['egPendingReviewsOrangePagesThreshold'] = 4; // 2 or 3 reviewers BESIDE
 $GLOBALS['egPendingReviewsNumberWatchSuggestions'] = 20;
 $GLOBALS['egPendingReviewsShowWatchSuggestionsIfReviewsUnder'] = 5;
 $GLOBALS['egWatchAnalyticsPageScoreNamespaces'] = array(
-	NS_MAIN
+	NS_MAIN, NS_TALK
 );
 $GLOBALS['egWatchAnalyticsWatchQualityColors'] = array(
 	// 6,   // score over 6   = excellent
