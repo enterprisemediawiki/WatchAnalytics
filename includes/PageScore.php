@@ -35,14 +35,21 @@ EOT;
 
 class PageScore {
 
-	public static $displayPageScore = true; // assume true until magic word says otherwise
+	/**
+	 * @var bool $displayPageScore: used to determine if a particular page should or
+	 * should not include page scores. Assume true until magic word says otherwise.
+	 */
+	public static $displayPageScore = true;
 
 	/**
-	 * @var int $limit: maximum number of database rows to return
-	 * @todo FIXME: who/what sets this?
-	 * @example 20
+	 * @var Title $mTitle: reference to current title
 	 */
-	// public $limit;
+	public $mTitle;
+
+	/**
+	 * @var array $cssColorClasses: names of classes used to color page score badges
+	 */
+	public $cssColorClasses;
 
 	public function __construct ( Title $title ) {
 	
@@ -100,21 +107,14 @@ class PageScore {
 	
 	public function getScoreColor ( $score, $configVariable ) {
 
-		$cssIndex = 4;
 		$scoreArr = $GLOBALS[ $configVariable ];
 
-		// echo $configVariable . "<br />";
-		// print_r( $scoreArr );
-		// echo "<br />score = $i: " . $this->cssColorClasses[ $i ] . "<br />";
-
-
-		for( $i = 0; $i < count( $scoreArr ); $i++ ) { //  ) as $index => $upperBound
+		$scoreArrCount = count( $scoreArr );
+		for( $i = 0; $i < $scoreArrCount; $i++ ) { //  ) as $index => $upperBound
 			if ( $score > $scoreArr[ $i ] ) {
-				// echo "returning $i: " . $this->cssColorClasses[ $i ] . "<br />";
 				return $this->cssColorClasses[ $i ];
 			}
 		}
-		// echo "no loop, returning 4: " . $this->cssColorClasses[ 4 ] . "<br />";
 		return $this->cssColorClasses[ count( $scoreArr ) ];
 
 	}

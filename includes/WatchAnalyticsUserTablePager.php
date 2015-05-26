@@ -12,16 +12,16 @@ class WatchAnalyticsUserTablePager extends WatchAnalyticsTablePager {
 		'engagement_score' => true,
 	);
 
-	function __construct( $page, $conds, $filters=array() ) {
+	public function __construct( $page, $conds, $filters=array() ) {
 		$this->watchQuery = new UserWatchesQuery();
 		parent::__construct( $page, $conds, $filters );
 	}
 
-	function getQueryInfo() {
+	public function getQueryInfo() {
 		return $this->watchQuery->getQueryInfo();
 	}
 
-	function formatValue ( $fieldName , $value ) {
+	public function formatValue ( $fieldName , $value ) {
 
 		if ( $fieldName === 'user_name' ) {
 
@@ -60,11 +60,11 @@ class WatchAnalyticsUserTablePager extends WatchAnalyticsTablePager {
 
 	}
 
-	function getFieldNames() {
+	public function getFieldNames() {
 		return $this->watchQuery->getFieldNames();
 	}
 
-	function getDefaultSort () {
+	public function getDefaultSort () {
 		return 'num_pending';
 	}
 

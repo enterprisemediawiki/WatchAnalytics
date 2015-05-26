@@ -28,7 +28,7 @@ class WatchAnalyticsWikiTablePager extends WatchAnalyticsTablePager {
 		'content_num_one_reviewed' => true,
 	);
 
-	function __construct( $page, $conds ) {
+	public function __construct( $page, $conds ) {
 		$this->watchQuery = new WikiWatchesQuery();
 
 		parent::__construct( $page , $conds );
@@ -43,11 +43,11 @@ class WatchAnalyticsWikiTablePager extends WatchAnalyticsTablePager {
 		$this->mExtraSortFields = array();
 	}
 
-	function getQueryInfo() {
+	public function getQueryInfo() {
 		return $this->watchQuery->getQueryInfo();
 	}
 
-	function formatValue ( $fieldName , $value ) {
+	public function formatValue ( $fieldName , $value ) {
 
 		$timeDiffFields = array(
 			'max_pending_minutes',
@@ -69,11 +69,11 @@ class WatchAnalyticsWikiTablePager extends WatchAnalyticsTablePager {
 
 	}
 
-	function getFieldNames() {
+	public function getFieldNames() {
 		return $this->watchQuery->getFieldNames();
 	}
 
-	function getDefaultSort () {
+	public function getDefaultSort () {
 		return 'tracking_timestamp';
 	}
 

@@ -52,11 +52,8 @@ class WatchAnalyticsHtmlHelper {
 			$perCol = $numLI + 1;
 		}
 
-		if ( $numLI > $perCol ) {
-			$colWidth = floor( 100 / $columns );
-
-			$html = "<table style='width:100%;'><tr><td style='width:$colWidth%;'>" . $html; // prepend the start of a table
-		}
+		$colWidth = floor( 100 / $columns );
+		$html = "<table style='width:100%;'><tr><td style='width:$colWidth%;'>" . $html; // prepend the start of a table
 
 		// $html .= '<pre>' . print_r( $list, true ) . '</pre>';
 		foreach ( $list as $li ) {

@@ -39,10 +39,29 @@ class ReviewHandler {
 	public static $pageLoadHandler = null;
 	public static $isReviewable = true;
 	
+	/**
+	 * @var User $user: reference to the current user
+	 */
+	public $user;
+
+	/**
+	 * @var Title $title: reference to current title
+	 */	
+	public $title;
+
+	/**
+	 * @var int $initial: state of the user watching the page initially (at the
+	 * beginning of the page load). Possible values: -1 for not watching the 
+	 * page, 0 for watching and has seen the latest version, and a large int
+	 * like 20150102030405 (timestamp) for the user not having seen the latest.
+	 */	
 	public $initial = null;
+
+	/**
+	 * @var int $final: same purpose as $initial, but determined late in the
+	 * page load to see if the watch/review-state has changed.
+	 */
 	public $final = null;
-
-
 
 	public function __construct ( User $user, Title $title ) {
 		$this->user = $user;

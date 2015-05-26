@@ -113,7 +113,7 @@ class WatchesQuery {
 		return $time[0];
 	}
 
-	function getFieldNames() {
+	public function getFieldNames() {
 		$output = array();
 
 		foreach ( $this->fieldNames as $dbKey => $msg ) {

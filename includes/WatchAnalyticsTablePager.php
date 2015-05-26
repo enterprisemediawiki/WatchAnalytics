@@ -2,7 +2,7 @@
 
 abstract class WatchAnalyticsTablePager extends TablePager {
 	
-	function __construct( $page, $conds, $filters=array() ) {
+	public function __construct( $page, $conds, $filters=array() ) {
 		$this->page = $page;
 		$this->limit = $page->limit;
 		$this->offset = $page->offset;
@@ -31,7 +31,7 @@ abstract class WatchAnalyticsTablePager extends TablePager {
 		parent::__construct( $page->getContext() );
 	}
 
-	function getIndexField() {
+	public function getIndexField() {
 
 		global $wgRequest;
 
@@ -45,11 +45,11 @@ abstract class WatchAnalyticsTablePager extends TablePager {
 
 	}
 
-	function isNavigationBarShown() {
+	public function isNavigationBarShown() {
 		return true;
 	}
 
-	function isFieldSortable ( $field ) {
+	public function isFieldSortable ( $field ) {
 		if ( ! isset( $this->isSortable[$field] ) ) {
 			return false;
 		}
@@ -107,7 +107,7 @@ abstract class WatchAnalyticsTablePager extends TablePager {
 	 *
 	 * @return Array
 	 */
-	function getPagingQueries() {
+	public function getPagingQueries() {
 		$queries = parent::getPagingQueries();
 				
 		# Don't announce the limit everywhere if it's the default

@@ -51,7 +51,7 @@ class PageWatchesQuery extends WatchesQuery {
 		'watch_quality'           => 'watchanalytics-special-header-watch-quality',
 	);
 
-	function getQueryInfo( $conds = null ) {
+	public function getQueryInfo( $conds = null ) {
 	
 		$this->fields = array(
 			$this->sqlNsAndTitle,

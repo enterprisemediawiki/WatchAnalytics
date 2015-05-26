@@ -36,17 +36,18 @@ EOT;
 class WatchSuggest {
 
 	/**
-	 * @var int $limit: maximum number of database rows to return
-	 * @todo FIXME: who/what sets this?
-	 * @example 20
+	 * @var User $mUser: reference to current user
 	 */
-	// public $limit;
+	public $mUser;
+
+	/**
+	 * @var DatabaseBase $dbr: FIXME confirm correct class
+	 */
+	public $dbr;
 
 	public function __construct ( User $user ) {
-	
 		$this->mUser = $user;
 		$this->dbr = wfGetDB( DB_SLAVE );
-
 	}
 
 	/**
@@ -229,9 +230,6 @@ class WatchSuggest {
 	
 	public function getPagesRelatedByLinks ( $userWatchlist ) {
 
-
-		$pagesIds = array();
-		$pageTitles = array();
 		$userWatchlistPageIds = array();
 		$userWatchlistPageTitles = array();
 		foreach ( $userWatchlist as $row ) {

@@ -35,7 +35,7 @@ EOT;
 
 class WatchAnalyticsParserFunctions {
 
-	static function setup ( &$parser ) {
+	static public function setup ( &$parser ) {
 		
 		$parser->setFunctionHook(
 			'underwatched_categories',
@@ -61,7 +61,7 @@ class WatchAnalyticsParserFunctions {
 		
 	}
 	
-	static function processArgs( $frame, $args, $defaults ) {
+	static public function processArgs( $frame, $args, $defaults ) {
 		$new_args = array();
 		$num_args = count($args);
 		$num_defaults = count($defaults);
@@ -76,7 +76,7 @@ class WatchAnalyticsParserFunctions {
 		return $new_args;
 	}
 
-	static function renderUnderwatchedCategories ( &$parser, $frame, $args ) {
+	static public function renderUnderwatchedCategories ( &$parser, $frame, $args ) {
 
 		// @TODO: currently these do nothing. The namespace arg needs to be text
 		// provided by the user, so this method needs to convert "Main" to zero, etc
@@ -146,7 +146,7 @@ class WatchAnalyticsParserFunctions {
 		return $output;
 	}
 	
-	static function renderWatchersNeeded ( &$parser, $frame, $args ) {
+	static public function renderWatchersNeeded ( &$parser, $frame, $args ) {
 		global $wgUser;
 		
 		$wgUserId = $wgUser->getId();
@@ -249,7 +249,7 @@ class WatchAnalyticsParserFunctions {
 		
 	}
 	
-	protected static function makeWatchLink ( $ns, $titleText ) {
+	static protected function makeWatchLink ( $ns, $titleText ) {
 		global $wgContLang, $wgUser;
 
 		$context = RequestContext::getMain();

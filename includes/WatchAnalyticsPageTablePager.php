@@ -12,7 +12,7 @@ class WatchAnalyticsPageTablePager extends WatchAnalyticsTablePager {
 		'watch_quality' => true,
 	);
 
-	function __construct( $page, $conds, $filters=array() ) {
+	public function __construct( $page, $conds, $filters=array() ) {
 		global $wgRequest;
 
 		$this->watchQuery = new PageWatchesQuery();
@@ -29,7 +29,7 @@ class WatchAnalyticsPageTablePager extends WatchAnalyticsTablePager {
 		$this->mExtraSortFields = array( 'num_watches', 'num_reviewed', 'page_ns_and_title' );
 	}
 
-	function getQueryInfo() {
+	public function getQueryInfo() {
 		$namespaces = MWNamespace::getCanonicalNamespaces();
 		
 		if ( $this->mQueryNamespace !== null 
@@ -46,7 +46,7 @@ class WatchAnalyticsPageTablePager extends WatchAnalyticsTablePager {
 		return $this->watchQuery->getQueryInfo( $conds );
 	}
 
-	function formatValue ( $fieldName , $value ) {
+	public function formatValue ( $fieldName , $value ) {
 
 		if ( $fieldName === 'page_ns_and_title' ) {
 			$pageInfo = explode(':', $value, 2);
@@ -97,11 +97,11 @@ class WatchAnalyticsPageTablePager extends WatchAnalyticsTablePager {
 
 	}
 
-	function getFieldNames() {
+	public function getFieldNames() {
 		return $this->watchQuery->getFieldNames();
 	}
 
-	function getDefaultSort () {
+	public function getDefaultSort () {
 		return 'num_reviewed';
 	}
 
