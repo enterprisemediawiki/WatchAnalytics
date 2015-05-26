@@ -426,9 +426,11 @@ class SpecialPendingReviews extends SpecialPage {
 		);
 	}
 	
+
 	/**
-	 * Creates a button which marks a deleted page as "reviewed" (e.g. nullifies
-	 * notification timestamp in watchlist).
+	 * Creates a button which marks a deleted or redirected page as "reviewed"
+	 * (e.g. nullifies notification timestamp in watchlist). This function is
+	 * used by several other functions to specify particular buttons.
 	 * 
 	 * Reference example for API:
 	 * http://example.com/wiki/api.php
@@ -439,22 +441,39 @@ class SpecialPendingReviews extends SpecialPage {
 	 *
 	 * @param string $titleText
 	 * @param string|int $namespace
+	 * @param string $buttonMsg: i18n message key for the button's display text
+	 * @param string $buttonClass: class or space-separate list of classes to apply to the button
+	 *
 	 * @return string HTML for button
 	 */
-	public function getMarkDeleteReviewedButton ( $titleText, $namespace ) {
-		global $wgTitle;
-
+ 	public function getClearNotificationButton ( $titleText, $namespace, $buttonMsg, $buttonClass ) {
 		return Xml::element( 'a',
 			array(
 				'href' => $this->getTitle()->getLocalURL( array( 
 					'clearNotificationTitle' => $titleText,
 					'clearNotificationNS' => $namespace,
 				) ),
-				'class' => 'pendingreviews-red-button pendingreviews-accept-deletion',
+				'class' => $buttonClass,
 				'pending-namespace' => $namespace,
 				'pending-title' => $titleText,
 			),
-			wfMessage( 'pendingreviews-accept-deletion' )->text()
+			wfMessage( $buttonMsg )->text()
+		);
+	}
+
+	/**
+	 * Creates a button which marks a deleted page as "reviewed" (e.g. nullifies
+	 * notification timestamp in watchlist).
+	 *
+	 * @param string $titleText
+	 * @param string|int $namespace
+	 *
+	 * @return string HTML for button
+	 */
+	public function getMarkDeleteReviewedButton ( $titleText, $namespace ) {
+		return $this->getClearNotificationButton(
+			$titleText, $namespace, 'pendingreviews-accept-deletion',
+			'pendingreviews-red-button pendingreviews-accept-deletion'
 		);
 	}
 
@@ -463,65 +482,33 @@ class SpecialPendingReviews extends SpecialPage {
 	 * a page is moved without leaving a redirect behind. Button allows the 
 	 * deleted page to be marked as "reviewed" (e.g. nullifies notification
 	 * timestamp in watchlist).
-	 * 
-	 * Reference example for API:
-	 * http://example.com/wiki/api.php
-	 *     ?action=setnotificationtimestamp
-	 *     &titles=Some%20Page
-	 *     &format=jsonfm
-	 *     &token=ef93a5946cdd798274990bc31d804625%2B%5C
 	 *
 	 * @param string $titleText
 	 * @param string|int $namespace
+	 *
 	 * @return string HTML for button
 	 */
 	public function getAcceptMoveWithoutRedirectButton ( $titleText, $namespace ) {
-		global $wgTitle;
-
-		return Xml::element( 'a',
-			array(
-				'href' => $this->getTitle()->getLocalURL( array( 
-					'clearNotificationTitle' => $titleText,
-					'clearNotificationNS' => $namespace,
-				) ),
-				'class' => 'pendingreviews-orange-button pendingreviews-accept-deletion',
-				'pending-namespace' => $namespace,
-				'pending-title' => $titleText,
-			),
-			wfMessage( 'pendingreviews-accept-move-without-redirect' )->text()
+		return $this->getClearNotificationButton(
+			$titleText, $namespace, 'pendingreviews-accept-move-without-redirect',
+			'pendingreviews-orange-button pendingreviews-accept-deletion'
 		);
 	}
 
 	/**
 	 * If a page is a redirect it should have a simple "accept" button
 	 * 
-	 * Reference example for API:
-	 * http://example.com/wiki/api.php
-	 *     ?action=setnotificationtimestamp
-	 *     &titles=Some%20Page
-	 *     &format=jsonfm
-	 *     &token=ef93a5946cdd798274990bc31d804625%2B%5C
-	 *
 	 * @param PendingReview $item
+	 * 
 	 * @return string HTML for button
 	 */
 	public function getAcceptRedirectButton ( $item ) {
-		global $wgTitle;
-
 		$titleText = $item->title->getDBkey();
 		$namespace = $item->title->getNamespace();
 
-		return Xml::element( 'a',
-			array(
-				'href' => $this->getTitle()->getLocalURL( array( 
-					'clearNotificationTitle' => $titleText,
-					'clearNotificationNS' => $namespace,
-				) ),
-				'class' => 'pendingreviews-orange-button pendingreviews-accept-deletion', //FIXME: this is not a deletion...but that's the class to make it so you don't have to go to the page.
-				'pending-namespace' => $namespace,
-				'pending-title' => $titleText,
-			),
-			wfMessage( 'pendingreviews-accept-redirect' )->text()
+		return $this->getClearNotificationButton(
+			$titleText, $namespace, 'pendingreviews-accept-redirect',
+			'pendingreviews-orange-button pendingreviews-accept-deletion'
 		);
 	}
 

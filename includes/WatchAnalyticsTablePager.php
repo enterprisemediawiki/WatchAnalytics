@@ -133,44 +133,8 @@ abstract class WatchAnalyticsTablePager extends TablePager {
 			$queries['next']['offset'] = $offset + $this->limit;
 		}
 
-		
 		return $queries;
 		
-		// ----------------------------------------
-		// Below from parent
-		// ----------------------------------------
-		
-		// if ( !$this->mQueryDone ) {
-			// $this->doQuery();
-		// }
-
-		// # Don't announce the limit everywhere if it's the default
-		// $urlLimit = $this->mLimit == $this->mDefaultLimit ? null : $this->mLimit;
-
-		// if ( $this->mIsFirst ) {
-			// $prev = false;
-			// $first = false;
-		// } else {
-			// $prev = array(
-				// 'dir' => 'prev',
-				// 'offset' => $this->mFirstShown,
-				// 'limit' => $urlLimit
-			// );
-			// $first = array( 'limit' => $urlLimit );
-		// }
-		// if ( $this->mIsLast ) {
-			// $next = false;
-			// $last = false;
-		// } else {
-			// $next = array( 'offset' => $this->mLastShown, 'limit' => $urlLimit );
-			// $last = array( 'dir' => 'prev', 'limit' => $urlLimit );
-		// }
-		// return array(
-			// 'prev' => $prev,
-			// 'next' => $next,
-			// 'first' => $first,
-			// 'last' => $last
-		// );
 	}
 	
 

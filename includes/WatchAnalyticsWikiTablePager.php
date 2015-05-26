@@ -77,4 +77,14 @@ class WatchAnalyticsWikiTablePager extends WatchAnalyticsTablePager {
 		return 'tracking_timestamp';
 	}
 
+	/**
+	 * Overrides default which builds a form allowing to select by category and
+	 * user group. These selections don't make sense for the all-wiki data, and
+	 * thus the method returns blank.
+	 *
+	 * @return string empty string
+	 */
+	public function buildForm () {
+		return '';
+	}
 }

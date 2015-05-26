@@ -146,74 +146,47 @@ class SpecialWatchAnalytics extends SpecialPage {
 		}
 
 	}
-	
+
 	public function pagesList ( $filters ) {
-		global $wgOut, $wgRequest;
-
-		$wgOut->setPageTitle( wfMessage( 'watchanalytics-special-pages-pagetitle' )->text() );
-
-		$pager = new WatchAnalyticsPageTablePager( $this, array(), $filters );
-		
-		// $form = $pager->getForm();
-		$body = $pager->getBody();
-		$html = ''; // FIXME: make a <SELECT> using User::getAllGroups()
-		// $html = $form;
-		if ( $body ) {
-			$html .= $pager->buildForm();
-			$html .= $pager->getNavigationBar();
-			$html .= $body;
-			$html .= $pager->getNavigationBar();
-		} 
-		else {
-			$html .= '<p>' . wfMsgHTML('listusers-noresult') . '</p>';
-		}
-		$wgOut->addHTML( $html );
+		return $this->createTablePager(
+			'watchanalytics-special-pages-pagetitle',
+			new WatchAnalyticsPageTablePager( $this, array(), $filters )
+		);
 	}
 
 	public function usersList ( $filters ) {
-		global $wgOut, $wgRequest;
-
-		$wgOut->setPageTitle( wfMessage( 'watchanalytics-special-users-pagetitle' )->text() );
-
-		$pager = new WatchAnalyticsUserTablePager( $this, array(), $filters );
-		
-		// $form = $pager->getForm();
-		$body = $pager->getBody();
-		$html = '';
-		// $html = $form;
-		if ( $body ) {
-			$html .= $pager->buildForm();
-			$html .= $pager->getNavigationBar();
-			$html .= $body;
-			$html .= $pager->getNavigationBar();
-		} 
-		else {
-			$html .= '<p>' . wfMsgHTML('listusers-noresult') . '</p>';
-		}
-		$wgOut->addHTML( $html );
+		return $this->createTablePager(
+			'watchanalytics-special-users-pagetitle',
+			new WatchAnalyticsUserTablePager( $this, array(), $filters )
+		);
 	}
-	
+
 	public function wikiHistory () {
+		return $this->createTablePager(
+			'watchanalytics-special-wikihistory-pagetitle',
+			new WatchAnalyticsWikiTablePager( $this, array() )
+		);
+	}
+
+	public function createTablePager ( $titleMsg, WatchAnalyticsTablePager $tablePager ) {
 		global $wgOut, $wgRequest;
 
-		$wgOut->setPageTitle( wfMessage( 'watchanalytics-special-wikihistory-pagetitle' )->text() );
-
-		$pager = new WatchAnalyticsWikiTablePager( $this, array() );
+		$wgOut->setPageTitle( wfMessage( $titleMsg )->text() );
 		
-		// $form = $pager->getForm();
-		$body = $pager->getBody();
+		$body = $tablePager->getBody();
 		$html = '';
-		// $html = $form;
+
 		if ( $body ) {
-			$html .= $pager->getNavigationBar();
+			$html .= $tablePager->buildForm();
+			$html .= $tablePager->getNavigationBar();
 			$html .= $body;
-			$html .= $pager->getNavigationBar();
+			$html .= $tablePager->getNavigationBar();
 		} 
 		else {
 			$html .= '<p>' . wfMsgHTML('listusers-noresult') . '</p>';
 		}
 		$wgOut->addHTML( $html );
-
+		return true;
 	}
 	
 	public function forceGraph () {

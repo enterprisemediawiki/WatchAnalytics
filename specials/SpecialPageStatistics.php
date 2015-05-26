@@ -269,6 +269,9 @@ class SpecialPageStatistics extends SpecialPage {
 		$html = '<h2>'. wfMessage( 'watchanalytics-pagestats-chart-header' )->text() .'</h2>';
 		$html .= '<canvas id="page-reviews-chart" width="400" height="400"></canvas>';
 		
+		// $dateRangeStart = new MWTimestamp( date( 'YmdHis', strtotime( '2 weeks ago' ) ) );
+		// $dateRangeStart = $dateRangeStart->format('YmdHis');
+
 		$dbr = wfGetDB( DB_SLAVE );
 		$res = $dbr->select(
 			array('wtp' => 'watch_tracking_page'),
@@ -277,7 +280,8 @@ class SpecialPageStatistics extends SpecialPage {
 				"wtp.num_reviewed AS num_reviewed",
 			),
 			array(
-				'page_id' => $this->mTitle->getArticleID()
+				'page_id' => $this->mTitle->getArticleID(),
+				// 'tracking_timestamp > ' . $dateRangeStart
 			),
 			__METHOD__,
 			array(
