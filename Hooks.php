@@ -3,18 +3,17 @@
 class WatchAnalyticsHooks {
 
 	/**
-	 * Handler for PersonalUrls hook.
-	 * Replace the "watchlist" item on the user toolbar ('personal URLs') with
-	 * a link to Special:Watchlist which includes the number of pending watches
-	 * the user has. Additionally, clicking the link in a javascript-enabled
-	 * browser pops up the quick watchlist viewer.
+	 * Handler for PersonalUrls hook. Replace the "watchlist" item on the user
+	 * toolbar ('personal URLs') with a link to Special:PendingReviews. 
 	 * 
 	 * @see http://www.mediawiki.org/wiki/Manual:Hooks/PersonalUrls
+	 *
 	 * @param &$personal_urls Array of URLs to append to.
 	 * @param &$title Title of page being visited.
+	 * 
 	 * @return bool true in all cases
 	 */
-	static function onPersonalUrls( &$personal_urls /*, &$title ,$sk*/ ) {
+	static public function onPersonalUrls ( &$personal_urls /*, &$title ,$sk*/ ) {
 		
 		global $wgUser, $wgOut;
 		$user = $wgUser;
@@ -27,20 +26,18 @@ class WatchAnalyticsHooks {
 		// NOTE: $wgOut->addModules() does not appear to work here, so 
 		// the onBeforePageDisplay() method was created below.
 		
+		// Get user's watch/review stats
 		$watchStats = $user->watchStats; // set in onBeforePageDisplay() hook
-		
 		$numPending = $watchStats['num_pending'];
-				
 		$maxPendingDays = $watchStats['max_pending_days'];
 		
-		if ( $numPending == 0 ) {
-			$personal_urls['watchlist']['class'] = array( 'mw-watchanalytics-watchlist-badge' );
-		} else {
-			$personal_urls['watchlist']['class'] = array( 'mw-watchanalytics-watchlist-pending', 'mw-watchanalytics-watchlist-badge' );
-			
-			$personal_urls['watchlist']['href'] = SpecialPage::getTitleFor( 'Watchlist' )->getLocalURL( array( 'days' => $maxPendingDays ) );
+		// Determine CSS class of Watchlist/PendingReviews link
+		$personal_urls['watchlist']['class'] = array( 'mw-watchanalytics-watchlist-badge' );
+		if ( $numPending !== 0 ) {
+			$personal_urls['watchlist']['class'] = array( 'mw-watchanalytics-watchlist-pending' );
 		}
 
+		// Determine text of Watchlist/PendingReviews link 
 		global $egPendingReviewsEmphasizeDays;
 		if ( $maxPendingDays > $egPendingReviewsEmphasizeDays ) {
 			$personal_urls['watchlist']['class'][] = 'mw-watchanalytics-watchlist-pending-old';
@@ -50,44 +47,52 @@ class WatchAnalyticsHooks {
 			// when $sk (third arg) available, replace wfMessage with $sk->msg()
 			$text = wfMessage( 'watchanalytics-personal-url' )->params( $numPending )->text();
 		}
-
 		$personal_urls['watchlist']['text'] = $text;
+		
+		// set "watchlist" link to Pending Reviews
 		$personal_urls['watchlist']['href'] = SpecialPage::getTitleFor( 'PendingReviews' )->getLocalURL();
 		return true;
 	}
 
 	/**
-	 * Handler for BeforePageDisplay hook.
+	 * Handler for BeforePageDisplay hook. This function supports several
+	 * WatchAnalytics features:
+	 * 
+	 * 1) Determine if user should see shaky pending reviews link
+	 * 2) Insert page scores on applicable pages
+	 * 3) If a page review has occured on this page view, display an unreview
+	 *    option and record that the review happened.
+	 *
+	 * Also supports parameter: Skin $skin.
 	 * @see http://www.mediawiki.org/wiki/Manual:Hooks/BeforePageDisplay
-	 * @param $out OutputPage object
-	 * @param $skin Skin being used.
+	 *
+	 * @param OutputPage $out reference to OutputPage object
+	 *
 	 * @return bool true in all cases
 	 */
-	static function onBeforePageDisplay( $out /*, $skin*/ ) {
+	static public function onBeforePageDisplay ( $out /*, $skin*/ ) {
 		$user = $out->getUser();
 		$title = $out->getTitle();
 
-		$userWatch = new UserWatchesQuery();
 
+		#
+		# 1) Is user's oldest pending review is old enough to require emphasis
+		#
+		$userWatch = new UserWatchesQuery();
 		$user->watchStats = $userWatch->getUserWatchStats( $user );
-		
 		$user->watchStats['max_pending_days'] = ceil(
 			$user->watchStats['max_pending_minutes'] / ( 60 * 24 )
 		);
-
-		// if ( $user->isLoggedIn() && $user->getOption( 'echo-notify-show-link' ) ) {
-			// // Load the module for the Notifications flyout
-			// $out->addModules( array( 'ext.echo.overlay.init' ) );
-			// // Load the styles for the Notifications badge
-			// $out->addModuleStyles( 'ext.echo.badge' );
-		// }
 		
 		global $egPendingReviewsEmphasizeDays;
 		if ( $user->watchStats['max_pending_days'] > $egPendingReviewsEmphasizeDays ) {
 			$out->addModules( array( 'ext.watchanalytics.shakependingreviews' ) );
 		}
 
-		// Insert page scores
+
+		#
+		# 2) Insert page scores
+		#
 		if ( in_array( $title->getNamespace() , $GLOBALS['egWatchAnalyticsPageScoreNamespaces'] )
 			&& $user->isAllowed( 'viewpagescore' ) 
 			&& PageScore::pageScoreIsEnabled() ) {
@@ -98,7 +103,9 @@ class WatchAnalyticsHooks {
 		}	
 
 
-		// determine if a change happened
+		#
+		# 3) If user has reviewed page on this page load show "unreview" option
+		#
 		$reviewHandler = ReviewHandler::pageHasBeenReviewed();
 		if ( $reviewHandler ) {
 
@@ -111,7 +118,6 @@ class WatchAnalyticsHooks {
 
 		}
 
-
 		return true;
 	}
 
@@ -123,19 +129,22 @@ class WatchAnalyticsHooks {
 	 * the notification timestamps of the original title so users are notified 
 	 * of changes prior to the move. Code taken from MediaWiki core head branch
 	 * WatchedItem::doDuplicateEntries() method.
-	 *
-	 * Note: additional arguments &$moverUser User, $oldid string|int, $newId
-	 * string|int, and $reason string are also available per MW documenation.
 	 * 
-	 * @todo FIXME: handle what to do if have MW 1.25...don't need this
-	 *
+	 * @todo FIXME: make this work for <1.25 and 1.25+
 	 * @todo document which commit fixes this issue specifically.
+	 * 
 	 * @see http://www.mediawiki.org/wiki/Manual:Hooks/TitleMoveComplete
-	 * @param &$originalTitle Title
-	 * @param &$newTitle Title
+	 *
+	 * @param Title &$originalTitle
+	 * @param Title &$newTitle
+	 * @param User &$user
+	 * @param int $oldid
+	 * @param int $newid
+	 * @param FIXME string|null $reason
+	 *
 	 * @return bool true in all cases
 	 */
-	static function onTitleMoveComplete ( Title &$originalTitle, Title &$newTitle,
+	static public function onTitleMoveComplete ( Title &$originalTitle, Title &$newTitle,
 			User &$user, $oldid, $newid, $reason = null) {
 
 		#
@@ -192,9 +201,15 @@ class WatchAnalyticsHooks {
 	}
 
 	/**
-	 * Register magic-word variable IDs
+	 * Register magic-word variable ID to hide page score from select pages.
+	 * 
+ 	 * @see FIXME (include link to hook documentation)
+	 *
+	 * @param Array $magicWordVariableIDs array of names of magic words
+	 *
+	 * @return bool
 	 */
-	static function addMagicWordVariableIDs( &$magicWordVariableIDs ) {
+	static public function addMagicWordVariableIDs( &$magicWordVariableIDs ) {
 		$magicWordVariableIDs[] = 'MAG_NOPAGESCORE';
 		return true;
 	}
@@ -202,8 +217,15 @@ class WatchAnalyticsHooks {
 	/**
 	 * Set values in the page_props table based on the presence of the
 	 * 'NOPAGESCORE' magic word in a page
+	 * 
+ 	 * @see FIXME (include link to hook documentation)
+	 *
+	 * @param Parser $parser reference to MediaWiki parser.
+	 * @param string $text FIXME html/wikitext? of output page before complete
+	 *
+	 * @return bool
 	 */
-	static function handleMagicWords( &$parser, &$text ) {
+	static public function handleMagicWords( &$parser, &$text ) {
 		$magicWord = MagicWord::get( 'MAG_NOPAGESCORE' );
 		if ( $magicWord->matchAndRemove( $text ) ) {
 			// $parser->mOutput->setProperty( 'approvedrevs', 'y' );
@@ -213,34 +235,34 @@ class WatchAnalyticsHooks {
 	}
 
 	/**
-	 * Early in page generation determines if the user is watching the page,
-	 * and if so determines what their review status is.
+	 * Early in page cycle determines if the user is watching the page,
+	 * and if so determines what their review status is. This is used later,
+	 * in onBeforePageDisplay, to determine if a change in state has occured.
+	 *
+	 * @see FIXME (include link to hook documentation)
+	 *
+	 * @param WikiPage $wikiPage
+	 *
+	 * @return bool
 	 */
 	static public function onArticlePageDataBefore ( $wikiPage ) {
-
 		global $wgUser;
-
 		ReviewHandler::setup( $wgUser, $wikiPage->getTitle() );
-
 		return true;
-
 	}
 
 	/**
-	 * Occurs after the save page request has been processed.
+	 * Occurs after the save page request has been processed, and causes the
+	 * new state of "watches" and "reviews" to be recorded for the page and all
+	 * of its watchers.
+	 * 
+	 * Additional parameters available include: User $user, Content $content,
+	 * string $summary, boolean $isMinor, boolean $isWatch, $section Deprecated,
+	 * integer $flags, {Revision|null} $revision, Status $status, integer $baseRevId
+	 *
 	 * @see https://www.mediawiki.org/wiki/Manual:Hooks/PageContentSaveComplete
 	 *
 	 * @param WikiPage $article
-	 * @param User $user
-	 * @param Content $content
-	 * @param string $summary
-	 * @param boolean $isMinor
-	 * @param boolean $isWatch
-	 * @param $section Deprecated
-	 * @param integer $flags
-	 * @param {Revision|null} $revision
-	 * @param Status $status
-	 * @param integer $baseRevId
 	 *
 	 * @return boolean
 	 */
