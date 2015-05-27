@@ -149,12 +149,14 @@ class ReviewHandler {
 			'unreview' => $this->initial
 		) );
 
+		$linkText = wfMessage('watchanalytics-unreview-button')->text();
+		$bannerText = wfMessage('watchanalytics-unreview-banner-text')->parse();
 
 		// when MW 1.25 is released (very soon) replace this with a mustache template
 		$template = 
 			"<div id='watch-analytics-review-handler'>
-				<a id='watch-analytics-unreview' href='$unReviewLink'>Un-review</a>
-				<p>By navigating to this page you have marked it reviewed. If you did not mean to review the page you may un-review it.</p>
+				<a id='watch-analytics-unreview' href='$unReviewLink'>$linkText</a>
+				<p>$bannerText</p>
 			</div>";
 
 		return "<script type='text/template' id='ext-watchanalytics-review-handler-template'>$template</script>";

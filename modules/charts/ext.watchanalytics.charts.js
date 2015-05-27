@@ -40,7 +40,7 @@ $(document).ready(function(){
     var data = [
         {
             label: "first dataset",
-            fillColor: "rgba(255,92,92,0.2)",
+            fillColor: "rgba(255,92,92,0.6)",
             strokeColor: "rgba(255,92,92,1)",
             pointColor: "rgba(255,92,92,1)",
             pointStrokeColor: "#fff",
@@ -86,7 +86,7 @@ $(document).ready(function(){
         // bezierCurveTension : 0.4,
 
         //Boolean - Whether to show a dot for each point
-        pointDot : true,
+        pointDot : false,
 
         //Number - Radius of each point dot in pixels
         pointDotRadius : 4,

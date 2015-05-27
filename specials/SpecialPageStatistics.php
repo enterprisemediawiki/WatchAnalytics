@@ -90,7 +90,7 @@ class SpecialPageStatistics extends SpecialPage {
 		// for now it's just an explanation of what should be here.
 		// @todo FIXME: hard coded width of the badge column is lame
 		return "<h2>Scores</h2>
-			<p>The following are page scores and explanations for $pageLink</p>
+			<p>The following are page scores and explanations for <strong>$pageLink</strong></p>
 
 			<table>
 			<tr>
@@ -251,11 +251,12 @@ class SpecialPageStatistics extends SpecialPage {
 
 	public function unReviewMessage () {
 
-		// FIXME: this shouldn't use the same CSS ID.
+		// FIXME: Original self: this shouldn't use the same CSS ID.
+		//        Newer self: Why not?
 		return 
-			"<div id='watch-analytics-review-handler'>
-				<p>This page has been un-reviewed.</p>
-			</div>";
+			"<div id='watch-analytics-review-handler'><p>" . 
+				wfMessage('watchanalytics-unreview-complete')->parse() . 
+			"</p></div>";
 
 	}
 
@@ -286,7 +287,7 @@ class SpecialPageStatistics extends SpecialPage {
 			__METHOD__,
 			array(
 				"ORDER BY" => "wtp.tracking_timestamp DESC",
-				"LIMIT" => "1000", // MOST RECENT 1000 changes
+				"LIMIT" => "200", // MOST RECENT 100 changes
 			),
 			null // join conditions
 		);
