@@ -19,7 +19,7 @@ class SpecialWatchAnalytics extends SpecialPage {
 		);
 	}
 	
-	function execute( $parser = null ) {
+	public function execute ( $parser = null ) {
 		global $wgRequest, $wgOut;
 
 		$this->setHeaders();
@@ -128,7 +128,7 @@ class SpecialWatchAnalytics extends SpecialPage {
 
 	}
 
-	function createHeaderLink($msg, $query_param) {
+	public function createHeaderLink($msg, $query_param) {
 	
 		$WatchAnalyticsTitle = SpecialPage::getTitleFor( $this->getName() );
 

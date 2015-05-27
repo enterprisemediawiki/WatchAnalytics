@@ -136,7 +136,7 @@ class UserWatchesQuery extends WatchesQuery {
 	/**
 	 * Gets watch statistics for a particular user.
 	 * 
-	 * @param User $user: the user to get watch-info on.
+	 * @param User $user the user to get watch-info on.
 	 * 
 	 * @return array returns user watch info in an array with keys the same as
 	 * $this->fieldNames.
@@ -174,7 +174,7 @@ class UserWatchesQuery extends WatchesQuery {
 	/**
 	 * Gets watch statistics for a list of users.
 	 * 
-	 * @param Array $userIds: array of integer user IDs.
+	 * @param Array $userIds array of integer user IDs.
 	 * @return Array returns user watch info in an array with user IDs as keys
 	 * and values being objects with params num_watches and num_pending.
 	 */

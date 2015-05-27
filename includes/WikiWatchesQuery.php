@@ -61,7 +61,7 @@ class WikiWatchesQuery extends WatchesQuery {
 		// 'content_num_one_reviewed'    => 'watchanalytics-special-header-main-num-one-reviewed',
 	);
 
-	function getQueryInfo( $conds = null ) {
+	public function getQueryInfo( $conds = null ) {
 	
 		$this->tables = array(
 			'w' => 'watch_tracking_wiki'

@@ -19,7 +19,7 @@ class SpecialPageStatistics extends SpecialPage {
 		);
 	}
 	
-	function execute( $parser = null ) {
+	public function execute( $parser = null ) {
 		global $wgRequest, $wgOut, $wgUser;
 
 		$this->setHeaders();

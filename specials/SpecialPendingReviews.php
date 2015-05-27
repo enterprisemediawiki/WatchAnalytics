@@ -42,8 +42,6 @@ class SpecialPendingReviews extends SpecialPage {
 
 	/**
 	 * Constructor for Special Page.
-	 *
-	 * @return null
 	 */
 	public function __construct() {
 		parent::__construct(
@@ -93,7 +91,7 @@ class SpecialPendingReviews extends SpecialPage {
 	 * @param Parser|null $parser
 	 * @return bool
 	 */
-	function execute( $parser = null ) {
+	public function execute( $parser = null ) {
 		global $wgOut, $wgUser;
 
 		$this->setHeaders();
@@ -441,8 +439,8 @@ class SpecialPendingReviews extends SpecialPage {
 	 *
 	 * @param string $titleText
 	 * @param string|int $namespace
-	 * @param string $buttonMsg: i18n message key for the button's display text
-	 * @param string $buttonClass: class or space-separate list of classes to apply to the button
+	 * @param string $buttonMsg i18n message key for the button's display text
+	 * @param string $buttonClass class or space-separate list of classes to apply to the button
 	 *
 	 * @return string HTML for button
 	 */
