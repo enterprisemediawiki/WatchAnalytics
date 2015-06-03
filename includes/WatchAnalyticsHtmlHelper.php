@@ -43,8 +43,6 @@ class WatchAnalyticsHtmlHelper {
 		$totalCount = 1;
 		$colCount = 0;
 
-		$html = "<$listType>";
-
 		if ( $columns > 1 ) {
 			$perCol = ceil( $numLI / $columns );
 		}
@@ -53,7 +51,7 @@ class WatchAnalyticsHtmlHelper {
 		}
 
 		$colWidth = floor( 100 / $columns );
-		$html = "<table style='width:100%;'><tr><td style='width:$colWidth%;'>" . $html; // prepend the start of a table
+		$html = "<table style='width:100%;'><tr><td style='width:$colWidth%;'><$listType>"; // prepend the start of a table
 
 		// $html .= '<pre>' . print_r( $list, true ) . '</pre>';
 		foreach ( $list as $li ) {
@@ -71,9 +69,11 @@ class WatchAnalyticsHtmlHelper {
 
 		$html .= "</$listType>";
 
-		if ( $numLI > $perCol ) {
-			$html .= "</td></tr></table>"; // close out table if required
-		}
+		// Was: close out table if required
+		// Question: when would it not be required? There was an if-statement here
+		// but it was removed because tables weren't being closed out if only one
+		// item was in the list ($numLI == 1)
+		$html .= "</td></tr></table>";
 
 		return $html;
 
