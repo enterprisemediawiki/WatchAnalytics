@@ -207,6 +207,12 @@ $GLOBALS['wgResourceModules'] += array(
 
 );
 
+// array of form array( 'table' => ..., 'column' => ..., 'join_column' => ... )
+// where the table is the database table to get the page hit counter info,
+// the column is the column within that table with the hit counter, and
+// join_column is an integer that joins this table with page.page_id
+$GLOBALS['egWatchAnalyticsPageCounter'] = false;
+
 $GLOBALS['egPendingReviewsEmphasizeDays'] = 7;
 $GLOBALS['egPendingReviewsRedPagesThreshold'] = 2; // 0 or 1 reviewers BESIDES the person who made the change
 $GLOBALS['egPendingReviewsOrangePagesThreshold'] = 4; // 2 or 3 reviewers BESIDES the person who made the change

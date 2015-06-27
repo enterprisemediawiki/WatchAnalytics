@@ -137,17 +137,21 @@ class PageWatchesQuery extends WatchesQuery {
 		$queryInfo['options'][ 'ORDER BY' ] = 'num_watches ASC';
 
 		$cols = array(
-				'p.page_id AS page_id',
-				$this->sqlNumWatches, // 'SUM( IF(w.wl_title IS NOT NULL, 1, 0) ) AS num_watches'
+			'p.page_id AS page_id',
+			$this->sqlNumWatches, // 'SUM( IF(w.wl_title IS NOT NULL, 1, 0) ) AS num_watches'
 		);
 
-		global $wgVersion;
-		// no page counter in MW 1.25+
-		$hasPageCounter = version_compare( $wgVersion, '1.25', '<' );
-		if ( $hasPageCounter ) {
-			$cols[] = 'p.page_counter AS num_views';
-		}
+		global $egWatchAnalyticsPageCounter;
+		if ( $egWatchAnalyticsPageCounter ) {
+			$queryInfo['tables']['counter'] = $egWatchAnalyticsPageCounter['table'];
+			$countCol = $egWatchAnalyticsPageCounter['column'];
+			$countPageIdJoinCol = $egWatchAnalyticsPageCounter['join_column'];
 
+			$cols[] = "counter.$countCol AS num_views";
+			$queryInfo['join_conds']['counter'] = array(
+				'LEFT JOIN' , "p.page_id = counter.$countPageIdJoinCol"
+			);
+		}
 
 		$pageWatchStats = $dbr->select(
 			$queryInfo['tables'],
