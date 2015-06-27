@@ -136,13 +136,26 @@ class PageWatchesQuery extends WatchesQuery {
 		$queryInfo = $this->getQueryInfo( 'p.page_id IN (' . $pagesList . ')' );
 		$queryInfo['options'][ 'ORDER BY' ] = 'num_watches ASC';
 
+		$cols = array(
+			'p.page_id AS page_id',
+			$this->sqlNumWatches, // 'SUM( IF(w.wl_title IS NOT NULL, 1, 0) ) AS num_watches'
+		);
+
+		global $egWatchAnalyticsPageCounter;
+		if ( $egWatchAnalyticsPageCounter ) {
+			$queryInfo['tables']['counter'] = $egWatchAnalyticsPageCounter['table'];
+			$countCol = $egWatchAnalyticsPageCounter['column'];
+			$countPageIdJoinCol = $egWatchAnalyticsPageCounter['join_column'];
+
+			$cols[] = "counter.$countCol AS num_views";
+			$queryInfo['join_conds']['counter'] = array(
+				'LEFT JOIN' , "p.page_id = counter.$countPageIdJoinCol"
+			);
+		}
+
 		$pageWatchStats = $dbr->select(
 			$queryInfo['tables'],
-			array(
-				'p.page_id AS page_id',
-				'p.page_counter AS num_views',
-				$this->sqlNumWatches, // 'SUM( IF(w.wl_title IS NOT NULL, 1, 0) ) AS num_watches'
-			),
+			$cols,
 			$queryInfo['conds'],
 			__METHOD__,
 			$queryInfo['options'],
@@ -151,6 +164,9 @@ class PageWatchesQuery extends WatchesQuery {
 
 		$return = array();
 		while ( $row = $pageWatchStats->fetchObject() ) {
+			if ( ! isset( $row->num_views ) ) {
+				$row->num_views = 1;
+			}
 			$return[] = $row;
 		}
 
