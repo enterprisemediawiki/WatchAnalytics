@@ -37,6 +37,7 @@ EOT;
 $GLOBALS['wgExtensionCredits']['specialpage'][] = array(
 	'path' => __FILE__,
 	'name' => 'WatchAnalytics',
+	'version' => '0.3.0',
 	'url' => 'https://www.mediawiki.org/wiki/Extension:WatchAnalytics',
 	'author' => array( '[https://www.mediawiki.org/wiki/User:Jamesmontalvo3 James Montalvo]' ),
 	'descriptionmsg' => 'watchanalytics-desc',
