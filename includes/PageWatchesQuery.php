@@ -220,8 +220,12 @@ class PageWatchesQuery extends WatchesQuery {
 		);
 
 		// $row = $pageData->fetchObject();
-
-		return $pageData->watch_quality;
+		if ( $pageData ) {
+			return $pageData->watch_quality;
+		}
+		else {
+			return 0;	
+		}
 
 	}
 
