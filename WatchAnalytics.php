@@ -130,10 +130,12 @@ $watchAnalyticsResourceTemplate = array(
 $GLOBALS['wgResourceModules'] += array(
 
 	'ext.watchanalytics.base' => $watchAnalyticsResourceTemplate + array(
+		'position' => 'bottom',
 		'styles' => 'base/ext.watchanalytics.base.css',
 	),
 
 	'ext.watchanalytics.forcegraph' => $watchAnalyticsResourceTemplate + array(
+		'position' => 'bottom',
 		'styles' => 'forcegraph/ext.watchanalytics.forcegraph.css',
 		'scripts' => array(
 			'forcegraph/ext.watchanalytics.circlesort.js',
@@ -151,10 +153,12 @@ $GLOBALS['wgResourceModules'] += array(
 	),
 
 	'ext.watchanalytics.specials' => $watchAnalyticsResourceTemplate + array(
+		'position' => 'bottom',
 		'styles' => 'specials/ext.watchanalytics.specials.css',
 	),
 
 	'ext.watchanalytics.pendingreviews' => $watchAnalyticsResourceTemplate + array(
+		'position' => 'bottom',
 		'styles' => 'pendingreviews/ext.watchanalytics.pendingreviews.css',
 		'scripts' => 'pendingreviews/ext.watchanalytics.pendingreviews.js',
 		'dependencies' => array(
@@ -164,18 +168,21 @@ $GLOBALS['wgResourceModules'] += array(
 	),
 
 	'underscore.js' => $watchAnalyticsResourceTemplate + array(
+		'position' => 'bottom',
 		'scripts' => array(
 			'underscore.js/underscore-min.js',
 		),
 	),
 
 	'd3.js' => $watchAnalyticsResourceTemplate + array(
+		'position' => 'bottom',
 		'scripts' => array(
 			'd3.js/d3.js',
 		),
 	),
 
 	'ext.watchanalytics.shakependingreviews' => $watchAnalyticsResourceTemplate + array(
+		'position' => 'bottom',
 		'scripts' => array(
 			'shakependingreviews/shake.js',
 		),
@@ -185,6 +192,7 @@ $GLOBALS['wgResourceModules'] += array(
 	),
 
 	'ext.watchanalytics.pagescores' => $watchAnalyticsResourceTemplate + array(
+		'position' => 'bottom',
 		'styles' => 'pagescores/pagescores.css',
 		'scripts' => array(
 			'pagescores/pagescores.js',
@@ -192,6 +200,7 @@ $GLOBALS['wgResourceModules'] += array(
 	),
 
 	'ext.watchanalytics.reviewhandler' => $watchAnalyticsResourceTemplate + array(
+		'position' => 'bottom',
 		'styles' => 'reviewhandler/reviewhandler.css',
 		'scripts' => array(
 			'reviewhandler/reviewhandler.js',
@@ -199,6 +208,7 @@ $GLOBALS['wgResourceModules'] += array(
 	),
 
 	'ext.watchanalytics.charts' => $watchAnalyticsResourceTemplate + array(
+		'position' => 'bottom',
 		'styles' => 'charts/ext.watchanalytics.charts.css',
 		'scripts' => array(
 			'charts/Chart.js',
