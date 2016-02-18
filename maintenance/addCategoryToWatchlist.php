@@ -72,7 +72,7 @@ class WatchAnalyticsAddCategoryToWatchlist extends Maintenance {
 		$usernames = $this->getOption( 'usernames' );
 		if ( $usernames ) {
 			$namesArray = explode( ',', $usernames );
-			foreach( $namesArray as $i => $u ) {
+			foreach ( $namesArray as $i => $u ) {
 				$namesArray[$i] = trim( $u );
 			}
 		}
@@ -81,14 +81,14 @@ class WatchAnalyticsAddCategoryToWatchlist extends Maintenance {
 		}
 
 		$users = array();
-		foreach( $namesArray as $username ) {
+		foreach ( $namesArray as $username ) {
 			$users[] = User::newFromName( $username );
 		}
 
 		$categories = $this->getOption( 'categories' );
 		if ( $categories ) {
 			$catsArray = explode( ',', $categories );
-			foreach( $catsArray as $i => $c ) {
+			foreach ( $catsArray as $i => $c ) {
 				$catsArray[$i] = trim( $c );
 			}
 		}
@@ -96,16 +96,16 @@ class WatchAnalyticsAddCategoryToWatchlist extends Maintenance {
 			die( 'You must supply at least one category' );
 		}
 
-		foreach( $catsArray as $categoryName ) {
+		foreach ( $catsArray as $categoryName ) {
 			$this->output( "Start processing Category:$categoryName\n" );
 
 			$category = Category::newFromName( $categoryName );
 			$titleArray = $category->getMembers();
 
-			while( $titleArray->valid() ) {
+			while ( $titleArray->valid() ) {
 				$this->output( "\nAdding watchers to [[" . $titleArray->current->getFullText() . "]]...\n" );
 
-				foreach( $users as $user ) {
+				foreach ( $users as $user ) {
 					$this->output( "    ...checking " . $user->getName() . "... " );
 
 					$watchedItem = WatchedItem::fromUserTitle(

@@ -695,7 +695,7 @@
 				});
 
 			}, this);
-			
+
 			//Set up tooltip events on the chart
 			if (this.options.showTooltips) {
 

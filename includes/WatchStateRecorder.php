@@ -39,13 +39,13 @@ class WatchStateRecorder {
 	protected $dbw;
 
 	public function recordedWithinHours ( $withinHours = 1 ) {
-		
+
 		$withinHours = ( intval( $withinHours ) > 0 ) ? intval( $withinHours ) : 1;
 		$withinDays = floor( $withinHours / 24 );
 		if ( $withinDays > 0 ) {
 			$withinHours = $withinHours % 24;
 		}
-		
+
 		$now = new MWTimestamp();
 		$diff = $now->diff( $this->getLatestAllWikiTimestamp() );
 
@@ -55,9 +55,9 @@ class WatchStateRecorder {
 
 		return true;
 	}
-	
+
 	public function getLatestAllWikiTimestamp () {
-	
+
 		$dbr = wfGetDB( DB_SLAVE );
 		$result = $dbr->selectRow(
 			'watch_tracking_wiki',
@@ -76,13 +76,13 @@ class WatchStateRecorder {
 		else {
 			return new MWTimestamp( '19700101000000' );
 		}
-		
+
 	}
 
 	public function recordAll() {
-		
+
 		$this->dbw = wfGetDB( DB_MASTER );
-		
+
 		// get user and page info
 		$userWatchQuery = new UserWatchesQuery();
 		$pageWatchQuery = new PageWatchesQuery();
@@ -112,7 +112,7 @@ class WatchStateRecorder {
 		) );
 
 		$now = new MWTimestamp();
-		$now = $now->format('YmdHis');
+		$now = $now->format( 'YmdHis' );
 
 		$unwatched = 0;
 		$oneWatched = 0;
@@ -124,11 +124,11 @@ class WatchStateRecorder {
 		$nsMainUnreviewed = 0;
 		$nsMainOneReviewed = 0;
 
-		foreach( $users as $key => $user ) {
+		foreach ( $users as $key => $user ) {
 			$users[$key]['tracking_timestamp'] = $now;
 		}
 
-		foreach( $pages as $key => $page ) {
+		foreach ( $pages as $key => $page ) {
 			$page['tracking_timestamp'] = $now;
 
 			$numWatches = intval( $page['num_watches'] );
@@ -173,7 +173,7 @@ class WatchStateRecorder {
 			__METHOD__
 		);
 
-        foreach( array_chunk( $pages, 100 ) as $chunk ) {
+        foreach ( array_chunk( $pages, 100 ) as $chunk ) {
             $this->dbw->insert(
                 'watch_tracking_page',
                 $chunk,
@@ -189,10 +189,10 @@ class WatchStateRecorder {
 			'num_pages', 'num_watches', 'num_pending', 'max_pending_minutes', 'avg_pending_minutes'
 		) );
 
-		$allNamespaces[0][ 'max_pending_minutes' ] = 
+		$allNamespaces[0][ 'max_pending_minutes' ] =
 			$allNamespaces[0][ 'max_pending_minutes' ]
 			? $allNamespaces[0][ 'max_pending_minutes' ] : 0;
-		
+
 		$allNamespaces[0][ 'avg_pending_minutes' ] =
 			$allNamespaces[0][ 'avg_pending_minutes' ]
 			? $allNamespaces[0][ 'avg_pending_minutes' ] : 0;
@@ -202,11 +202,11 @@ class WatchStateRecorder {
 			'content_max_pending_minutes', 'content_avg_pending_minutes'
 		) );
 
-		$contentOnly[0][ 'content_max_pending_minutes' ] = 
-			$contentOnly[0][ 'content_max_pending_minutes' ] 
+		$contentOnly[0][ 'content_max_pending_minutes' ] =
+			$contentOnly[0][ 'content_max_pending_minutes' ]
 			? $contentOnly[0][ 'content_max_pending_minutes' ] : 0;
-		
-		$contentOnly[0][ 'content_avg_pending_minutes' ] = 
+
+		$contentOnly[0][ 'content_avg_pending_minutes' ] =
 			$contentOnly[0][ 'content_avg_pending_minutes' ]
 			? $contentOnly[0][ 'content_avg_pending_minutes' ] : 0;
 
@@ -230,7 +230,7 @@ class WatchStateRecorder {
 			$allWikiAnalytics,
 			__METHOD__
 		);
-		
+
 		return true;
 	}
 
@@ -248,7 +248,7 @@ class WatchStateRecorder {
 
 		while ( $row = $result->fetchRow() ) {
 			$c = count( $output );
-			foreach ($columnsToKeep as $col) {
+			foreach ( $columnsToKeep as $col ) {
 				$output[$c][$col] = $row[$col];
 			}
 		}
@@ -256,7 +256,7 @@ class WatchStateRecorder {
 		return $output;
 	}
 
-	public function getWikiQueryInfo ($namespace = false, $prefix = '') {
+	public function getWikiQueryInfo ( $namespace = false, $prefix = '' ) {
 
 		$sqlNumPages = "COUNT( DISTINCT p.page_id ) AS {$prefix}num_pages";
 		$sqlNumWatches = "SUM( IF( w.wl_title IS NOT NULL,             1, 0) ) AS {$prefix}num_watches";
@@ -350,7 +350,7 @@ class WatchStateRecorder {
 		);
 
 		// insert into watch_tracking_user: timestamp, user ID, num watches, num reviews
-		// @todo FIXME: this incorrectly records the editors watch state if they change from 
+		// @todo FIXME: this incorrectly records the editors watch state if they change from
 		// watched to unwatched or unwatched to watched during the edit...maybe.
 		$dbw->replace(
 			'watch_tracking_user',
@@ -421,7 +421,7 @@ class WatchStateRecorder {
 		$numWatchers = count( $watchers );
 		$numReviewed = 0;
 		$userIdArray = array();
-		foreach( $watchers as $w ) {
+		foreach ( $watchers as $w ) {
 			if ( $w->wl_notificationtimestamp === NULL ) {
 				$numReviewed++;
 			}

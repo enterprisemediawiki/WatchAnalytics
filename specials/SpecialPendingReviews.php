@@ -24,7 +24,7 @@
 /**
  * A special page that lists last changes made to the wiki that a user is
  * watching. Pages are listed in reverse-chronological order or by priority;
- * Priority is determined by how many people have already "reviewed" the 
+ * Priority is determined by how many people have already "reviewed" the
  * change.
  *
  * @ingroup SpecialPage
@@ -45,12 +45,12 @@ class SpecialPendingReviews extends SpecialPage {
 	 */
 	public function __construct() {
 		parent::__construct(
-			"PendingReviews", // 
+			"PendingReviews", //
 			"",  // rights required to view
 			true // show in Special:SpecialPages
 		);
 	}
-	
+
 	/**
 	 * Main function for generating special page.
 	 *
@@ -65,7 +65,7 @@ class SpecialPendingReviews extends SpecialPage {
 	 * query string it is possible to view others' Pending Reviews. FIXME: When
 	 * this extension is "released" this function should be limited only to
 	 * people with a special right.
-	 * 
+	 *
 	 * Useful Title functions:
 	 * -----------------------
 	 *   getAuthorsBetween
@@ -85,7 +85,7 @@ class SpecialPendingReviews extends SpecialPage {
 	 *   isRedirect
 	 *
 	 * @todo FIXME: break sections out into smaller functions - namely HTML writing (HTML templates?x)
-	 * @todo FIXME: need logic for: isRedirect, isDeleted, isNewPage, 
+	 * @todo FIXME: need logic for: isRedirect, isDeleted, isNewPage,
 	 * and files, approvals ... other log actions?
 	 * @todo FIXME: improve documentation above
 	 * @param Parser|null $parser
@@ -99,7 +99,7 @@ class SpecialPendingReviews extends SpecialPage {
 		// check if the request is to clear a notification timestamp
 		$clearNotifyTitle = $this->getClearNotificationTitle();
 		if ( $clearNotifyTitle ) {
-			$this->handleClearNotification( $clearNotifyTitle );			
+			$this->handleClearNotification( $clearNotifyTitle );
 			return true;
 		}
 
@@ -120,32 +120,32 @@ class SpecialPendingReviews extends SpecialPage {
 
 		// how many reviews to display
 		$this->setReviewLimit();
-		
-		//FIXME: is this using a limit?
+
+		// FIXME: is this using a limit?
 		$this->pendingReviewList = PendingReview::getPendingReviewsList( $this->mUser );
 
 		$html = $this->getPageHeader();
-		
+
 		$html .= '<table class="pendingreviews-list">';
 		$rowCount = 0;
-	
+
 		// loop through pending reviews
 		foreach ( $this->pendingReviewList as $item ) {
 			// if the title exists, then the page exists (and hence it has not
 			// been deleted)
 			if ( $item->title ) {
-				$html .= $this->getStandardChangeRow( $item, $rowCount );		
+				$html .= $this->getStandardChangeRow( $item, $rowCount );
 			}
 			// page has been deleted (or moved w/o a redirect)
 			else {
 				$html .= $this->getDeletedPageRow( $item, $rowCount );
 			}
-		
+
 			$rowCount++;
 			if ( $rowCount >= $this->reviewLimit ) {
 				break;
 			}
-		}//die();
+		}// die();
 		$html .= '</table>';
 
 		global $egPendingReviewsShowWatchSuggestionsIfReviewsUnder; // FIXME: crazy long name...
@@ -162,23 +162,23 @@ class SpecialPendingReviews extends SpecialPage {
 	/**
 	 * Handles case where user clicked a link to clear a pending review
 	 * This will not display the pending reviews page.
-	 * 
+	 *
 	 * @return bool
 	 */
 	public function handleClearNotification ( $clearNotifyTitle ) {
 
 		PendingReview::clearByUserAndTitle( $this->getUser(), $clearNotifyTitle );
-		
+
 		$this->getOutput()->addHTML(
 			$this->msg(
 				'pendingreviews-clear-page-notification',
 				$clearNotifyTitle->getFullText(),
-				Xml::tags('a', 
+				Xml::tags( 'a',
 					array(
 						'href' => $this->getTitle()->getLocalUrl(),
 						'style' => 'font-weight:bold;',
-					), 
-					$this->getTitle() 
+					),
+					$this->getTitle()
 				)
 			)->text()
 		);
@@ -187,7 +187,7 @@ class SpecialPendingReviews extends SpecialPage {
 
 	/**
 	 * Sending which user's reviews to display
-	 * 
+	 *
 	 * @return bool
 	 */
 	public function setPendingReviewsUser () {
@@ -195,7 +195,7 @@ class SpecialPendingReviews extends SpecialPage {
 		$viewingUser = $this->getUser();
 
 		// Check if a user has been specified.
-		$requestUser = $this->getRequest()->getVal( 'user' );		
+		$requestUser = $this->getRequest()->getVal( 'user' );
 		if ( $requestUser ) {
 			$this->mUser = User::newFromName( $requestUser );
 			if ( $this->mUser->getId() === $viewingUser ) {
@@ -216,22 +216,22 @@ class SpecialPendingReviews extends SpecialPage {
 
 	/**
 	 * Sets the number of reviews to return
-	 * 
+	 *
 	 * @return null
 	 */
 	public function setReviewLimit () {
-		if( $this->getRequest()->getVal( 'limit' ) ) {
-			$this->reviewLimit = $this->getRequest()->getVal( 'limit' ); //FIXME: for consistency, shouldn't this be just "limit"
+		if ( $this->getRequest()->getVal( 'limit' ) ) {
+			$this->reviewLimit = $this->getRequest()->getVal( 'limit' ); // FIXME: for consistency, shouldn't this be just "limit"
 		}
 		else {
-			$this->reviewLimit = 20;		
+			$this->reviewLimit = 20;
 		}
 	}
 
 	/**
 	 * Determines if user is attempting to clear a notification and returns
 	 * the appropriate title.
-	 * 
+	 *
 	 * @return Title|false
 	 */
 	public function getClearNotificationTitle () {
@@ -246,7 +246,7 @@ class SpecialPendingReviews extends SpecialPage {
 		if ( ! $clearNotifyNS ) {
 			$clearNotifyNS = 0;
 		}
-		
+
 		$title = Title::newFromText( $clearNotifyTitle, $clearNotifyNS );
 		return $title;
 	}
@@ -254,7 +254,7 @@ class SpecialPendingReviews extends SpecialPage {
 
 	/**
 	 * Generates row for a particular page in PendingReviews.
-	 * 
+	 *
 	 * @param PendingReview $item
 	 * @param int $rowCount used to determine if the row is odd or even
 	 * @return string HTML for row
@@ -263,7 +263,7 @@ class SpecialPendingReviews extends SpecialPage {
 
 		$combinedList = $this->combineLogAndChanges( $item->log, $item->newRevisions, $item->title );
 		$changes = $this->getPendingReviewChangesList( $combinedList );
-		
+
 		if ( $item->title->isRedirect() ) {
 			$reviewButton = $this->getAcceptRedirectButton( $item );
 		}
@@ -274,7 +274,7 @@ class SpecialPendingReviews extends SpecialPage {
 		$historyButton = $this->getHistoryButton( $item );
 
 		$displayTitle = '<strong>' . $item->title->getFullText() . '</strong>';
-		
+
 		return $this->getRowHTML( $item, $rowCount, $displayTitle, $reviewButton, $historyButton, $changes );
 
 	}
@@ -283,7 +283,7 @@ class SpecialPendingReviews extends SpecialPage {
 	 * Generates row for a deleted page in PendingReviews. Pages could have
 	 * been explicitly deleted, or they could have been moved without leaving
 	 * a redirect behind.
-	 * 
+	 *
 	 * @param PendingReview $item
 	 * @param int $rowCount used to determine if the row is odd or even
 	 * @return string HTML for row
@@ -317,7 +317,7 @@ class SpecialPendingReviews extends SpecialPage {
 		$talkToDeleterButton = $this->getDeleterTalkButton( $item->deletionLog );
 
 		$title = Title::makeTitle( $item->deletedNS, $item->deletedTitle );
-		$displayTitle = '<strong>' 
+		$displayTitle = '<strong>'
 			. wfMessage( $displayMessage, $title->getFullText() )->parse()
 			. '</strong>';
 
@@ -326,7 +326,7 @@ class SpecialPendingReviews extends SpecialPage {
 
 	/**
 	 * Creates a button bringing user to the diff page.
-	 * 
+	 *
 	 * @param PendingReview $item
 	 * @param int $rowCount
 	 * @param string $displayTitle
@@ -336,10 +336,10 @@ class SpecialPendingReviews extends SpecialPage {
 	 * @return string HTML for pending review of a given page
 	 */
 	public function getRowHTML ( PendingReview $item, $rowCount, $displayTitle, $buttonOne, $buttonTwo, $changes ) {
-		
+
 		// FIXME: wow this is ugly
 		$rowClass = ( $rowCount % 2 === 0 ) ? 'pendingreviews-even-row' : 'pendingreviews-odd-row';
-		
+
 		if ( $item->numReviewers > $GLOBALS['egPendingReviewsOrangePagesThreshold'] ) {
 			$reviewCriticality = 'green'; // page is "green" because it has lots of reviewers
 		}
@@ -362,14 +362,14 @@ class SpecialPendingReviews extends SpecialPage {
 
 	/**
 	 * Creates a button bringing user to the diff page.
-	 * 
+	 *
 	 * @param PendingReview $item
 	 * @return string HTML for button
 	 */
 	public function getReviewButton ( $item ) {
 
 		if ( count( $item->newRevisions ) > 0 ) {
-		
+
 			// returns essentially the negative-oneth revision...the one before
 			// the wl_notificationtimestamp revision...or null/false if none exists?
 			$mostRecentReviewed = Revision::newFromRow( $item->newRevisions[0] )->getPrevious();
@@ -380,8 +380,8 @@ class SpecialPendingReviews extends SpecialPage {
 
 		if ( $mostRecentReviewed ) {
 
-			$diffURL= $item->title->getLocalURL( array(
-				'diff' => '', 
+			$diffURL = $item->title->getLocalURL( array(
+				'diff' => '',
 				'oldid' => $mostRecentReviewed->getId()
 			) );
 
@@ -397,7 +397,7 @@ class SpecialPendingReviews extends SpecialPage {
 
 			$latest = Revision::newFromTitle( $item->title );
 			$diffURL = $item->title->getLocalURL( array( 'oldid' => $latest->getId() ) );
-			
+
 			$diffLink = Xml::element( 'a',
 				array( 'href' => $diffURL, 'class' => 'pendingreviews-green-button' ),
 				$this->msg( 'watchanalytics-pendingreviews-users-first-view' )->text()
@@ -407,10 +407,10 @@ class SpecialPendingReviews extends SpecialPage {
 
 		return $diffLink;
 	}
-	
+
 	/**
 	 * Creates a button bringing user to the history page.
-	 * 
+	 *
 	 * @param PendingReview $item
 	 * @return string HTML for button
 	 */
@@ -423,13 +423,13 @@ class SpecialPendingReviews extends SpecialPage {
 			wfMessage( 'watchanalytics-pendingreviews-history-link' )->text()
 		);
 	}
-	
+
 
 	/**
 	 * Creates a button which marks a deleted or redirected page as "reviewed"
 	 * (e.g. nullifies notification timestamp in watchlist). This function is
 	 * used by several other functions to specify particular buttons.
-	 * 
+	 *
 	 * Reference example for API:
 	 * http://example.com/wiki/api.php
 	 *     ?action=setnotificationtimestamp
@@ -447,7 +447,7 @@ class SpecialPendingReviews extends SpecialPage {
  	public function getClearNotificationButton ( $titleText, $namespace, $buttonMsg, $buttonClass ) {
 		return Xml::element( 'a',
 			array(
-				'href' => $this->getTitle()->getLocalURL( array( 
+				'href' => $this->getTitle()->getLocalURL( array(
 					'clearNotificationTitle' => $titleText,
 					'clearNotificationNS' => $namespace,
 				) ),
@@ -477,7 +477,7 @@ class SpecialPendingReviews extends SpecialPage {
 
 	/**
 	 * Creates a button which marks the "deleted" page that is "created" when
-	 * a page is moved without leaving a redirect behind. Button allows the 
+	 * a page is moved without leaving a redirect behind. Button allows the
 	 * deleted page to be marked as "reviewed" (e.g. nullifies notification
 	 * timestamp in watchlist).
 	 *
@@ -495,9 +495,9 @@ class SpecialPendingReviews extends SpecialPage {
 
 	/**
 	 * If a page is a redirect it should have a simple "accept" button
-	 * 
+	 *
 	 * @param PendingReview $item
-	 * 
+	 *
 	 * @return string HTML for button
 	 */
 	public function getAcceptRedirectButton ( $item ) {
@@ -513,13 +513,13 @@ class SpecialPendingReviews extends SpecialPage {
 	/**
 	 * Creates a button bringing user to the talk page of the user who deleted
 	 * the page, allowing them to ask questions about why the page was deleted.
-	 * 
+	 *
 	 * @param $deletionLog
 	 * @return string HTML for button
 	 */
 	public function getDeleterTalkButton ( $deletionLog ) {
 
-		if ( count( $deletionLog ) == 0 ){
+		if ( count( $deletionLog ) == 0 ) {
 			return '';
 		}
 
@@ -546,7 +546,7 @@ class SpecialPendingReviews extends SpecialPage {
 
 	/**
 	 * Creates simple header stating how many pending reviews the user has.
-	 * 
+	 *
 	 * @return string HTML for header
 	 */
 	public function getPageHeader() {
@@ -559,12 +559,12 @@ class SpecialPendingReviews extends SpecialPage {
 
 		// message like "You have X pending reviews"
 		$html .= '<p>' . wfMessage( 'pendingreviews-num-reviews', $numPendingReviews )->text();
-		
+
 		// message like "showing the most important Y reviews"
 		if ( $numPendingReviews > $this->reviewLimit ) {
 			$html .= ' ' . wfMessage( 'pendingreviews-num-shown', $this->reviewLimit )->text();
 		}
-		
+
 		// close out header
 		$html .= '</p>';
 
@@ -574,7 +574,7 @@ class SpecialPendingReviews extends SpecialPage {
 
 	/**
 	 * Creates a legend for PendingReviews showing what colors mean regarding priority of pages
-	 * 
+	 *
 	 * @return string HTML for legend (table)
 	 */
 	public function getPendingReviewsLegend () {
@@ -606,20 +606,20 @@ class SpecialPendingReviews extends SpecialPage {
 	}
 
 	/**
-	 * Merges arrays. 
-	 * 
+	 * Merges arrays.
+	 *
 	 * @todo FIXME: documentation...why does this do what it does?
 	 * @todo FIXME: cleanup temporary code
-	 * 
+	 *
 	 * @param $log
 	 * @param $revisions
 	 * @param $title
 	 * @return array
-	 */	
+	 */
 	protected function combineLogAndChanges( $log, $revisions, $title ) {
-	
+
 		// if ( $title->getNamespace() === NS_FILE ) {
-			
+
 		// }
 
 
@@ -629,7 +629,7 @@ class SpecialPendingReviews extends SpecialPage {
 		$revI = 0;
 
 		$combinedArray = array();
-		
+
 		while ( count( $log ) > 0 && count( $revisions ) > 0 ) {
 
 			$revTs = $revisions[ $revI ]->rev_timestamp;
@@ -650,14 +650,14 @@ class SpecialPendingReviews extends SpecialPage {
 		$combinedArray = array_merge( $combinedArray, $revisions, $log );
 
 		return $combinedArray;
-	
+
 	}
 
 	/**
 	 * Creates and returns a Message object appropriate for the type of log entry.
-	 * 
+	 *
 	 * @todo FIXME: what type is $logEntry
-	 * 
+	 *
 	 * @param object $logEntry
 	 * @return Message HTML for button
 	 */
@@ -665,7 +665,7 @@ class SpecialPendingReviews extends SpecialPage {
 
 		// add pendingreviews-edited-by?
 		$messages = array(
-			'approval' => array( 
+			'approval' => array(
 				'approve'    => 'pendingreviews-log-approved',
 				'unapprove'  => 'pendingreviews-log-unapproved'
 			),
@@ -710,7 +710,7 @@ class SpecialPendingReviews extends SpecialPage {
 			}
 
 			return wfMessage( $messages[ $logEntry->log_type ][ $logEntry->log_action ], $messageParams );
-		
+
 		}
 
 		// if no message exists for the log type and action, handling with "unknown change"
@@ -722,7 +722,7 @@ class SpecialPendingReviews extends SpecialPage {
 
 	/**
 	 * Creates list of changes for a given page.
-	 * 
+	 *
 	 * @param array $combinedList
 	 * @return string HTML
 	 */
@@ -755,11 +755,11 @@ class SpecialPendingReviews extends SpecialPage {
 
 			$changes[] = $changeTs . $changeText;
 		}
-		
+
 		$changes = '<ul><li>' . implode( '</li><li>', $changes ) . '</li></ul>';
-		
+
 		return $changes;
 	}
-	
+
 }
 

@@ -12,7 +12,7 @@ class WatchAnalyticsPageTablePager extends WatchAnalyticsTablePager {
 		'watch_quality' => true,
 	);
 
-	public function __construct( $page, $conds, $filters=array() ) {
+	public function __construct( $page, $conds, $filters = array() ) {
 		global $wgRequest;
 
 		$this->watchQuery = new PageWatchesQuery();
@@ -25,17 +25,17 @@ class WatchAnalyticsPageTablePager extends WatchAnalyticsTablePager {
 		if ( ! isset( $sortField ) ) {
 			$this->mDefaultDirection = false;
 		}
-		
+
 		$this->mExtraSortFields = array( 'num_watches', 'num_reviewed', 'page_ns_and_title' );
 	}
 
 	public function getQueryInfo() {
 		$namespaces = MWNamespace::getCanonicalNamespaces();
-		
-		if ( $this->mQueryNamespace !== null 
-			&& $this->mQueryNamespace >= 0 
+
+		if ( $this->mQueryNamespace !== null
+			&& $this->mQueryNamespace >= 0
 			&& isset( $namespaces[ $this->mQueryNamespace ] ) ) {
-			
+
 			$conds = array(
 				'p.page_namespace = ' . $this->mQueryNamespace
 			);
@@ -49,7 +49,7 @@ class WatchAnalyticsPageTablePager extends WatchAnalyticsTablePager {
 	public function formatValue ( $fieldName , $value ) {
 
 		if ( $fieldName === 'page_ns_and_title' ) {
-			$pageInfo = explode(':', $value, 2);
+			$pageInfo = explode( ':', $value, 2 );
 			$pageNsIndex = $pageInfo[0];
 			$pageTitleText = $pageInfo[1];
 
@@ -63,13 +63,13 @@ class WatchAnalyticsPageTablePager extends WatchAnalyticsTablePager {
 			else {
 				$titleFullText = $titleNsText . ':' . $title->getText();
 			}
-			
+
 			$pageLink = Xml::element(
 				'a',
 				array( 'href' => $titleURL ),
 				$titleFullText
 			);
-			
+
 
 			// FIXME: page stats not currently enabled. Uncomment when enabled
 			$url = SpecialPage::getTitleFor( 'PageStatistics' )->getInternalURL( array(
@@ -82,14 +82,14 @@ class WatchAnalyticsPageTablePager extends WatchAnalyticsTablePager {
 				$msg
 			);
 
-			
+
 			$pageLink .= ' <small>(' . $pageStatsLink . ' | ' . WatchSuggest::getWatchLink( $title ) . ')</small>';
 
 
 			return $pageLink;
 		}
 		else if ( $fieldName === 'max_pending_minutes' || $fieldName === 'avg_pending_minutes' ) {
-			return ($value === NULL) ? NULL : $this->watchQuery->createTimeStringFromMinutes( $value );
+			return ( $value === NULL ) ? NULL : $this->watchQuery->createTimeStringFromMinutes( $value );
 		}
 		else {
 			return $value;

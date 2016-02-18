@@ -36,7 +36,7 @@ EOT;
 class WatchAnalyticsHtmlHelper {
 
 	static public function formatListArray ( $list, $columns = 1, $listType = 'ol' ) {
-		
+
 		// number of <li> elements
 		$numLI = count( $list );
 

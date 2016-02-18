@@ -2,9 +2,9 @@
 
 class WatchAnalyticsWikiTablePager extends WatchAnalyticsTablePager {
 
-	protected $isSortable = array(		
+	protected $isSortable = array(
 		'tracking_timestamp' => true,
-		
+
 		'num_pages' => true,
 		'num_watches' => true,
 		'num_pending' => true,
@@ -39,7 +39,7 @@ class WatchAnalyticsWikiTablePager extends WatchAnalyticsTablePager {
 		if ( ! isset( $sortField ) ) {
 			$this->mDefaultDirection = false;
 		}
-		
+
 		$this->mExtraSortFields = array();
 	}
 
@@ -55,13 +55,13 @@ class WatchAnalyticsWikiTablePager extends WatchAnalyticsTablePager {
 			'content_max_pending_minutes',
 			'content_avg_pending_minutes',
 		);
-	
+
 		if ( in_array( $fieldName, $timeDiffFields ) ) {
-			return ($value === NULL) ? NULL : $this->watchQuery->createTimeStringFromMinutes( $value );
+			return ( $value === NULL ) ? NULL : $this->watchQuery->createTimeStringFromMinutes( $value );
 		}
 		else if ( $fieldName === 'tracking_timestamp' ) {
 			$ts = new MWTimestamp( $value );
-			return $ts->format('Y-m-d') . '<br />' . $ts->format('H:i:s');
+			return $ts->format( 'Y-m-d' ) . '<br />' . $ts->format( 'H:i:s' );
 		}
 		else {
 			return $value;

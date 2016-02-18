@@ -29,48 +29,48 @@
 require_once( __DIR__ . '/../../../maintenance/Maintenance.php' );
 
 class WatchAnalyticsForgivePendingReviews extends Maintenance {
-	
+
 	protected $forgiveBefore;
-	
+
 	public function __construct() {
 		parent::__construct();
-				
-		$this->forgiveBefore = date( 'YmdHis', time() - 365*24*60*60 );
+
+		$this->forgiveBefore = date( 'YmdHis', time() - 365 * 24 * 60 * 60 );
 		$this->reviewedBy = 2;
-		
+
 		$this->mDescription = "Record the current state of page-watching.";
-		
+
 		// addOption ($name, $description, $required=false, $withArg=false, $shortName=false)
 		$this->addOption(
 			'usernames',
-			'Limit forgiveness to comma separated list of usernames', 
+			'Limit forgiveness to comma separated list of usernames',
 			false, true );
-		
+
 		$this->addOption(
 			'forgivebefore',
-			'Limit forgiveness to pending reviews older than specified date (default 1 year ago, ' . $this->forgiveBefore . ')', 
+			'Limit forgiveness to pending reviews older than specified date (default 1 year ago, ' . $this->forgiveBefore . ')',
 			false, true );
-		
+
 		$this->addOption(
 			'reviewedby',
-			'Limit forgiveness to pages which have been reviewed by at least the specified number of people (default ' . $this->forgiveBefore . ')', 
+			'Limit forgiveness to pages which have been reviewed by at least the specified number of people (default ' . $this->forgiveBefore . ')',
 			false, true );
 
 	}
-	
-	// $query = 
+
+	// $query =
 		// "SELECT
 			// u.user_name AS user_name,
 			// p.page_title AS title,
 			// w.wl_notificationtimestamp AS pending_since
 		// FROM watchlist AS w
 		// LEFT JOIN page AS p ON
-			// w.wl_title = p.page_title 
+			// w.wl_title = p.page_title
 			// AND w.wl_namespace = p.page_namespace
 		// LEFT JOIN user AS u ON
 			// u.user_id = w.wl_user
 		// WHERE
-			// w.wl_notificationtimestamp IS NOT NULL 
+			// w.wl_notificationtimestamp IS NOT NULL
 			// AND w.wl_notificationtimestamp < $forgiveBefore
 			// AND (
 				// SELECT COUNT(*)
@@ -88,31 +88,31 @@ class WatchAnalyticsForgivePendingReviews extends Maintenance {
 		$usernames = $this->getOption( 'usernames' );
 		if ( $usernames ) {
 			$namesArray = explode( ',', $usernames );
-			foreach( $namesArray as $i => $u ) {
+			foreach ( $namesArray as $i => $u ) {
 				$namesArray[$i] = trim( $u );
 			}
-		
+
 			$namesForDB = $dbw->makeList( $namesArray );
 			$usernames = "AND u.user_name IN ($namesForDB)";
 		}
 		else {
 			$usernames = '';
 		}
-		
+
 
 		$forgiveBefore = $this->getOption( 'forgivebefore', $this->forgiveBefore );
 		$reviewedBy = $this->getOption( 'reviewedby', $this->reviewedBy );
 
-		$query = 
+		$query =
 			"UPDATE watchlist AS w
 			LEFT JOIN page AS p ON
-				w.wl_title = p.page_title 
+				w.wl_title = p.page_title
 				AND w.wl_namespace = p.page_namespace
 			LEFT JOIN user AS u ON
 				u.user_id = w.wl_user
 			SET wl_notificationtimestamp = NULL
 			WHERE
-				w.wl_notificationtimestamp IS NOT NULL 
+				w.wl_notificationtimestamp IS NOT NULL
 				AND w.wl_notificationtimestamp < $forgiveBefore
 				$usernames
 				AND (

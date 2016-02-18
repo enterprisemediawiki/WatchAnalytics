@@ -40,12 +40,12 @@ class PendingReview {
 	 * @example 20141031072315
 	 */
 	public $notificationTimestamp;
-	
+
 	/**
 	 * @var Title $title
 	 */
 	public $title;
-	
+
 	/**
 	 * @var array|false $newRevisions
 	 * @todo FIXME: document
@@ -57,7 +57,7 @@ class PendingReview {
 	 * @todo document is this "Main Page" or "Main_Page"
 	 */
 	public $deletedTitle;
-	
+
 	/**
 	 * @var int $deletedNS
 	 */
@@ -84,19 +84,19 @@ class PendingReview {
 
 		$pageID = $row['page_id'];
 		$notificationTimestamp = $row['notificationtimestamp'];
-	
+
 		if ( $pageID ) {
 			$title = Title::newFromID( $pageID );
 		}
 		else {
 			$title = false;
 		}
-		
+
 		if ( $pageID && $title->exists() ) {
-		
+
 			$dbr = wfGetDB( DB_SLAVE );
 
-		
+
 			$revResults = $dbr->select(
 				array( 'r' => 'revision' ),
 				array( '*' ),
@@ -129,7 +129,7 @@ class PendingReview {
 				// 	'l.log_user AS log_user_id',
 				// 	'l.log_user_text AS log_user_name',
 				// ),
-				"l.log_page=$pageID AND l.log_timestamp>=$notificationTimestamp 
+				"l.log_page=$pageID AND l.log_timestamp>=$notificationTimestamp
 					AND l.log_type NOT IN ('interwiki','newusers','patrol','rights','upload')",
 				__METHOD__,
 				array( 'ORDER BY' => 'log_timestamp ASC' ),
@@ -153,7 +153,7 @@ class PendingReview {
 			$revsPending = false;
 		}
 
-		
+
 		$this->notificationTimestamp = $notificationTimestamp;
 		$this->title = $title;
 		$this->newRevisions = $revsPending;
@@ -164,32 +164,32 @@ class PendingReview {
 		$this->numReviewers = intval( $row['num_reviewed'] );
 
 	}
-	
+
 	/*
 		Make more like this:
 
-		SELECT 
+		SELECT
 			p.page_id AS id,
 			w.wl_namespace AS namespace,
 			w.wl_title AS title,
 			w.wl_notificationtimestamp AS notificationtimestamp
-		FROM `watchlist` `w` 
-		LEFT JOIN `page` `p` ON 
-			((p.page_namespace=w.wl_namespace AND p.page_title=w.wl_title)) 
+		FROM `watchlist` `w`
+		LEFT JOIN `page` `p` ON
+			((p.page_namespace=w.wl_namespace AND p.page_title=w.wl_title))
 		LEFT JOIN `logging` `log` ON
 			log.log_namespace = w.wl_namespace
 			AND log.log_title = w.wl_title
 			AND p.page_namespace IS NULL
 			AND p.page_title IS NULL
 			AND log.log_action = 'delete'
-		WHERE 
-			w.wl_user=1 
-			AND w.wl_notificationtimestamp IS NOT NULL 
+		WHERE
+			w.wl_user=1
+			AND w.wl_notificationtimestamp IS NOT NULL
 		ORDER BY w.wl_notificationtimestamp ASC;
 
 	*/
 	static public function getPendingReviewsList ( User $user ) {
-		
+
 		$tables = array(
 			'w' => 'watchlist',
 			'p' => 'page',
@@ -222,7 +222,7 @@ class PendingReview {
 				'LEFT JOIN', 'p.page_namespace=w.wl_namespace AND p.page_title=w.wl_title'
 			),
 			'log' => array(
-				'LEFT JOIN', 
+				'LEFT JOIN',
 				'log.log_namespace = w.wl_namespace '
 				. ' AND log.log_title = w.wl_title'
 				. ' AND p.page_namespace IS NULL'
@@ -242,22 +242,22 @@ class PendingReview {
 			$options,
 			$join_conds
 		);
-		
+
 		$pending = array();
 
 		while ( $row = $dbr->fetchRow( $watchResult ) ) {
 
 			$pending[] = new self( $row );
-		
+
 		}
 
 		return $pending;
 	}
-	
+
 	public function getDeletionLog ( $title, $ns, $notificationTimestamp ) {
 
 		$dbr = wfGetDB( DB_SLAVE );
-		
+
 		$title = $dbr->addQuotes( $title );
 
 		// pages are deleted when (a) they are explicitly deleted or (b) they
@@ -265,7 +265,7 @@ class PendingReview {
 		$logResults = $dbr->select(
 			array( 'l' => 'logging' ),
 			array( '*' ),
-			"l.log_title=$title AND l.log_namespace=$ns AND l.log_timestamp>=$notificationTimestamp 
+			"l.log_title=$title AND l.log_namespace=$ns AND l.log_timestamp>=$notificationTimestamp
 				AND l.log_type IN ('delete','move')",
 			__METHOD__,
 			array( 'ORDER BY' => 'log_timestamp ASC' ),
@@ -287,7 +287,7 @@ class PendingReview {
 	 * var $logParams is the content of the column log_params in the logging table
 	 */
 	public static function getMoveTarget ( $logParams ) {
-		
+
 		wfSuppressWarnings();
 		$unserializedParams = unserialize( $logParams );
 		wfRestoreWarnings();
@@ -305,35 +305,35 @@ class PendingReview {
 
 			return $moveLogParams[0];
 		}
-		
+
 	}
 
 	/**
 	 * Clears a pending reviews of a particular page for a particular user.
-	 * 
+	 *
 	 * @param User $user
 	 * @param Title $title
 	 * @return string HTML for row
 	 */
 	public function clearByUserAndTitle ( $user, $title ) {
-		
+
 		$watch = WatchedItem::fromUserTitle( $user, $title );
 		$watch->resetNotificationTimestamp();
-		
+
 		// $wgOut->addHTML(
 		// 	wfMessage(
 		// 		'pendingreviews-clear-page-notification',
 		// 		$title->getFullText(),
-		// 		Xml::tags('a', 
+		// 		Xml::tags('a',
 		// 			array(
 		// 				'href' => $this->getTitle()->getLocalUrl(),
 		// 				'style' => 'font-weight:bold;',
-		// 			), 
-		// 			$this->getTitle() 
+		// 			),
+		// 			$this->getTitle()
 		// 		)
 		// 	)->text()
 		// );
-		
+
 		return true;
 
 

@@ -39,20 +39,20 @@ class UserWatchesQuery extends WatchesQuery {
 	public $sqlNumWatches = 'COUNT(*) AS num_watches';
 	public $sqlNumPending = 'SUM( IF(w.wl_notificationtimestamp IS NULL, 0, 1) ) AS num_pending';
 	public $sqlPercentPending = 'SUM( IF(w.wl_notificationtimestamp IS NULL, 0, 1) ) * 100 / COUNT(*) AS percent_pending';
-	public $sqlEngagementScore = 
-		'ROUND( IFNULL( 
+	public $sqlEngagementScore =
+		'ROUND( IFNULL(
 			EXP(
-				-0.01 * SUM( 
+				-0.01 * SUM(
 					IF(w.wl_notificationtimestamp IS NULL, 0, 1)
 				)
 			)
 			*
 			EXP(
 				-0.01 * FLOOR(
-					AVG( 
+					AVG(
 						TIMESTAMPDIFF( DAY, w.wl_notificationtimestamp, UTC_TIMESTAMP() )
 					)
-				) 
+				)
 			),
 		1), 3) AS engagement_score';
 
@@ -84,7 +84,7 @@ class UserWatchesQuery extends WatchesQuery {
 			$this->sqlAvgPendingMins,
 			$this->sqlEngagementScore,
 		);
-		
+
 		$this->conds = $conds ? $conds : array();
 
 		$this->join_conds = array(
@@ -95,7 +95,7 @@ class UserWatchesQuery extends WatchesQuery {
 				'LEFT JOIN', 'p.page_namespace=w.wl_namespace AND p.page_title=w.wl_title'
 			),
 			'log' => array(
-				'LEFT JOIN', 
+				'LEFT JOIN',
 				'log.log_namespace = w.wl_namespace '
 				. ' AND log.log_title = w.wl_title'
 				. ' AND p.page_namespace IS NULL'
@@ -128,21 +128,21 @@ class UserWatchesQuery extends WatchesQuery {
 		$this->options = array(
 			'GROUP BY' => 'w.wl_user'
 		);
-		
+
 		return parent::getQueryInfo();
 
 	}
 
 	/**
 	 * Gets watch statistics for a particular user.
-	 * 
+	 *
 	 * @param User $user the user to get watch-info on.
-	 * 
+	 *
 	 * @return array returns user watch info in an array with keys the same as
 	 * $this->fieldNames.
 	 */
 	public function getUserWatchStats ( User $user ) {
-	
+
 		$qInfo = $this->getQueryInfo();
 
 		$dbr = wfGetDB( DB_SLAVE );
@@ -155,14 +155,14 @@ class UserWatchesQuery extends WatchesQuery {
 			$qInfo['options'],
 			$qInfo['join_conds']
 		);
-		
+
 		$row = $dbr->fetchRow( $res );
 
 		// if user doesn't have any pages in watchlist, then no data will be
 		// returned by this query. Create a "blank" row instead.
 		if ( $row === false ) {
 			$row = array();
-			foreach( $this->fieldNames as $name => $msg ) {
+			foreach ( $this->fieldNames as $name => $msg ) {
 				$row[ $name ] = 0;
 			}
 			$row[ 'user_name' ] = $user->getName();
@@ -173,7 +173,7 @@ class UserWatchesQuery extends WatchesQuery {
 
 	/**
 	 * Gets watch statistics for a list of users.
-	 * 
+	 *
 	 * @param Array $userIds array of integer user IDs.
 	 * @return Array returns user watch info in an array with user IDs as keys
 	 * and values being objects with params num_watches and num_pending.
@@ -206,7 +206,7 @@ class UserWatchesQuery extends WatchesQuery {
 			), // no options
 			null // no joins
 		);
-		
+
 		$return = array();
 		while ( $row = $res->fetchObject() ) {
 			$return[] = (object)array(

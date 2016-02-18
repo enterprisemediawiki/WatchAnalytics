@@ -1,7 +1,7 @@
 <?php
 
 class WatchAnalyticsUserTablePager extends WatchAnalyticsTablePager {
-	
+
 	protected $isSortable = array(
 		'user_name' => true,
 		'num_watches' => true,
@@ -12,7 +12,7 @@ class WatchAnalyticsUserTablePager extends WatchAnalyticsTablePager {
 		'engagement_score' => true,
 	);
 
-	public function __construct( $page, $conds, $filters=array() ) {
+	public function __construct( $page, $conds, $filters = array() ) {
 		$this->watchQuery = new UserWatchesQuery();
 		parent::__construct( $page, $conds, $filters );
 	}
@@ -29,7 +29,7 @@ class WatchAnalyticsUserTablePager extends WatchAnalyticsTablePager {
 
 			$userPage = Title::makeTitle( NS_USER, $user_name );
 			$name = $this->getSkin()->makeLinkObj( $userPage, htmlspecialchars( $userPage->getText() ) );
-			
+
 			/*
 			Maybe do a stats page at some point...for now just show that user's pending reviews...
 			$url = Title::newFromText('Special:WatchAnalytics')->getLocalUrl(
@@ -38,7 +38,7 @@ class WatchAnalyticsUserTablePager extends WatchAnalyticsTablePager {
 			$msg = wfMsg( 'watchanalytics-view-user-stats' );
 			*/
 
-			$url = Title::newFromText('Special:PendingReviews')->getLocalUrl(
+			$url = Title::newFromText( 'Special:PendingReviews' )->getLocalUrl(
 				array( 'user' => $user_name )
 			);
 			$msg = wfMsg( 'watchanalytics-view-user-pendingreviews' );
@@ -48,11 +48,11 @@ class WatchAnalyticsUserTablePager extends WatchAnalyticsTablePager {
 				array( 'href' => $url ),
 				$msg
 			) . ')';
-			
+
 			return $name;
 		}
 		else if ( $fieldName === 'max_pending_minutes' || $fieldName === 'avg_pending_minutes' ) {
-			return ($value === NULL) ? NULL : $this->watchQuery->createTimeStringFromMinutes( $value );
+			return ( $value === NULL ) ? NULL : $this->watchQuery->createTimeStringFromMinutes( $value );
 		}
 		else {
 			return $value;

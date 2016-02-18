@@ -12,13 +12,13 @@ class SpecialWatchAnalytics extends SpecialPage {
 
 
 	public function __construct() {
-		parent::__construct( 
-			"WatchAnalytics", // 
+		parent::__construct(
+			"WatchAnalytics", //
 			"",  // rights required to view
 			true // show in Special:SpecialPages
 		);
 	}
-	
+
 	public function execute ( $parser = null ) {
 		global $wgRequest, $wgOut;
 
@@ -29,26 +29,26 @@ class SpecialWatchAnalytics extends SpecialPage {
 
 		// $userTarget = isset( $parser ) ? $parser : $wgRequest->getVal( 'username' );
 		$this->mMode = $wgRequest->getVal( 'show' );
-		//$fileactions = array('actions...?');
+		// $fileactions = array('actions...?');
 
 		$w = new WatchStateRecorder();
 		if ( ! $w->recordedWithinHours( 1 ) ) {
 			$w->recordAll();
-			$wgOut->addHTML( '<p>' . wfMessage('watchanalytics-all-wiki-stats-recorded')->text() . '</p>' );
+			$wgOut->addHTML( '<p>' . wfMessage( 'watchanalytics-all-wiki-stats-recorded' )->text() . '</p>' );
 		}
-		
+
 		$filters = array(
 			'groupfilter'    => $wgRequest->getVal( 'groupfilter', '' ),
 			'categoryfilter' => $wgRequest->getVal( 'categoryfilter', '' ),
 		);
-		foreach( $filters as &$filter ) {
+		foreach ( $filters as &$filter ) {
 			if ( $filter === '' ) {
 				$filter = false;
 			}
 		}
-		
+
 		$wgOut->addHTML( $this->getPageHeader() );
-		if ($this->mMode == 'users') {
+		if ( $this->mMode == 'users' ) {
 			$this->usersList( $filters );
 		}
 		else if ( $this->mMode == 'wikihistory' ) {
@@ -61,11 +61,11 @@ class SpecialWatchAnalytics extends SpecialPage {
 			$this->pagesList( $filters );
 		}
 	}
-	
+
 	public function getPageHeader() {
 
 		// show the names of the four lists of pages, with the one
-		// corresponding to the current "mode" not being linked		
+		// corresponding to the current "mode" not being linked
 
 		// SELECT
 		// 	COUNT(*) AS watches,
@@ -82,7 +82,7 @@ class SpecialWatchAnalytics extends SpecialPage {
 		// 		'p' => 'page',
 		// 	),
 		// 	array(
-		// 		"COUNT(*) AS watches", 
+		// 		"COUNT(*) AS watches",
 		// 		"SUM( IF(watchlist.wl_notificationtimestamp IS NULL, 0, 1) ) AS num_pending",
 		// 		"SUM( IF(watchlist.wl_notificationtimestamp IS NULL, 0, 1) ) * 100 / COUNT(*) AS percent_pending",
 		// 	),
@@ -96,40 +96,40 @@ class SpecialWatchAnalytics extends SpecialPage {
 		// 	)
 		// );
 
-		$res = $dbr->query('
+		$res = $dbr->query( '
 			SELECT
 				COUNT(*) AS num_watches,
 				SUM( IF(watchlist.wl_notificationtimestamp IS NULL, 0, 1) ) AS num_pending,
 				SUM( IF(watchlist.wl_notificationtimestamp IS NULL, 0, 1) ) * 100 / COUNT(*) AS percent_pending
 			FROM watchlist
 			INNER JOIN page ON page.page_namespace = watchlist.wl_namespace AND page.page_title = watchlist.wl_title;
-		');
+		' );
 
 		$allWikiData = $dbr->fetchRow( $res );
 
-		list($watches, $pending, $percent) = array(
+		list( $watches, $pending, $percent ) = array(
 			$allWikiData['num_watches'],
 			$allWikiData['num_pending'],
 			$allWikiData['percent_pending']
 		);
-		
-		$percent = round($percent, 1);
+
+		$percent = round( $percent, 1 );
 		$stateOf = "<strong>The state of the Wiki: </strong>$watches watches of which $percent% ($pending) are pending";
-		
+
 		$navLinks = '';
-		foreach($this->header_links as $msg => $query_param) {
-			$navLinks .= '<li>' . $this->createHeaderLink($msg, $query_param) . '</li>';
+		foreach ( $this->header_links as $msg => $query_param ) {
+			$navLinks .= '<li>' . $this->createHeaderLink( $msg, $query_param ) . '</li>';
 		}
 
 		$header = '<strong>' . wfMessage( 'watchanalytics-view' )->text() . '</strong>';
 		$header .= Xml::tags( 'ul', null, $navLinks ) . "\n";
 
-		return $stateOf . Xml::tags('div', array('class'=>'special-watchanalytics-header'), $header);
+		return $stateOf . Xml::tags( 'div', array( 'class' => 'special-watchanalytics-header' ), $header );
 
 	}
 
-	public function createHeaderLink($msg, $query_param) {
-	
+	public function createHeaderLink( $msg, $query_param ) {
+
 		$WatchAnalyticsTitle = SpecialPage::getTitleFor( $this->getName() );
 
 		if ( $this->mMode == $query_param ) {
@@ -138,7 +138,7 @@ class SpecialWatchAnalytics extends SpecialPage {
 				wfMessage( $msg )->text()
 			);
 		} else {
-			$show = ($query_param == '') ? array() : array( 'show' => $query_param );
+			$show = ( $query_param == '' ) ? array() : array( 'show' => $query_param );
 			return Xml::element( 'a',
 				array( 'href' => $WatchAnalyticsTitle->getLocalURL( $show ) ),
 				wfMessage( $msg )->text()
@@ -172,7 +172,7 @@ class SpecialWatchAnalytics extends SpecialPage {
 		global $wgOut, $wgRequest;
 
 		$wgOut->setPageTitle( wfMessage( $titleMsg )->text() );
-		
+
 		$body = $tablePager->getBody();
 		$html = '';
 
@@ -181,14 +181,14 @@ class SpecialWatchAnalytics extends SpecialPage {
 			$html .= $tablePager->getNavigationBar();
 			$html .= $body;
 			$html .= $tablePager->getNavigationBar();
-		} 
+		}
 		else {
-			$html .= '<p>' . wfMsgHTML('listusers-noresult') . '</p>';
+			$html .= '<p>' . wfMsgHTML( 'listusers-noresult' ) . '</p>';
 		}
 		$wgOut->addHTML( $html );
 		return true;
 	}
-	
+
 	public function forceGraph () {
 
 		global $wgOut;
@@ -251,7 +251,7 @@ class SpecialWatchAnalytics extends SpecialPage {
 			// if the page isn't in $pages, then it's also not in $nodes
 			// add to both
 			if ( ! isset( $pages[ $row['title'] ] ) ) {
-				$nextNode = count($nodes);
+				$nextNode = count( $nodes );
 
 				$pages[ $row['title'] ] = $nextNode;
 
@@ -265,12 +265,12 @@ class SpecialWatchAnalytics extends SpecialPage {
 
 			// same for users...add to $users and $nodes accordingly
 			if ( ! isset( $users[ $row['user_name'] ] ) ) {
-				$nextNode = count($nodes);
+				$nextNode = count( $nodes );
 
 				$users[ $row['user_name'] ] = $nextNode;
 
 				$nodes[ $nextNode ] = $row['user_name'];
-				if ( $row['real_name'] !== NULL && trim($row['real_name']) !== '' ) {
+				if ( $row['real_name'] !== NULL && trim( $row['real_name'] ) !== '' ) {
 					$displayName = $row['real_name'];
 				}
 				else {
@@ -308,10 +308,10 @@ class SpecialWatchAnalytics extends SpecialPage {
 		}
 
 		$json = array( "nodes" => $nodes, "links" => $links );
-		$json = json_encode( $json ); //, JSON_PRETTY_PRINT );
+		$json = json_encode( $json ); // , JSON_PRETTY_PRINT );
 
-		$html = '<h3>' . wfMessage('watchanalytics-watch-forcegraph-header')->text() . '</h3>';
-		$html .= '<p>' . wfMessage('watchanalytics-watch-forcegraph-description')->text() . '</p>';
+		$html = '<h3>' . wfMessage( 'watchanalytics-watch-forcegraph-header' )->text() . '</h3>';
+		$html .= '<p>' . wfMessage( 'watchanalytics-watch-forcegraph-description' )->text() . '</p>';
 		$html .= '<div id="mw-ext-watchAnalytics-forceGraph-container"></div>';
 		// $html .= "<pre>$json</pre>"; // easy testing
 		$html .= "<script type='text/template' id='mw-ext-watchAnalytics-forceGraph'>$json</script>";
