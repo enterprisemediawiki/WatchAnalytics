@@ -173,11 +173,13 @@ class WatchStateRecorder {
 			__METHOD__
 		);
 
-		$this->dbw->insert(
-			'watch_tracking_page',
-			$pages,
-			__METHOD__
-		);
+        foreach( array_chunk( $pages, 100 ) as $chunk ) {
+            $this->dbw->insert(
+                'watch_tracking_page',
+                $chunk,
+                __METHOD__
+            );
+        }
 
 		// Get all wiki info
 		$allWikiQueryInfo = $this->getWikiQueryInfo();
