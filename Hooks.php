@@ -18,7 +18,7 @@ class WatchAnalyticsHooks {
 		global $wgUser, $wgOut;
 		$user = $wgUser;
 
-		if ( $user->isAnon() ) {
+		if ( !$user->isAllowed('watchanalytics') ) {
 			return true;
 		}
 
