@@ -26,7 +26,15 @@
  * @ingroup Maintenance
  */
 
-require_once( __DIR__ . '/../../../maintenance/Maintenance.php' );
+// Allow people to have different layouts.
+if ( ! isset( $IP ) ) {
+	$IP = __DIR__ . '/../../../';
+	if ( getenv("MW_INSTALL_PATH") ) {
+		$IP = getenv("MW_INSTALL_PATH");
+	}
+}
+
+require_once( "$IP/maintenance/Maintenance.php" );
 
 class WatchAnalyticsForgivePendingReviews extends Maintenance {
 
