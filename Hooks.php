@@ -271,4 +271,14 @@ class WatchAnalyticsHooks {
 		return true;
 	}
 
+	public static function onLanguageGetMagic( &$magicWords, $langCode ) {
+		switch ( $langCode ) {
+		default:
+			$magicWords['underwatched_categories']    = array( 0, 'underwatched_categories' );
+			$magicWords['watchers_needed'] = array( 0, 'watchers_needed' );
+			$magicWords['MAG_NOPAGESCORE']   = array( 0, '__NOPAGESCORE__' );
+		}
+		return true;
+	}
+
 }

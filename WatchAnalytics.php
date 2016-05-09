@@ -112,10 +112,12 @@ $GLOBALS['wgHooks']['PageContentSaveComplete'][] = 'WatchAnalyticsHooks::onPageC
 // Page Score magic word
 $GLOBALS['wgHooks']['MagicWordwgVariableIDs'][] = 'WatchAnalyticsHooks::addMagicWordVariableIDs';
 $GLOBALS['wgHooks']['ParserBeforeTidy'][] = 'WatchAnalyticsHooks::handleMagicWords';
+$GLOBALS['wgHooks']['LanguageGetMagic'][] = 'WatchAnalyticsHooks::onLanguageGetMagic';
 
 
 // update database
 $GLOBALS['wgHooks']['LoadExtensionSchemaUpdates'][] = 'WatchAnalyticsUpdaterHooks::addSchemaUpdates';
+$GLOBALS['wgHooks']['ParserTestTables'][] = 'WatchAnalyticsUpdaterHooks::onParserTestTables';
 
 
 

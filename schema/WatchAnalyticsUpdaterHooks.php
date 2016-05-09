@@ -2,6 +2,13 @@
 
 class WatchAnalyticsUpdaterHooks {
 
+	public static function onParserTestTables( &$tables ) {
+		$tables[] = 'watch_tracking_wiki';
+		$tables[] = 'watch_tracking_user';
+		$tables[] = 'watch_tracking_page';
+		return true;
+	}
+
 	public static function addSchemaUpdates( $updater = null ) {
 
 		// NOTE: this SQL file adds tables watch_tracking_user,
