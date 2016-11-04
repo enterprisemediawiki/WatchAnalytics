@@ -4,40 +4,40 @@ class WatchAnalyticsHooks {
 
 	/**
 	 * Handler for PersonalUrls hook. Replace the "watchlist" item on the user
-	 * toolbar ('personal URLs') with a link to Special:PendingReviews. 
-	 * 
+	 * toolbar ('personal URLs') with a link to Special:PendingReviews.
+	 *
 	 * @see http://www.mediawiki.org/wiki/Manual:Hooks/PersonalUrls
 	 *
 	 * @param &$personal_urls Array of URLs to append to.
 	 * @param &$title Title of page being visited.
-	 * 
+	 *
 	 * @return bool true in all cases
 	 */
 	static public function onPersonalUrls ( &$personal_urls /*, &$title ,$sk*/ ) {
-		
+
 		global $wgUser, $wgOut;
 		$user = $wgUser;
-				
-		if ( $user->isAnon() ) {
+
+		if ( !$user->isAllowed('watchanalytics') ) {
 			return true;
 		}
 
 		$wgOut->addModuleStyles( 'ext.watchanalytics.base' );
-		// NOTE: $wgOut->addModules() does not appear to work here, so 
+		// NOTE: $wgOut->addModules() does not appear to work here, so
 		// the onBeforePageDisplay() method was created below.
-		
+
 		// Get user's watch/review stats
 		$watchStats = $user->watchStats; // set in onBeforePageDisplay() hook
 		$numPending = $watchStats['num_pending'];
 		$maxPendingDays = $watchStats['max_pending_days'];
-		
+
 		// Determine CSS class of Watchlist/PendingReviews link
 		$personal_urls['watchlist']['class'] = array( 'mw-watchanalytics-watchlist-badge' );
 		if ( $numPending != 0 ) {
 			$personal_urls['watchlist']['class'] = array( 'mw-watchanalytics-watchlist-pending' );
 		}
 
-		// Determine text of Watchlist/PendingReviews link 
+		// Determine text of Watchlist/PendingReviews link
 		global $egPendingReviewsEmphasizeDays;
 		if ( $maxPendingDays > $egPendingReviewsEmphasizeDays ) {
 			$personal_urls['watchlist']['class'][] = 'mw-watchanalytics-watchlist-pending-old';
@@ -48,7 +48,7 @@ class WatchAnalyticsHooks {
 			$text = wfMessage( 'watchanalytics-personal-url' )->params( $numPending )->text();
 		}
 		$personal_urls['watchlist']['text'] = $text;
-		
+
 		// set "watchlist" link to Pending Reviews
 		$personal_urls['watchlist']['href'] = SpecialPage::getTitleFor( 'PendingReviews' )->getLocalURL();
 		return true;
@@ -57,7 +57,7 @@ class WatchAnalyticsHooks {
 	/**
 	 * Handler for BeforePageDisplay hook. This function supports several
 	 * WatchAnalytics features:
-	 * 
+	 *
 	 * 1) Determine if user should see shaky pending reviews link
 	 * 2) Insert page scores on applicable pages
 	 * 3) If a page review has occured on this page view, display an unreview
@@ -83,7 +83,7 @@ class WatchAnalyticsHooks {
 		$user->watchStats['max_pending_days'] = ceil(
 			$user->watchStats['max_pending_minutes'] / ( 60 * 24 )
 		);
-		
+
 		global $egPendingReviewsEmphasizeDays;
 		if ( $user->watchStats['max_pending_days'] > $egPendingReviewsEmphasizeDays ) {
 			$out->addModules( array( 'ext.watchanalytics.shakependingreviews' ) );
@@ -94,13 +94,13 @@ class WatchAnalyticsHooks {
 		# 2) Insert page scores
 		#
 		if ( in_array( $title->getNamespace() , $GLOBALS['egWatchAnalyticsPageScoreNamespaces'] )
-			&& $user->isAllowed( 'viewpagescore' ) 
+			&& $user->isAllowed( 'viewpagescore' )
 			&& PageScore::pageScoreIsEnabled() ) {
-			
+
 			$pageScore = new PageScore( $title );
 			$out->addScript( $pageScore->getPageScoreTemplate() );
 			$out->addModules( array( 'ext.watchanalytics.pagescores' ) );
-		}	
+		}
 
 
 		#
@@ -126,13 +126,13 @@ class WatchAnalyticsHooks {
 	 * are handled correctly in the `watchlist` table. Prior to a MW 1.25 alpha
 	 * release when a page is moved, the new entries into the `watchlist` table
 	 * are given an notification timestamp of NULL; they should be identical to
-	 * the notification timestamps of the original title so users are notified 
+	 * the notification timestamps of the original title so users are notified
 	 * of changes prior to the move. Code taken from MediaWiki core head branch
 	 * WatchedItem::doDuplicateEntries() method.
-	 * 
+	 *
 	 * @todo FIXME: make this work for <1.25 and 1.25+
 	 * @todo document which commit fixes this issue specifically.
-	 * 
+	 *
 	 * @see http://www.mediawiki.org/wiki/Manual:Hooks/TitleMoveComplete
 	 *
 	 * @param Title &$originalTitle
@@ -145,13 +145,13 @@ class WatchAnalyticsHooks {
 	 * @return bool true in all cases
 	 */
 	static public function onTitleMoveComplete ( Title &$originalTitle, Title &$newTitle,
-			User &$user, $oldid, $newid, $reason = null) {
+			User &$user, $oldid, $newid, $reason = null ) {
 
 		#
 		# Record move in watch stats
 		#
 		WatchStateRecorder::recordPageChange( Article::newFromID( $oldid ) );
-		
+
 		// if a redirect was created, record data for the "new" page (the redirect)
 		if ( $newid > 0 ) {
 			WatchStateRecorder::recordPageChange( Article::newFromID( $newid ) );
@@ -202,7 +202,7 @@ class WatchAnalyticsHooks {
 
 	/**
 	 * Register magic-word variable ID to hide page score from select pages.
-	 * 
+	 *
  	 * @see FIXME (include link to hook documentation)
 	 *
 	 * @param Array $magicWordVariableIDs array of names of magic words
@@ -217,7 +217,7 @@ class WatchAnalyticsHooks {
 	/**
 	 * Set values in the page_props table based on the presence of the
 	 * 'NOPAGESCORE' magic word in a page
-	 * 
+	 *
  	 * @see FIXME (include link to hook documentation)
 	 *
 	 * @param Parser $parser reference to MediaWiki parser.
@@ -255,7 +255,7 @@ class WatchAnalyticsHooks {
 	 * Occurs after the save page request has been processed, and causes the
 	 * new state of "watches" and "reviews" to be recorded for the page and all
 	 * of its watchers.
-	 * 
+	 *
 	 * Additional parameters available include: User $user, Content $content,
 	 * string $summary, boolean $isMinor, boolean $isWatch, $section Deprecated,
 	 * integer $flags, {Revision|null} $revision, Status $status, integer $baseRevId
@@ -268,6 +268,16 @@ class WatchAnalyticsHooks {
 	 */
 	static public function onPageContentSaveComplete ( $article ) {
 		WatchStateRecorder::recordPageChange( $article );
+		return true;
+	}
+
+	public static function onLanguageGetMagic( &$magicWords, $langCode ) {
+		switch ( $langCode ) {
+		default:
+			$magicWords['underwatched_categories']    = array( 0, 'underwatched_categories' );
+			$magicWords['watchers_needed'] = array( 0, 'watchers_needed' );
+			$magicWords['MAG_NOPAGESCORE']   = array( 0, '__NOPAGESCORE__' );
+		}
 		return true;
 	}
 

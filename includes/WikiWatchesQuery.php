@@ -37,7 +37,7 @@ class WikiWatchesQuery extends WatchesQuery {
 
 	protected $fieldNames = array(
 		'tracking_timestamp'          => 'watchanalytics-special-header-timestamp',
-		
+
 		'num_pages'                   => 'watchanalytics-special-header-num-pages',
 		'num_watches'                 =>   'watchanalytics-special-header-watches',
 		'num_pending'                 =>   'watchanalytics-special-header-pending-watches',
@@ -62,14 +62,14 @@ class WikiWatchesQuery extends WatchesQuery {
 	);
 
 	public function getQueryInfo( $conds = null ) {
-	
+
 		$this->tables = array(
 			'w' => 'watch_tracking_wiki'
 		);
 
 		$this->fields = array(
 			'tracking_timestamp',
-			
+
 			'num_pages',
 			'num_watches',
 			'num_pending',
@@ -94,11 +94,11 @@ class WikiWatchesQuery extends WatchesQuery {
 		);
 
 		$this->conds = $conds ? $conds : array();
-		
+
 		$this->join_conds = array();
 
 		$this->options = array();
-		
+
 		return parent::getQueryInfo();
 
 	}

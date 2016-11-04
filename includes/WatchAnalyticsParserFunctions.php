@@ -36,7 +36,7 @@ EOT;
 class WatchAnalyticsParserFunctions {
 
 	static public function setup ( &$parser ) {
-		
+
 		$parser->setFunctionHook(
 			'underwatched_categories',
 			array(
@@ -56,20 +56,20 @@ class WatchAnalyticsParserFunctions {
 			SFH_OBJECT_ARGS
 		);
 
-		
+
 		return true;
-		
+
 	}
-	
+
 	static public function processArgs( $frame, $args, $defaults ) {
 		$new_args = array();
-		$num_args = count($args);
-		$num_defaults = count($defaults);
-		$count = ($num_args > $num_defaults) ? $num_args : $num_defaults;
-		
-		for ($i=0; $i<$count; $i++) {
-			if ( isset($args[$i]) )
-				$new_args[$i] = trim( $frame->expand($args[$i]) );
+		$num_args = count( $args );
+		$num_defaults = count( $defaults );
+		$count = ( $num_args > $num_defaults ) ? $num_args : $num_defaults;
+
+		for ( $i = 0; $i < $count; $i++ ) {
+			if ( isset( $args[$i] ) )
+				$new_args[$i] = trim( $frame->expand( $args[$i] ) );
 			else
 				$new_args[$i] = $defaults[$i];
 		}
@@ -82,12 +82,12 @@ class WatchAnalyticsParserFunctions {
 		// provided by the user, so this method needs to convert "Main" to zero, etc
 		// $args = self::processArgs( $frame, $args, array(0) );
 		// $namespace  = $args[0];
-		
+
 		$dbr = wfGetDB( DB_SLAVE );
-		
+
 		$query = "
 			SELECT * FROM (
-				SELECT 
+				SELECT
 					p.page_namespace,
 					p.page_title,
 					SUM(IF(w.wl_title IS NOT NULL, 1, 0)) AS num_watches,
@@ -98,7 +98,7 @@ class WatchAnalyticsParserFunctions {
 					(SELECT group_concat(cl_to SEPARATOR ';') as subq_categories FROM categorylinks WHERE cl_from = p.page_id) AS categories
 				FROM `watchlist` `w`
 				RIGHT JOIN `page` `p` ON ((p.page_namespace=w.wl_namespace AND p.page_title=w.wl_title))
-				WHERE 
+				WHERE
 					p.page_namespace = 0
 					AND p.page_is_redirect = 0
 				GROUP BY p.page_title, p.page_namespace
@@ -110,12 +110,12 @@ class WatchAnalyticsParserFunctions {
 
 		$output = "{| class=\"wikitable sortable\"\n";
 		$output .= "! Category !! Number of Under-watched pages\n";
-		
+
 		$categories = array();
 		while ( $row = $dbr->fetchObject( $result ) ) {
 			$pageCategories = explode( ';' , $row->categories );
 
-			foreach ( $pageCategories as $cat ) {			
+			foreach ( $pageCategories as $cat ) {
 				if ( isset ( $categories[ $cat ] ) ) {
 					$categories[ $cat ]++;
 				}
@@ -124,11 +124,11 @@ class WatchAnalyticsParserFunctions {
 				}
 			}
 		}
-		
+
 		arsort( $categories );
 
 		foreach ( $categories as $cat => $numUnderwatchedPages ) {
-		
+
 			if ( $cat === '' ) {
 				$catLink = "''Uncategorized''";
 			}
@@ -136,34 +136,34 @@ class WatchAnalyticsParserFunctions {
 				$catTitle = Category::newFromName( $cat )->getTitle();
 				$catLink = "[[:$catTitle|" . $catTitle->getText() . "]]";
 			}
-			
+
 			$output .= "|-\n";
 			$output .= "| $catLink || $numUnderwatchedPages\n";
 		}
-		
+
 		$output .= '|}[[Category:Pages using beta WatchAnalytics features]]';
-		
+
 		return $output;
 	}
-	
+
 	static public function renderWatchersNeeded ( &$parser, $frame, $args ) {
 		global $wgUser;
-		
+
 		$wgUserId = $wgUser->getId();
-	
+
 		$args = self::processArgs( $frame, $args, array( 0, 60, 3, 10 ) );
 		$namespace   = intval( $args[0] );
 		$numDays     = intval( $args[1] );
 		$maxWatchers = intval( $args[2] );
 		$limit       = intval( $args[3] );
-		
-		$rangeTimestamp = date('YmdHis', time() - ($numDays * 24 * 60 * 60) );
-		
+
+		$rangeTimestamp = date( 'YmdHis', time() - ( $numDays * 24 * 60 * 60 ) );
+
 		$dbr = wfGetDB( DB_SLAVE );
-		
+
 		if ( class_exists( 'Wiretap' ) && false ) {
 			$query =
-				"SELECT 
+				"SELECT
 					p.page_id AS page_id,
 					p.page_title AS page_title,
 					p.page_namespace AS page_namespace,
@@ -179,7 +179,7 @@ class WatchAnalyticsParserFunctions {
 							AND watch.wl_title = p.page_title
 					) AS watches
 				FROM wiretap AS w
-				INNER JOIN page AS p ON 
+				INNER JOIN page AS p ON
 					p.page_id = w.page_id
 				LEFT JOIN redirect AS red ON
 					red.rd_from = p.page_id
@@ -195,7 +195,7 @@ class WatchAnalyticsParserFunctions {
 				LIMIT 20";
 		}
 		else {
-			$query = 
+			$query =
 				"SELECT page_title, page_namespace FROM (
 					SELECT
 						p.page_title AS page_title,
@@ -218,7 +218,7 @@ class WatchAnalyticsParserFunctions {
 						p.page_title, p.page_namespace
 					ORDER BY
 						view_watch_ratio DESC
-				) AS tmp 
+				) AS tmp
 				WHERE
 					num_watches <= $maxWatchers
 					AND wg_user_watches = 0
@@ -237,25 +237,25 @@ class WatchAnalyticsParserFunctions {
 				array(),
 				self::makeWatchLink( $row->page_namespace, $row->page_title )
 			);
-			
+
 		}
-		
-		$output = Xml::tags('ul',array(),$output);
-		
+
+		$output = Xml::tags( 'ul', array(), $output );
+
 		return array(
 			0 => $output,
 			'isHTML' => true,
 		);
-		
+
 	}
-	
+
 	static protected function makeWatchLink ( $ns, $titleText ) {
 		global $wgContLang, $wgUser;
 
 		$context = RequestContext::getMain();
-		
+
 		$nt = Title::makeTitle( $ns, $titleText ); // was: makeTitleSafe
-		
+
 		// FIXME: this is from Special:Unwatchedpages. It may not be valid in
 		// for a parser function intended to get people to watch more pages.
 		// Perhaps the parser function should offer an option as to whether or
@@ -275,7 +275,7 @@ class WatchAnalyticsParserFunctions {
 			array( 'class' => 'mw-watch-link watch-analytics-watchers-needed-link' ),
 			array( 'action' => 'watch', 'token' => $token )
 		);
-		
+
 		return $context->getLanguage()->specialList( $plink, $wlink );
 	}
 }

@@ -56,7 +56,7 @@ class WatchesQuery {
 	 * @example 100
 	 */
 	public $offset;
-	
+
 	/**
 	 * @var array $fieldNames: property declared in child classes to bind a MW
 	 * message with a SQL database column
@@ -66,25 +66,25 @@ class WatchesQuery {
 	protected $fieldNames;
 
 	/**
-	 * @var string|bool $userGroupFilter: defines which user group to be used to 
+	 * @var string|bool $userGroupFilter: defines which user group to be used to
 	 * filter for page-watches
 	 * @example 'sysop'
 	 */
 	protected $userGroupFilter = false;
-	
+
 	/**
-	 * @var string|bool $categoryFilter: defines which category to be used to 
+	 * @var string|bool $categoryFilter: defines which category to be used to
 	 * filter for page-watches
 	 * @example 'Articles_with_unsourced_statements'
 	 */
 	protected $categoryFilter = false;
 
-	
+
 	public function __construct () {
 	}
-	
+
 	public function createTimeStringFromMinutes ( $totalMinutes ) {
-		
+
 		$remainder = $totalMinutes;
 
 		$minutesInDay = 60 * 24;
@@ -100,13 +100,13 @@ class WatchesQuery {
 
 		$time = array();
 		if ( $days ) {
-			$time[] = $days . ' day' . (($days > 1) ? 's' : ''); 
+			$time[] = $days . ' day' . ( ( $days > 1 ) ? 's' : '' );
 		}
 		if ( $hours ) {
-			$time[] = $hours . ' hour' . (($hours > 1) ? 's' : ''); 
+			$time[] = $hours . ' hour' . ( ( $hours > 1 ) ? 's' : '' );
 		}
 		if ( $minutes ) {
-			$time[] = $minutes . ' minute' . (($minutes > 1) ? 's' : ''); 
+			$time[] = $minutes . ' minute' . ( ( $minutes > 1 ) ? 's' : '' );
 		}
 
 		// return implode(', ', $time);
@@ -124,7 +124,7 @@ class WatchesQuery {
 	}
 
 	public function getQueryInfo() {
-	
+
 		$this->conds = $this->conds ? $this->conds : array();
 
 		if ( isset ( $this->limit ) ) {
@@ -141,7 +141,7 @@ class WatchesQuery {
 			'conds' => $this->conds,
 			'options' => $this->options,
 		);
-		
+
 		return $return;
 
 	}
@@ -164,5 +164,5 @@ class WatchesQuery {
 			'RIGHT JOIN', 'cat.cl_from = p.page_id AND cat.cl_to = "' . $this->categoryFilter . '"'
 		);
 	}
-	
+
 }

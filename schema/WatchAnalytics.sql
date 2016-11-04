@@ -7,9 +7,9 @@ CREATE TABLE /*_*/watch_tracking_user (
 	event_notes			VARCHAR(63)
 ) /*$wgDBTableOptions*/;
 
-CREATE UNIQUE INDEX /*i*/watch_tracking_user_datapoint ON /*_*/watch_tracking_user (tracking_timestamp,user_id);
-CREATE INDEX        /*i*/watch_tracking_user_user      ON /*_*/watch_tracking_user (user_id);
-CREATE INDEX        /*i*/watch_tracking_user_timestamp ON /*_*/watch_tracking_user (tracking_timestamp);
+CREATE INDEX /*i*/watch_tracking_user_datapoint ON /*_*/watch_tracking_user (tracking_timestamp,user_id);
+CREATE INDEX /*i*/watch_tracking_user_user      ON /*_*/watch_tracking_user (user_id);
+CREATE INDEX /*i*/watch_tracking_user_timestamp ON /*_*/watch_tracking_user (tracking_timestamp);
 
 
 CREATE TABLE /*_*/watch_tracking_page (

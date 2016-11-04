@@ -26,16 +26,24 @@
  * @ingroup Maintenance
  */
 
-require_once( __DIR__ . '/../../../maintenance/Maintenance.php' );
+// Allow people to have different layouts.
+if ( ! isset( $IP ) ) {
+	$IP = __DIR__ . '/../../../';
+	if ( getenv("MW_INSTALL_PATH") ) {
+		$IP = getenv("MW_INSTALL_PATH");
+	}
+}
+
+require_once( "$IP/maintenance/Maintenance.php" );
 
 class WatchAnalyticsRecordState extends Maintenance {
-	
+
 	public function __construct() {
 		parent::__construct();
-		
+
 		$this->mDescription = "Record the current state of page-watching.";
 	}
-	
+
 	public function execute() {
 		$recorder = new WatchStateRecorder();
 		$recorder->recordAll();

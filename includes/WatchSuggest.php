@@ -52,7 +52,7 @@ class WatchSuggest {
 
 	/**
 	 * Handles something.
-	 * 
+	 *
 	 * @return bool
 	 */
 	public function getWatchSuggestionList () {
@@ -68,7 +68,7 @@ class WatchSuggest {
 		if ( count( $userWatchlist ) > 0 ) {
 			$linkedPages = $this->getPagesRelatedByLinks( $userWatchlist );
 		}
-		
+
 
 		if ( count( $linkedPages ) == 0 ) {
 
@@ -118,7 +118,7 @@ class WatchSuggest {
 		global $egPendingReviewsNumberWatchSuggestions;
 
 		$watchSuggestionsLIs = array();
-		foreach( $sortedPages as $pageId => $pageInfo ) {
+		foreach ( $sortedPages as $pageId => $pageInfo ) {
 
 			$suggestedTitle = Title::newFromID( $pageInfo[ 'page_id' ] );
 			if ( ! $suggestedTitle // for some reason some pages in the pagelinks table don't exist in either table page or table archive...
@@ -145,7 +145,7 @@ class WatchSuggest {
 			if ( $count > $egPendingReviewsNumberWatchSuggestions ) {
 				break;
 			}
-		
+
 		}
 
 		$numTopWatchers = 20;
@@ -172,7 +172,7 @@ class WatchSuggest {
 			}
 			$namespaces = array( $namespaces );
 		}
-		
+
 		if ( count( $namespaces ) > 1 ) {
 			$namespaceCondition = 'AND p.page_namespace IN (' . $this->dbr->makeList( $namespaces ) . ')';
 		}
@@ -212,7 +212,7 @@ class WatchSuggest {
 			array(), // options
 			array(
 				'w' => array(
-					'LEFT JOIN', 
+					'LEFT JOIN',
 					'w.wl_namespace = p.page_namespace AND w.wl_title = p.page_title'
 				)
 			)
@@ -226,8 +226,8 @@ class WatchSuggest {
 
 		return $return;
 	}
-	
-	
+
+
 	public function getPagesRelatedByLinks ( $userWatchlist ) {
 
 		$userWatchlistPageIds = array();
@@ -255,8 +255,8 @@ class WatchSuggest {
 		// WHERE
 		// 	pl.pl_from IN ( <LIST OF all p_id found above> )
 		// 	OR ( pl.pl_namespace = 0 AND pl.pl_title IN ( <LIST OF ALL p_title found above> ) )
-		$where = 
-			"pl.pl_from IN ($ids) " . 
+		$where =
+			"pl.pl_from IN ($ids) " .
 			" OR ( pl.pl_namespace = 0 AND pl.pl_title IN ($titles) )";
 
 
@@ -274,7 +274,7 @@ class WatchSuggest {
 			array(), // options
 			array(
 				'p_to' => array(
-					'INNER JOIN', 
+					'INNER JOIN',
 					'pl.pl_namespace = p_to.page_namespace AND pl.pl_title = p_to.page_title'
 				),
 			)
@@ -285,15 +285,15 @@ class WatchSuggest {
 				$linkedPages[ $row->pl_from_id ] = 1;
 			}
 			else {
-				$linkedPages[ $row->pl_from_id ]++;				
+				$linkedPages[ $row->pl_from_id ]++;
 			}
 
 			if ( ! isset( $linkedPages[ $row->pl_to_id ] ) ) {
 				$linkedPages[ $row->pl_to_id ] = 1;
 			}
 			else {
-				$linkedPages[ $row->pl_to_id ]++;				
-			}			
+				$linkedPages[ $row->pl_to_id ]++;
+			}
 		}
 
 		$linkedPagesToKeep = array();
@@ -314,7 +314,7 @@ class WatchSuggest {
 		$links = array();
 		$watchNeedArray = array();
 		$sortedPages = array();
-		foreach( $pages as $pageId => $pageData ) {
+		foreach ( $pages as $pageId => $pageData ) {
 			if ( isset( $pageData[ 'num_watches' ] ) ) {
 				$numWatches = intval( $pageData[ 'num_watches' ] );
 				$numViews = intval( $pageData[ 'num_views' ] );
@@ -343,7 +343,7 @@ class WatchSuggest {
 		return $sortedPages;
 	}
 
-	// SELECT 
+	// SELECT
 	// 	u.user_name AS uname,
 	// 	u.user_real_name AS name,
 	// 	COUNT( * ) AS user_watches
@@ -379,11 +379,11 @@ class WatchSuggest {
 			),
 			array(
 				'p' => array(
-					'RIGHT JOIN', 
+					'RIGHT JOIN',
 					'w.wl_namespace = p.page_namespace AND w.wl_title = p.page_title'
 				),
 				'u' => array(
-					'LEFT JOIN', 
+					'LEFT JOIN',
 					'w.wl_user = u.user_id'
 				),
 			)

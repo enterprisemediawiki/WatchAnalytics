@@ -38,7 +38,7 @@ class ReviewHandler {
 	// used to track change of state through page load.
 	public static $pageLoadHandler = null;
 	public static $isReviewable = true;
-	
+
 	/**
 	 * @var User $user: reference to the current user
 	 */
@@ -46,15 +46,15 @@ class ReviewHandler {
 
 	/**
 	 * @var Title $title: reference to current title
-	 */	
+	 */
 	public $title;
 
 	/**
 	 * @var int $initial: state of the user watching the page initially (at the
-	 * beginning of the page load). Possible values: -1 for not watching the 
+	 * beginning of the page load). Possible values: -1 for not watching the
 	 * page, 0 for watching and has seen the latest version, and a large int
 	 * like 20150102030405 (timestamp) for the user not having seen the latest.
-	 */	
+	 */
 	public $initial = null;
 
 	/**
@@ -72,7 +72,7 @@ class ReviewHandler {
 		if ( ! $title->isWatchable() ) {
 			self::$isReviewable = false;
 			return false;
-		} 
+		}
 		self::$pageLoadHandler = new self ( $user, $title );
 		self::$pageLoadHandler->initial = self::$pageLoadHandler->getReviewStatus();
 	}
@@ -149,11 +149,11 @@ class ReviewHandler {
 			'unreview' => $this->initial
 		) );
 
-		$linkText = wfMessage('watchanalytics-unreview-button')->text();
-		$bannerText = wfMessage('watchanalytics-unreview-banner-text')->parse();
+		$linkText = wfMessage( 'watchanalytics-unreview-button' )->text();
+		$bannerText = wfMessage( 'watchanalytics-unreview-banner-text' )->parse();
 
 		// when MW 1.25 is released (very soon) replace this with a mustache template
-		$template = 
+		$template =
 			"<div id='watch-analytics-review-handler'>
 				<a id='watch-analytics-unreview' href='$unReviewLink'>$linkText</a>
 				<p>$bannerText</p>

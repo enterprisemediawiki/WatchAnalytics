@@ -2,6 +2,13 @@
 
 class WatchAnalyticsUpdaterHooks {
 
+	public static function onParserTestTables( &$tables ) {
+		$tables[] = 'watch_tracking_wiki';
+		$tables[] = 'watch_tracking_user';
+		$tables[] = 'watch_tracking_page';
+		return true;
+	}
+
 	public static function addSchemaUpdates( $updater = null ) {
 
 		// NOTE: this SQL file adds tables watch_tracking_user,
@@ -13,11 +20,11 @@ class WatchAnalyticsUpdaterHooks {
 
 		// DB updates
 		// For now, there's just a single SQL file for all DB types.
-		//if ( $updater->getDB()->getType() == 'mysql' ) {
+		// if ( $updater->getDB()->getType() == 'mysql' ) {
 			$updater->addExtensionUpdate( array( 'addTable', 'watch_tracking_user', __DIR__ . '/WatchAnalytics.sql', true ) );
-		//}
+		// }
 
 		return true;
 	}
-	
+
 }

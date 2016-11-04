@@ -52,13 +52,13 @@ class PageScore {
 	public $cssColorClasses;
 
 	public function __construct ( Title $title ) {
-	
+
 		$this->mTitle = $title;
 		$this->cssColorClasses = array(
 			'excellent',
-			//'good',
+			// 'good',
 			'okay',
-			//'warning',
+			// 'warning',
 			'danger',
 		);
 	}
@@ -73,7 +73,7 @@ class PageScore {
 
 	/**
 	 * Handles something.
-	 * 
+	 *
 	 * @return string
 	 */
 	public function getWatchQuality () {
@@ -104,13 +104,13 @@ class PageScore {
 		return $pageData->num_reviews;
 
 	}
-	
+
 	public function getScoreColor ( $score, $configVariable ) {
 
 		$scoreArr = $GLOBALS[ $configVariable ];
 
 		$scoreArrCount = count( $scoreArr );
-		for( $i = 0; $i < $scoreArrCount; $i++ ) { //  ) as $index => $upperBound
+		for ( $i = 0; $i < $scoreArrCount; $i++ ) { //  ) as $index => $upperBound
 			if ( $score > $scoreArr[ $i ] ) {
 				return $this->cssColorClasses[ $i ];
 			}
@@ -122,7 +122,7 @@ class PageScore {
 
 	public function getPageScoreTemplate () {
 
-		// simple explanation of what PageScores are		
+		// simple explanation of what PageScores are
 		$pageScoresTooltip = wfMessage( 'watch-analytics-page-score-tooltip' )->text();
 
 		// @FIXME: Replace with special page showing page stats
@@ -132,7 +132,7 @@ class PageScore {
 		) );
 
 		// when MW 1.25 is released (very soon) replace this with a mustache template
-		$template = 
+		$template =
 			"<a title='$pageScoresTooltip' id='ext-watchanalytics-pagescores' href='$pageScoresHelpPageLink'>"
 				. $this->getScrutinyBadge()
 				. $this->getReviewsBadge()
@@ -142,7 +142,7 @@ class PageScore {
 
 	}
 
-	public function getBadge ( $label, $score, $color, $showLabel=false ) {
+	public function getBadge ( $label, $score, $color, $showLabel = false ) {
 
 		// @todo FIXME: make the javascript apply a class to handle this, so this can just apply a class
 		if ( $showLabel ) {
@@ -154,7 +154,7 @@ class PageScore {
 			$rightStyle = "";
 		}
 
-		return 
+		return
 			"<div class='ext-watchanalytics-pagescores-$color'>
 				<div class='ext-watchanalytics-pagescores-left'$leftStyle>
 					$label
@@ -166,7 +166,7 @@ class PageScore {
 
 	}
 
-	public function getScrutinyBadge ( $showLabel=false ) {
+	public function getScrutinyBadge ( $showLabel = false ) {
 		$scrutinyScore = $this->getWatchQuality();
 		$scrutinyLabel = wfMessage( 'watch-analytics-page-score-scrutiny-label' )->text();
 		$scrutinyColor = $this->getScoreColor( $scrutinyScore, 'egWatchAnalyticsWatchQualityColors' );
@@ -174,7 +174,7 @@ class PageScore {
 		return $this->getBadge( $scrutinyLabel, $scrutinyScore, $scrutinyColor, $showLabel );
 	}
 
-	public function getReviewsBadge ( $showLabel=false ) {
+	public function getReviewsBadge ( $showLabel = false ) {
 		$reviewsScore = $this->getReviewStatus();
 		$reviewsLabel = wfMessage( 'watch-analytics-page-score-reviews-label' )->text();
 		$reviewsColor = $this->getScoreColor( $reviewsScore, 'egWatchAnalyticsReviewStatusColors' );

@@ -12,13 +12,13 @@ class SpecialPageStatistics extends SpecialPage {
 
 
 	public function __construct() {
-		parent::__construct( 
-			"PageStatistics", // 
+		parent::__construct(
+			"PageStatistics", //
 			"",  // rights required to view
 			true // show in Special:SpecialPages
 		);
 	}
-	
+
 	public function execute( $parser = null ) {
 		global $wgRequest, $wgOut, $wgUser;
 
@@ -40,7 +40,7 @@ class SpecialPageStatistics extends SpecialPage {
 		// 		$filter = false;
 		// 	}
 		// }
-		
+
 		// @todo: delete if multiple views not needed (thus, not requiring header call here)
 		if ( $this->mTitle && $this->mTitle->isKnown() && $this->mTitle->isWatchable() ) {
 
@@ -61,11 +61,11 @@ class SpecialPageStatistics extends SpecialPage {
 			$wgOut->addHTML( "<p>\"$requestedPage\" is either not a page or is not watchable</p>" );
 		}
 		else {
-			$wgOut->addHTML( "<p>No page requested</p>" );			
+			$wgOut->addHTML( "<p>No page requested</p>" );
 		}
 
 	}
-	
+
 	public function getPageHeader() {
 		global $wgOut;
 		$wgOut->addModuleStyles( array( 'ext.watchanalytics.pagescores' ) );
@@ -74,12 +74,12 @@ class SpecialPageStatistics extends SpecialPage {
 		$pageScore = new PageScore( $this->mTitle );
 		// $out->addScript( $pageScore->getPageScoreTemplate() );
 
-		$scrutinyBadge = 
+		$scrutinyBadge =
 			"<div id='ext-watchanalytics-pagescores' style='float:left; opacity:1.0; margin-right: 10px;'>"
 				. $pageScore->getScrutinyBadge( true )
 			. "</div>";
 
-		$reviewsBadge = 
+		$reviewsBadge =
 			"<div id='ext-watchanalytics-pagescores' style='float:left; opacity:1.0; margin-right: 10px;'>"
 				. $pageScore->getReviewsBadge( true )
 			. "</div>";
@@ -107,7 +107,7 @@ class SpecialPageStatistics extends SpecialPage {
 			</table>";
 
 	}
-	
+
 	public function renderPageStats () {
 
 		global $wgOut;
@@ -118,9 +118,9 @@ class SpecialPageStatistics extends SpecialPage {
 		$dbr = wfGetDB( DB_SLAVE );
 		$html = '';
 		// Load the module for the D3.js force directed graph
-		//$wgOut->addModules( array( 'ext.watchanalytics.forcegraph' ) );
+		// $wgOut->addModules( array( 'ext.watchanalytics.forcegraph' ) );
 		// Load the styles for the D3.js force directed graph
-		//$wgOut->addModuleStyles( 'ext.watchanalytics.forcegraph' );
+		// $wgOut->addModuleStyles( 'ext.watchanalytics.forcegraph' );
 
 
 		// SELECT
@@ -144,7 +144,7 @@ class SpecialPageStatistics extends SpecialPage {
 			array(
 				'rev.rev_user',
 				'rev.rev_user_text',
-				'COUNT( * ) AS num_revisions',				
+				'COUNT( * ) AS num_revisions',
 			),
 			array(
 				'p.page_title' => $this->mTitle->getDBkey(),
@@ -173,13 +173,13 @@ class SpecialPageStatistics extends SpecialPage {
 			// $editor = User::newFromId( $row->rev_user )
 			// $realName = $editor->getRealName();
 
-			$html .= 
+			$html .=
 				Xml::openElement( 'li' )
 				. wfMessage(
 					'watchanalytics-pagestats-editors-list-item',
 					Linker::userLink( $row->rev_user, $row->rev_user_text ),
 					$row->num_revisions
-				)->text() 
+				)->text()
 				. Xml::closeElement( 'li' );
 
 		}
@@ -230,12 +230,12 @@ class SpecialPageStatistics extends SpecialPage {
 				$watcherMsg = 'watchanalytics-pagestats-watchers-list-item-unreviewed';
 			}
 
-			$html .= 
+			$html .=
 				Xml::openElement( 'li' )
 				. wfMessage(
 					$watcherMsg,
 					Linker::userLink( $row->wl_user, $row->user_name )
-				)->text() 
+				)->text()
 				. Xml::closeElement( 'li' );
 
 		}
@@ -253,9 +253,9 @@ class SpecialPageStatistics extends SpecialPage {
 
 		// FIXME: Original self: this shouldn't use the same CSS ID.
 		//        Newer self: Why not?
-		return 
-			"<div id='watch-analytics-review-handler'><p>" . 
-				wfMessage('watchanalytics-unreview-complete')->parse() . 
+		return
+			"<div id='watch-analytics-review-handler'><p>" .
+				wfMessage( 'watchanalytics-unreview-complete' )->parse() .
 			"</p></div>";
 
 	}
@@ -267,17 +267,17 @@ class SpecialPageStatistics extends SpecialPage {
 		global $wgOut;
 		$wgOut->addModules( 'ext.watchanalytics.charts' );
 
-		$html = '<h2>'. wfMessage( 'watchanalytics-pagestats-chart-header' )->text() .'</h2>';
+		$html = '<h2>' . wfMessage( 'watchanalytics-pagestats-chart-header' )->text() . '</h2>';
 		$html .= '<canvas id="page-reviews-chart" width="400" height="400"></canvas>';
-		
+
 		// $dateRangeStart = new MWTimestamp( date( 'YmdHis', strtotime( '2 weeks ago' ) ) );
 		// $dateRangeStart = $dateRangeStart->format('YmdHis');
 
 		$dbr = wfGetDB( DB_SLAVE );
 		$res = $dbr->select(
-			array('wtp' => 'watch_tracking_page'),
+			array( 'wtp' => 'watch_tracking_page' ),
 			array(
-				"DATE_FORMAT( wtp.tracking_timestamp, '%Y-%m-%d %H:%i:%s' ) AS timestamp", 
+				"DATE_FORMAT( wtp.tracking_timestamp, '%Y-%m-%d %H:%i:%s' ) AS timestamp",
 				"wtp.num_reviewed AS num_reviewed",
 			),
 			array(
@@ -293,7 +293,7 @@ class SpecialPageStatistics extends SpecialPage {
 		);
 
 		$data = array();
-		while( $row = $dbr->fetchObject( $res ) ) {
+		while ( $row = $dbr->fetchObject( $res ) ) {
 			$data[ $row->timestamp ] = $row->num_reviewed;
 		}
 

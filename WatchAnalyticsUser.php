@@ -41,8 +41,8 @@ class WatchAnalyticsUser {
 	public function __construct ( User $user ) {
 		$this->user = $user;
 	}
-	
-	
+
+
 	/*
 	SELECT watchlist.wl_title, user.user_name
 	FROM watchlist
@@ -61,15 +61,15 @@ class WatchAnalyticsUser {
 	// FROM watchlist
 	// LEFT JOIN user ON user.user_id = watchlist.wl_user
 	public function getPendingWatches () {
-	
+
 		$dbr = wfGetDB( DB_SLAVE );
 
 		$res = $dbr->select(
-			array('w' => 'watchlist'),
+			array( 'w' => 'watchlist' ),
 			array(
-				'w.wl_namespace AS namespace_id', 
-				'w.wl_title AS title_text', 
-				'w.wl_notificationtimestamp AS notification_timestamp', 
+				'w.wl_namespace AS namespace_id',
+				'w.wl_title AS title_text',
+				'w.wl_notificationtimestamp AS notification_timestamp',
 			),
 			'w.wl_notificationtimestamp IS NOT NULL AND w.wl_user=' . $this->user->getId(),
 			__METHOD__,
@@ -82,12 +82,12 @@ class WatchAnalyticsUser {
 			null // array( 'u' => array( 'LEFT JOIN', 'u.user-id=w.wl_user' ) )
 		);
 		$this->pendingWatches = array();
-		while( $row = $dbr->fetchRow( $res ) ) {
+		while ( $row = $dbr->fetchRow( $res ) ) {
 
 			// $title = Title::newFromText( $row['title_text'], $row['notification_timestamp'] );
 			$this->pendingWatches[] = $row;
-			
-		
+
+
 		}
 
 		return $this;

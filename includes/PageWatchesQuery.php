@@ -52,7 +52,7 @@ class PageWatchesQuery extends WatchesQuery {
 	);
 
 	public function getQueryInfo( $conds = null ) {
-	
+
 		$this->fields = array(
 			$this->sqlNsAndTitle,
 			$this->sqlNumWatches,
@@ -64,11 +64,11 @@ class PageWatchesQuery extends WatchesQuery {
 		);
 
 		$this->conds = $conds ? $conds : array( 'p.page_namespace IS NOT NULL' );
-	
+
 		$this->tables = array( 'w' => 'watchlist' );
-	
+
 		$this->join_conds = array();
-		
+
 		// optionally join the 'user_groups' table to filter by user group
 		if ( $this->userGroupFilter ) {
 			$this->tables['ug'] = 'user_groups';
@@ -95,17 +95,17 @@ class PageWatchesQuery extends WatchesQuery {
 				(
 					ROUND( IFNULL(
 						EXP(
-							-0.01 * SUM( 
+							-0.01 * SUM(
 								IF(w2.wl_notificationtimestamp IS NULL, 0, 1)
 							)
 						)
 						*
 						EXP(
 							-0.01 * FLOOR(
-								AVG( 
+								AVG(
 									TIMESTAMPDIFF( DAY, w2.wl_notificationtimestamp, UTC_TIMESTAMP() )
 								)
-							) 
+							)
 						),
 					1), 3)
 				) AS engagement_score
@@ -117,18 +117,18 @@ class PageWatchesQuery extends WatchesQuery {
 		$this->join_conds['user_watch_scores'] = array(
 			'LEFT JOIN', 'user_watch_scores.user_name = w.wl_user'
 		);
-		
+
 		$this->options = array(
 			// 'GROUP BY' => 'w.wl_title, w.wl_namespace'
 			'GROUP BY' => 'p.page_title, p.page_namespace',
 		);
-		
+
 		return parent::getQueryInfo();
 
 	}
 
 	public function getPageWatchesAndViews ( $pages ) {
-		
+
 		$dbr = wfGetDB( DB_SLAVE );
 
 		$pagesList = $dbr->makeList( $pages );
@@ -175,7 +175,7 @@ class PageWatchesQuery extends WatchesQuery {
 	}
 
 	public function getPageWatchers ( $titleKey, $ns = NS_MAIN ) {
-		
+
 		$dbr = wfGetDB( DB_SLAVE );
 
 		$pageWatchStats = $dbr->select(
@@ -224,7 +224,7 @@ class PageWatchesQuery extends WatchesQuery {
 			return $pageData->watch_quality;
 		}
 		else {
-			return 0;	
+			return 0;
 		}
 
 	}
