@@ -18,7 +18,7 @@ class WatchAnalyticsHooks {
 		global $wgUser, $wgOut;
 		$user = $wgUser;
 
-		if ( !$user->isAllowed('watchanalytics') ) {
+		if ( !$user->isAllowed('pendingreviewslink') ) {
 			return true;
 		}
 

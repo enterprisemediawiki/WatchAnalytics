@@ -248,7 +248,9 @@ $GLOBALS['egWatchAnalyticsReviewStatusColors'] = array(
 );
 
 
-
 // allows showing page score for each page
 $GLOBALS['wgAvailableRights'][] = 'viewpagescore';
+$GLOBALS['wgAvailableRights'][] = 'pendingreviewslink';
+
 $GLOBALS['wgGroupPermissions']['sysop']['viewpagescore'] = true;
+$GLOBALS['wgGroupPermissions']['user']['pendingreviewslink'] = true;
