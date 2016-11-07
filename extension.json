@@ -1,0 +1,189 @@
+{
+	"name": "WatchAnalytics",
+	"version": "1.0.0",
+	"author": [
+		"[https://www.mediawiki.org/wiki/User:Jamesmontalvo3 James Montalvo]"
+	],
+	"url": "https://www.mediawiki.org/wiki/Extension:WatchAnalytics",
+	"descriptionmsg": "watchanalytics-desc",
+	"type": "specialpage",
+	"GroupPermissions": {
+		"sysop": {
+			"viewpagescore": true
+		},
+		"user": {
+			"pendingreviewslink": true
+		}
+	},
+	"AvailableRights": [
+		"viewpagescore",
+		"pendingreviewslink"
+	],
+	"SpecialPages": {
+		"WatchAnalytics": "SpecialWatchAnalytics",
+		"PendingReviews": "SpecialPendingReviews",
+		"PageStatistics": "SpecialPageStatistics"
+	},
+	"MessagesDirs": {
+		"WatchAnalytics": [
+			"i18n"
+		]
+	},
+	"ExtensionMessagesFiles": {
+		"WatchAnalyticsAliases": "WatchAnalytics.alias.php",
+		"WatchAnalyticsMagic": "WatchAnalytics.i18n.magic.php"
+	},
+	"AutoloadClasses": {
+		"WatchAnalyticsHooks": "Hooks.php",
+		"WatchAnalyticsUser": "WatchAnalyticsUser.php",
+		"WatchAnalyticsUpdaterHooks": "schema/WatchAnalyticsUpdaterHooks.php",
+		"PendingReview": "includes/PendingReview.php",
+		"WatchSuggest": "includes/WatchSuggest.php",
+		"ReviewHandler": "includes/ReviewHandler.php",
+		"PageScore": "includes/PageScore.php",
+		"WatchesQuery": "includes/WatchesQuery.php",
+		"PageWatchesQuery": "includes/PageWatchesQuery.php",
+		"UserWatchesQuery": "includes/UserWatchesQuery.php",
+		"WikiWatchesQuery": "includes/WikiWatchesQuery.php",
+		"WatchAnalyticsTablePager": "includes/WatchAnalyticsTablePager.php",
+		"WatchAnalyticsUserTablePager": "includes/WatchAnalyticsUserTablePager.php",
+		"WatchAnalyticsPageTablePager": "includes/WatchAnalyticsPageTablePager.php",
+		"WatchAnalyticsWikiTablePager": "includes/WatchAnalyticsWikiTablePager.php",
+		"WatchAnalyticsParserFunctions": "includes/WatchAnalyticsParserFunctions.php",
+		"WatchAnalyticsHtmlHelper": "includes/WatchAnalyticsHtmlHelper.php",
+		"WatchStateRecorder": "includes/WatchStateRecorder.php",
+		"SpecialWatchAnalytics": "specials/SpecialWatchAnalytics.php",
+		"SpecialPendingReviews": "specials/SpecialPendingReviews.php",
+		"SpecialPageStatistics": "specials/SpecialPageStatistics.php"
+	},
+	"ResourceModules": {
+		"ext.watchanalytics.base": {
+			"position": "bottom",
+			"styles": "base/ext.watchanalytics.base.css"
+		},
+		"ext.watchanalytics.forcegraph": {
+			"position": "bottom",
+			"styles": "forcegraph/ext.watchanalytics.forcegraph.css",
+			"scripts": [
+				"forcegraph/ext.watchanalytics.circlesort.js",
+				"forcegraph/ext.watchanalytics.forcegraph.js"
+			],
+			"messages": [
+				"watchanalytics-pause-visualization",
+				"watchanalytics-unpause-visualization"
+			],
+			"dependencies": [
+				"underscore.js",
+				"d3.js"
+			]
+		},
+		"ext.watchanalytics.specials": {
+			"position": "bottom",
+			"styles": "specials/ext.watchanalytics.specials.css"
+		},
+		"ext.watchanalytics.pendingreviews": {
+			"position": "bottom",
+			"styles": "pendingreviews/ext.watchanalytics.pendingreviews.css",
+			"scripts": "pendingreviews/ext.watchanalytics.pendingreviews.js",
+			"dependencies": [
+				"mediawiki.Title"
+			]
+		},
+		"underscore.js": {
+			"position": "bottom",
+			"scripts": [
+				"underscore.js/underscore-min.js"
+			]
+		},
+		"d3.js": {
+			"position": "bottom",
+			"scripts": [
+				"d3.js/d3.js"
+			]
+		},
+		"ext.watchanalytics.shakependingreviews": {
+			"position": "bottom",
+			"scripts": [
+				"shakependingreviews/shake.js"
+			],
+			"dependencies": [
+				"jquery.effects.shake"
+			]
+		},
+		"ext.watchanalytics.pagescores": {
+			"position": "bottom",
+			"styles": "pagescores/pagescores.css",
+			"scripts": [
+				"pagescores/pagescores.js"
+			]
+		},
+		"ext.watchanalytics.reviewhandler": {
+			"position": "bottom",
+			"styles": "reviewhandler/reviewhandler.css",
+			"scripts": [
+				"reviewhandler/reviewhandler.js"
+			]
+		},
+		"ext.watchanalytics.charts": {
+			"position": "bottom",
+			"styles": "charts/ext.watchanalytics.charts.css",
+			"scripts": [
+				"charts/Chart.js",
+				"charts/Chart.Scatter.js",
+				"charts/ext.watchanalytics.charts.js"
+			]
+		}
+	},
+	"ResourceFileModulePaths": {
+		"localBasePath": "modules",
+		"remoteExtPath": "WatchAnalytics/modules"
+	},
+	"Hooks": {
+		"PersonalUrls": [
+			"WatchAnalyticsHooks::onPersonalUrls"
+		],
+		"BeforePageDisplay": [
+			"WatchAnalyticsHooks::onBeforePageDisplay"
+		],
+		"ParserFirstCallInit": [
+			"WatchAnalyticsParserFunctions::setup"
+		],
+		"TitleMoveComplete": [
+			"WatchAnalyticsHooks::onTitleMoveComplete"
+		],
+		"ArticlePageDataBefore": [
+			"WatchAnalyticsHooks::onArticlePageDataBefore"
+		],
+		"PageContentSaveComplete": [
+			"WatchAnalyticsHooks::onPageContentSaveComplete"
+		],
+		"MagicWordwgVariableIDs": [
+			"WatchAnalyticsHooks::addMagicWordVariableIDs"
+		],
+		"ParserBeforeTidy": [
+			"WatchAnalyticsHooks::handleMagicWords"
+		],
+		"LanguageGetMagic": [
+			"WatchAnalyticsHooks::onLanguageGetMagic"
+		],
+		"LoadExtensionSchemaUpdates": [
+			"WatchAnalyticsUpdaterHooks::addSchemaUpdates"
+		],
+		"ParserTestTables": [
+			"WatchAnalyticsUpdaterHooks::onParserTestTables"
+		]
+	},
+	"config": {
+		"_prefix": "eg",
+		"WatchAnalyticsPageCounter": false,
+		"PendingReviewsEmphasizeDays": 7,
+		"PendingReviewsRedPagesThreshold": 2,
+		"PendingReviewsOrangePagesThreshold": 4,
+		"PendingReviewsNumberWatchSuggestions": 20,
+		"PendingReviewsShowWatchSuggestionsIfReviewsUnder": 5,
+		"WatchAnalyticsPageScoreNamespaces": [0, 1],
+		"WatchAnalyticsWatchQualityColors": [5, 1.5],
+		"WatchAnalyticsReviewStatusColors": [4, 2]
+	},
+	"manifest_version": 1
+}
