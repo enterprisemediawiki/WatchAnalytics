@@ -43,7 +43,9 @@
 
 		var lowArr = firstLastReorder( descArr );
 
-
+		if ( numOverAverage == 0 ) {
+			numOverAverage = 1;
+		}
 		var groupSize = Math.floor(descArr.length / numOverAverage);
 		var pointer = newArr.length;
 		var direction = -1;
