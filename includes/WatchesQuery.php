@@ -110,7 +110,11 @@ class WatchesQuery {
 		}
 
 		// return implode(', ', $time);
-		return $time[0];
+		if ( count( $time ) > 0 ) {
+			return $time[0];
+		} else {
+			return '';
+		}
 	}
 
 	public function getFieldNames() {

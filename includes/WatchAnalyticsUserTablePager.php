@@ -28,20 +28,20 @@ class WatchAnalyticsUserTablePager extends WatchAnalyticsTablePager {
 			$user_name = $value;
 
 			$userPage = Title::makeTitle( NS_USER, $user_name );
-			$name = $this->getSkin()->makeLinkObj( $userPage, htmlspecialchars( $userPage->getText() ) );
+			$name = Linker::link( $userPage, htmlspecialchars( $userPage->getText() ) );
 
 			/*
 			Maybe do a stats page at some point...for now just show that user's pending reviews...
 			$url = Title::newFromText('Special:WatchAnalytics')->getLocalUrl(
 				array( 'user' => $user_name )
 			);
-			$msg = wfMsg( 'watchanalytics-view-user-stats' );
+			$msg = wfMessage( 'watchanalytics-view-user-stats' );
 			*/
 
 			$url = Title::newFromText( 'Special:PendingReviews' )->getLocalUrl(
 				array( 'user' => $user_name )
 			);
-			$msg = wfMsg( 'watchanalytics-view-user-pendingreviews' );
+			$msg = wfMessage( 'watchanalytics-view-user-pendingreviews' );
 
 			$name .= ' (' . Xml::element(
 				'a',
