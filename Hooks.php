@@ -235,19 +235,19 @@ class WatchAnalyticsHooks {
 	}
 
 	/**
-	 * Early in page cycle determines if the user is watching the page,
+	 * Prior to clearing notification timestamp determines if user is watching page,
 	 * and if so determines what their review status is. This is used later,
 	 * in onBeforePageDisplay, to determine if a change in state has occured.
 	 *
 	 * @see FIXME (include link to hook documentation)
 	 *
 	 * @param WikiPage $wikiPage
+	 * @param User $user
 	 *
 	 * @return bool
 	 */
-	static public function onArticlePageDataBefore ( $wikiPage ) {
-		global $wgUser;
-		ReviewHandler::setup( $wgUser, $wikiPage->getTitle() );
+	static public function onPageViewUpdates ( WikiPage $wikiPage, User $user ) {
+		ReviewHandler::setup( $user, $wikiPage->getTitle() );
 		return true;
 	}
 
