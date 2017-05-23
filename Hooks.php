@@ -60,7 +60,7 @@ class WatchAnalyticsHooks {
 	 *
 	 * 1) Determine if user should see shaky pending reviews link
 	 * 2) Insert page scores on applicable pages
-	 * 3) If a page review has occured on this page view, display an unreview
+	 * 3) REMOVED FOR MW 1.27: If a page review has occured on this page view, display an unreview
 	 *    option and record that the review happened.
 	 *
 	 * Also supports parameter: Skin $skin.
@@ -103,20 +103,21 @@ class WatchAnalyticsHooks {
 		}
 
 
-		#
-		# 3) If user has reviewed page on this page load show "unreview" option
-		#
-		$reviewHandler = ReviewHandler::pageHasBeenReviewed();
-		if ( $reviewHandler ) {
+		// REMOVED FOR MW 1.27
+		// #
+		// # 3) If user has reviewed page on this page load show "unreview" option
+		// #
+		// $reviewHandler = ReviewHandler::pageHasBeenReviewed();
+		// if ( $reviewHandler ) {
 
-			// display "unreview" button
-			$out->addScript( $reviewHandler->getTemplate() );
-			$out->addModules( array( 'ext.watchanalytics.reviewhandler' ) );
+		// 	// display "unreview" button
+		// 	$out->addScript( $reviewHandler->getTemplate() );
+		// 	$out->addModules( array( 'ext.watchanalytics.reviewhandler' ) );
 
-			// record change in user/page stats
-			WatchStateRecorder::recordReview( $user, $title );
+		// 	// record change in user/page stats
+		// 	WatchStateRecorder::recordReview( $user, $title );
 
-		}
+		// }
 
 		return true;
 	}
@@ -236,8 +237,8 @@ class WatchAnalyticsHooks {
 
 	/**
 	 * Prior to clearing notification timestamp determines if user is watching page,
-	 * and if so determines what their review status is. This is used later,
-	 * in onBeforePageDisplay, to determine if a change in state has occured.
+	 * and if so determines what their review status is. Records review and adds
+	 * "defer" banner if required.
 	 *
 	 * @see FIXME (include link to hook documentation)
 	 *
@@ -247,7 +248,22 @@ class WatchAnalyticsHooks {
 	 * @return bool
 	 */
 	static public function onPageViewUpdates ( WikiPage $wikiPage, User $user ) {
-		ReviewHandler::setup( $user, $wikiPage->getTitle() );
+
+		$title = $wikiPage->getTitle();
+		$reviewHandler = ReviewHandler::setup( $user, $title );
+
+		if ( $reviewHandler::pageIsBeingReviewed() ) {
+
+			global $wgOut;
+
+			// display "unreview" button
+			$wgOut->addScript( $reviewHandler->getTemplate() );
+			$wgOut->addModules( array( 'ext.watchanalytics.reviewhandler' ) );
+
+			// record change in user/page stats
+			WatchStateRecorder::recordReview( $user, $title );
+
+		}
 		return true;
 	}
 
