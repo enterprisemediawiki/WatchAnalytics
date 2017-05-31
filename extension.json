@@ -151,8 +151,8 @@
 		"TitleMoveComplete": [
 			"WatchAnalyticsHooks::onTitleMoveComplete"
 		],
-		"ArticlePageDataBefore": [
-			"WatchAnalyticsHooks::onArticlePageDataBefore"
+		"PageViewUpdates": [
+			"WatchAnalyticsHooks::onPageViewUpdates"
 		],
 		"PageContentSaveComplete": [
 			"WatchAnalyticsHooks::onPageContentSaveComplete"

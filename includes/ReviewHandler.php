@@ -75,6 +75,7 @@ class ReviewHandler {
 		}
 		self::$pageLoadHandler = new self ( $user, $title );
 		self::$pageLoadHandler->initial = self::$pageLoadHandler->getReviewStatus();
+		return self::$pageLoadHandler;
 	}
 
 	/**
@@ -113,7 +114,7 @@ class ReviewHandler {
 
 	}
 
-	public static function pageHasBeenReviewed () {
+	public static function pageIsBeingReviewed () {
 
 		// never setup
 		if ( ! self::$isReviewable || self::$pageLoadHandler === null ) {
@@ -125,18 +126,28 @@ class ReviewHandler {
 			return false;
 		}
 
-		$newStatus = self::$pageLoadHandler->getReviewStatus();
+		// After MW 1.25 (either 1.26 or 1.27), clearing wl_notificationtimestamp
+		// was done via the job queue. This broke the ability to do a second
+		// check of the review status and then compare the two statuses.
+		// Instead just assume if the page is being viewed and it has a
+		// positive wl_notificationtimestamp, then it is being reviewed.
+		// $newStatus = self::$pageLoadHandler->getReviewStatus();
 
+		// OLD VERSIONS OF WatchAnalytics DID THIS, BUT THE JOB QUEUE CHANGE
+		// MADE THIS DIFFICULT. THIS MAY BE ADDED BACK LATER, BUT TO GET THE
+		// EXTENSION WORKING AGAIN, INSTEAD WE'LL BE LESS EXACT FOR NOW.
 		// either $newStatus is 0 or -1 meaning they don't have a pending review
 		// or $newStatus is a timestamp greater than the original timestamp, meaning
 		// they have reviewed a more recent version of the page than they had originally
-		if ( $newStatus < 1 || $newStatus > self::$pageLoadHandler->initial ) {
-			self::$pageLoadHandler->final = $newStatus;
-			return self::$pageLoadHandler;
-		}
-		else {
-			return false;
-		}
+		// if ( $newStatus < 1 || $newStatus > self::$pageLoadHandler->initial ) {
+		// 	self::$pageLoadHandler->final = $newStatus;
+		// 	return self::$pageLoadHandler;
+		// }
+		// else {
+		// 	return false;
+		// }
+
+		return true;
 
 	}
 
