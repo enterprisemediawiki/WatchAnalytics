@@ -60,7 +60,7 @@ class WatchSuggest {
 		$html = '';
 
 		// gets id, NS and title of all pages in users watchlist in NS_MAIN
-		$userWatchlist = $this->getUserWatchlist( $this->mUser, NS_MAIN );
+		$userWatchlist = $this->getUserWatchlist( $this->mUser, $wgWatchSuggestionsNamespaces );
 		$linkedPages = array();
 
 		// if the user has pages from NS_MAIN in their watchlist then find all
