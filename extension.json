@@ -184,7 +184,7 @@
 		"WatchAnalyticsPageScoreNamespaces": [0, 1],
 		"WatchAnalyticsWatchQualityColors": [5, 1.5],
 		"WatchAnalyticsReviewStatusColors": [4, 2],
-		"$wgWatchSuggestionsNamespaces": 0
+		"WatchSuggestionsNamespaces": [0]
 	},
 	"manifest_version": 1
 }

@@ -59,6 +59,7 @@ class WatchSuggest {
 
 		$html = '';
 
+		global $wgWatchSuggestionsNamespaces;
 		// gets id, NS and title of all pages in users watchlist in NS_MAIN
 		$userWatchlist = $this->getUserWatchlist( $this->mUser, $wgWatchSuggestionsNamespaces );
 		$linkedPages = array();
