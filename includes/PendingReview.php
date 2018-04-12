@@ -99,7 +99,7 @@ class PendingReview {
 
 			$revResults = $dbr->select(
 				array( 'r' => 'revision' ),
-				array( '*' ),
+				Revision::selectFields(),
 				// array(
 				// 	'r.rev_id AS rev_id',
 				// 	'r.rev_comment AS rev_comment',
@@ -264,7 +264,7 @@ class PendingReview {
 		// are moved without leaving a redirect behind.
 		$logResults = $dbr->select(
 			array( 'l' => 'logging' ),
-			array( '*' ),
+			Revision::selectFields(),
 			"l.log_title=$title AND l.log_namespace=$ns AND l.log_timestamp>=$notificationTimestamp
 				AND l.log_type IN ('delete','move')",
 			__METHOD__,
