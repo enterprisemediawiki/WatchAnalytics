@@ -198,9 +198,9 @@ class SpecialWatchAnalytics extends SpecialPage {
 		$dbr = wfGetDB( DB_SLAVE );
 
 		// Load the module for the D3.js force directed graph
-		$wgOut->addModules( array( 'ext.watchanalytics.forcegraph' ) );
+		$wgOut->addModules( 'ext.watchanalytics.forcegraph.scripts' );
 		// Load the styles for the D3.js force directed graph
-		$wgOut->addModuleStyles( 'ext.watchanalytics.forcegraph' );
+		$wgOut->addModuleStyles( 'ext.watchanalytics.forcegraph.styles' );
 
 		// SELECT
 		// 	watchlist.wl_title AS title,

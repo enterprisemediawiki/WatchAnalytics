@@ -99,7 +99,8 @@ class WatchAnalyticsHooks {
 
 			$pageScore = new PageScore( $title );
 			$out->addScript( $pageScore->getPageScoreTemplate() );
-			$out->addModules( array( 'ext.watchanalytics.pagescores' ) );
+			$out->addModules( 'ext.watchanalytics.pagescores.scripts' );
+			$out->addModuleStyles( 'ext.watchanalytics.pagescores.styles' );
 		}
 
 
@@ -112,7 +113,10 @@ class WatchAnalyticsHooks {
 
 		// 	// display "unreview" button
 		// 	$out->addScript( $reviewHandler->getTemplate() );
-		// 	$out->addModules( array( 'ext.watchanalytics.reviewhandler' ) );
+		//  $wgOut->addModules( [
+		//    'ext.watchanalytics.reviewhandler.scripts',
+		//    'ext.watchanalytics.reviewhandler.styles'
+		//  ] );
 
 		// 	// record change in user/page stats
 		// 	WatchStateRecorder::recordReview( $user, $title );
@@ -258,7 +262,10 @@ class WatchAnalyticsHooks {
 
 			// display "unreview" button
 			$wgOut->addScript( $reviewHandler->getTemplate() );
-			$wgOut->addModules( array( 'ext.watchanalytics.reviewhandler' ) );
+			$wgOut->addModules( [
+				'ext.watchanalytics.reviewhandler.scripts',
+				'ext.watchanalytics.reviewhandler.styles'
+			] );
 
 			// record change in user/page stats
 			WatchStateRecorder::recordReview( $user, $title );

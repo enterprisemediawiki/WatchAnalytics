@@ -61,9 +61,8 @@
 			"position": "bottom",
 			"styles": "base/ext.watchanalytics.base.css"
 		},
-		"ext.watchanalytics.forcegraph": {
+		"ext.watchanalytics.forcegraph.scripts": {
 			"position": "bottom",
-			"styles": "forcegraph/ext.watchanalytics.forcegraph.css",
 			"scripts": [
 				"forcegraph/ext.watchanalytics.circlesort.js",
 				"forcegraph/ext.watchanalytics.forcegraph.js"
@@ -77,17 +76,24 @@
 				"d3.js"
 			]
 		},
+		"ext.watchanalytics.forcegraph.styles": {
+			"position": "bottom",
+			"styles": "forcegraph/ext.watchanalytics.forcegraph.css"
+		},
 		"ext.watchanalytics.specials": {
 			"position": "bottom",
 			"styles": "specials/ext.watchanalytics.specials.css"
 		},
-		"ext.watchanalytics.pendingreviews": {
+		"ext.watchanalytics.pendingreviews.scripts": {
 			"position": "bottom",
-			"styles": "pendingreviews/ext.watchanalytics.pendingreviews.css",
 			"scripts": "pendingreviews/ext.watchanalytics.pendingreviews.js",
 			"dependencies": [
 				"mediawiki.Title"
 			]
+		},
+		"ext.watchanalytics.pendingreviews.styles": {
+			"position": "bottom",
+			"styles": "pendingreviews/ext.watchanalytics.pendingreviews.css"
 		},
 		"underscore.js": {
 			"position": "bottom",
@@ -110,19 +116,21 @@
 				"jquery.effects.shake"
 			]
 		},
-		"ext.watchanalytics.pagescores": {
+		"ext.watchanalytics.pagescores.scripts": {
 			"position": "bottom",
-			"styles": "pagescores/pagescores.css",
-			"scripts": [
-				"pagescores/pagescores.js"
-			]
+			"scripts": "pagescores/pagescores.js"
 		},
-		"ext.watchanalytics.reviewhandler": {
+		"ext.watchanalytics.pagescores.styles": {
 			"position": "bottom",
-			"styles": "reviewhandler/reviewhandler.css",
-			"scripts": [
-				"reviewhandler/reviewhandler.js"
-			]
+			"styles": "pagescores/pagescores.css"
+		},
+		"ext.watchanalytics.reviewhandler.scripts": {
+			"position": "bottom",
+			"scripts": "reviewhandler/reviewhandler.js"
+		},
+		"ext.watchanalytics.reviewhandler.styles": {
+			"position": "bottom",
+			"styles": "reviewhandler/reviewhandler.css"
 		},
 		"ext.watchanalytics.charts": {
 			"position": "bottom",

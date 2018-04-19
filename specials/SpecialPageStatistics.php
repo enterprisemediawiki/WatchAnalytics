@@ -48,7 +48,7 @@ class SpecialPageStatistics extends SpecialPage {
 			if ( $unReviewTimestamp ) {
 				$rh = new ReviewHandler( $wgUser, $this->mTitle );
 				$rh->resetNotificationTimestamp( $unReviewTimestamp );
-				$wgOut->addModuleStyles( array( 'ext.watchanalytics.reviewhandler' ) );
+				$wgOut->addModuleStyles( array( 'ext.watchanalytics.reviewhandler.styles' ) );
 				$wgOut->addHTML( $this->unReviewMessage() );
 			}
 
@@ -68,7 +68,7 @@ class SpecialPageStatistics extends SpecialPage {
 
 	public function getPageHeader() {
 		global $wgOut;
-		$wgOut->addModuleStyles( array( 'ext.watchanalytics.pagescores' ) );
+		$wgOut->addModuleStyles( array( 'ext.watchanalytics.pagescores.styles' ) );
 
 
 		$pageScore = new PageScore( $this->mTitle );
@@ -118,9 +118,9 @@ class SpecialPageStatistics extends SpecialPage {
 		$dbr = wfGetDB( DB_SLAVE );
 		$html = '';
 		// Load the module for the D3.js force directed graph
-		// $wgOut->addModules( array( 'ext.watchanalytics.forcegraph' ) );
+		// $wgOut->addModules( 'ext.watchanalytics.forcegraph.scripts' );
 		// Load the styles for the D3.js force directed graph
-		// $wgOut->addModuleStyles( 'ext.watchanalytics.forcegraph' );
+		// $wgOut->addModuleStyles( 'ext.watchanalytics.forcegraph.styles' );
 
 
 		// SELECT
