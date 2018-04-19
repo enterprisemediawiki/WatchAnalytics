@@ -107,7 +107,7 @@ class SpecialPendingReviews extends SpecialPage {
 		$this->setPendingReviewsUser();
 
 		// add pending reviews JS (and CSS, but need to explicitly call it below)
-		$wgOut->addModules( 'ext.watchanalytics.pendingreviews' );
+		$wgOut->addModules( 'ext.watchanalytics.pendingreviews.scripts' );
 
 		// load styles for watch analytics special pages
 		// Note: doing $out->addModules( ... ) instead of the two separate
@@ -115,7 +115,7 @@ class SpecialPendingReviews extends SpecialPage {
 		// apply late. This looks bad.
 		$wgOut->addModuleStyles( array(
 			'ext.watchanalytics.specials',
-			'ext.watchanalytics.pendingreviews',
+			// 'ext.watchanalytics.pendingreviews.styles',
 		) );
 
 		// how many reviews to display
