@@ -126,11 +126,11 @@
 		},
 		"ext.watchanalytics.reviewhandler.scripts": {
 			"position": "bottom",
-			"styles": "reviewhandler/reviewhandler.css"
+			"scripts": "reviewhandler/reviewhandler.js"
 		},
 		"ext.watchanalytics.reviewhandler.styles": {
 			"position": "bottom",
-			"scripts": "reviewhandler/reviewhandler.js"
+			"styles": "reviewhandler/reviewhandler.css"
 		},
 		"ext.watchanalytics.charts": {
 			"position": "bottom",

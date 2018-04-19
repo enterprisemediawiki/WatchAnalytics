@@ -100,6 +100,7 @@ class WatchAnalyticsHooks {
 			$pageScore = new PageScore( $title );
 			$out->addScript( $pageScore->getPageScoreTemplate() );
 			$out->addModules( 'ext.watchanalytics.pagescores.scripts' );
+			$out->addModuleStyles( 'ext.watchanalytics.pagescores.styles' );
 		}
 
 

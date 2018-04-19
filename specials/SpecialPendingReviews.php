@@ -113,10 +113,10 @@ class SpecialPendingReviews extends SpecialPage {
 		// Note: doing $out->addModules( ... ) instead of the two separate
 		// functions causes the CSS to load later, which makes the page styles
 		// apply late. This looks bad.
-		$wgOut->addModuleStyles( array(
+		$wgOut->addModuleStyles( [
 			'ext.watchanalytics.specials',
-			// 'ext.watchanalytics.pendingreviews.styles',
-		) );
+			'ext.watchanalytics.pendingreviews.styles',
+		] );
 
 		// how many reviews to display
 		$this->setReviewLimit();
