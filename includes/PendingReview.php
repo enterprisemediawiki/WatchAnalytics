@@ -264,7 +264,20 @@ class PendingReview {
 		// are moved without leaving a redirect behind.
 		$logResults = $dbr->select(
 			array( 'l' => 'logging' ),
-			Revision::selectFields(),
+			[
+				'log_id',
+				'log_type',
+				'log_action',
+				'log_timestamp',
+				'log_user',
+				'log_user_text',
+				'log_namespace',
+				'log_title',
+				'log_page',
+				'log_comment',
+				'log_params',
+				'log_deleted',
+			],
 			"l.log_title=$title AND l.log_namespace=$ns AND l.log_timestamp>=$notificationTimestamp
 				AND l.log_type IN ('delete','move')",
 			__METHOD__,
