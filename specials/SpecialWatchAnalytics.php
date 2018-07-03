@@ -96,14 +96,14 @@ class SpecialWatchAnalytics extends SpecialPage {
 		// 	)
 		// );
 
-		$res = $dbr->query( '
+		$res = $dbr->query( "
 			SELECT
 				COUNT(*) AS num_watches,
-				SUM( IF(watchlist.wl_notificationtimestamp IS NULL, 0, 1) ) AS num_pending,
-				SUM( IF(watchlist.wl_notificationtimestamp IS NULL, 0, 1) ) * 100 / COUNT(*) AS percent_pending
-			FROM watchlist
-			INNER JOIN page ON page.page_namespace = watchlist.wl_namespace AND page.page_title = watchlist.wl_title;
-		' );
+				SUM( IF({$GLOBALS['wgDBprefix']}watchlist.wl_notificationtimestamp IS NULL, 0, 1) ) AS num_pending,
+				SUM( IF({$GLOBALS['wgDBprefix']}watchlist.wl_notificationtimestamp IS NULL, 0, 1) ) * 100 / COUNT(*) AS percent_pending
+			FROM {$GLOBALS['wgDBprefix']}watchlist
+			INNER JOIN {$GLOBALS['wgDBprefix']}page ON {$GLOBALS['wgDBprefix']}page.page_namespace = {$GLOBALS['wgDBprefix']}watchlist.wl_namespace AND {$GLOBALS['wgDBprefix']}page.page_title = {$GLOBALS['wgDBprefix']}watchlist.wl_title;
+		" );
 
 		$allWikiData = $dbr->fetchRow( $res );
 

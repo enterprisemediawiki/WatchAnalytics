@@ -89,7 +89,7 @@ class PageWatchesQuery extends WatchesQuery {
 		}
 
 		// add user watch scores join
-		$this->tables['user_watch_scores'] = '(
+		$this->tables['user_watch_scores'] = "(
 			SELECT
 				w2.wl_user AS user_name,
 				(
@@ -110,10 +110,10 @@ class PageWatchesQuery extends WatchesQuery {
 					1), 3)
 				) AS engagement_score
 
-			FROM watchlist AS w2
+			FROM {$GLOBALS['wgDBprefix']}watchlist AS w2
 			GROUP BY w2.wl_user
 
-		)';
+		)";
 		$this->join_conds['user_watch_scores'] = array(
 			'LEFT JOIN', 'user_watch_scores.user_name = w.wl_user'
 		);

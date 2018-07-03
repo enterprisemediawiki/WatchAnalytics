@@ -112,11 +112,11 @@ class WatchAnalyticsForgivePendingReviews extends Maintenance {
 		$reviewedBy = $this->getOption( 'reviewedby', $this->reviewedBy );
 
 		$query =
-			"UPDATE watchlist AS w
-			LEFT JOIN page AS p ON
+			"UPDATE {$GLOBALS['wgDBprefix']}watchlist AS w
+			LEFT JOIN {$GLOBALS['wgDBprefix']}page AS p ON
 				w.wl_title = p.page_title
 				AND w.wl_namespace = p.page_namespace
-			LEFT JOIN user AS u ON
+			LEFT JOIN {$GLOBALS['wgDBprefix']}user AS u ON
 				u.user_id = w.wl_user
 			SET wl_notificationtimestamp = NULL
 			WHERE
@@ -125,7 +125,7 @@ class WatchAnalyticsForgivePendingReviews extends Maintenance {
 				$usernames
 				AND (
 					SELECT COUNT(*)
-					FROM (SELECT * FROM watchlist) AS w2
+					FROM (SELECT * FROM {$GLOBALS['wgDBprefix']}watchlist) AS w2
 					WHERE
 						w.wl_namespace = w2.wl_namespace
 						AND w.wl_title = w2.wl_title

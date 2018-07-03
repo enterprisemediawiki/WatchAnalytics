@@ -96,8 +96,8 @@ class WatchAnalyticsParserFunctions {
 					MAX(TIMESTAMPDIFF(MINUTE, w.wl_notificationtimestamp, UTC_TIMESTAMP())) AS max_pending_minutes,
 					AVG(TIMESTAMPDIFF(MINUTE, w.wl_notificationtimestamp, UTC_TIMESTAMP())) AS avg_pending_minutes,
 					(SELECT group_concat(cl_to SEPARATOR ';') as subq_categories FROM categorylinks WHERE cl_from = p.page_id) AS categories
-				FROM `watchlist` `w`
-				RIGHT JOIN `page` `p` ON ((p.page_namespace=w.wl_namespace AND p.page_title=w.wl_title))
+				FROM `{$GLOBALS['wgDBprefix']}watchlist` `w`
+				RIGHT JOIN `{$GLOBALS['wgDBprefix']}page` `p` ON ((p.page_namespace=w.wl_namespace AND p.page_title=w.wl_title))
 				WHERE
 					p.page_namespace = 0
 					AND p.page_is_redirect = 0
@@ -173,17 +173,17 @@ class WatchAnalyticsParserFunctions {
 					redir_page.page_id AS redir_id,
 					(
 						SELECT COUNT(*)
-						FROM watchlist AS watch
+						FROM {$GLOBALS['wgDBprefix']}watchlist AS watch
 						WHERE
 							watch.wl_namespace = p.page_namespace
 							AND watch.wl_title = p.page_title
 					) AS watches
-				FROM wiretap AS w
-				INNER JOIN page AS p ON
+				FROM {$GLOBALS['wgDBprefix']}wiretap AS w
+				INNER JOIN {$GLOBALS['wgDBprefix']}wage AS p ON
 					p.page_id = w.page_id
-				LEFT JOIN redirect AS red ON
+				LEFT JOIN {$GLOBALS['wgDBprefix']}redirect AS red ON
 					red.rd_from = p.page_id
-				LEFT JOIN page AS redir_page ON
+				LEFT JOIN {$GLOBALS['wgDBprefix']}page AS redir_page ON
 					red.rd_namespace = redir_page.page_namespace
 					AND red.rd_title = redir_page.page_title
 				WHERE
@@ -204,11 +204,11 @@ class WatchAnalyticsParserFunctions {
 						SUM( IF(w.wl_user = $wgUserId, 1, 0) ) AS wg_user_watches,
 						p.page_counter / SUM( IF(w.wl_title IS NOT NULL, 1, 0) ) AS view_watch_ratio
 					FROM
-						watchlist AS w
-					LEFT JOIN page AS p ON
+						{$GLOBALS['wgDBprefix']}watchlist AS w
+					LEFT JOIN {$GLOBALS['wgDBprefix']}page AS p ON
 						w.wl_title = p.page_title
 						AND w.wl_namespace = p.page_namespace
-					LEFT JOIN revision AS r ON
+					LEFT JOIN {$GLOBALS['wgDBprefix']}revision AS r ON
 						r.rev_id = p.page_latest
 					WHERE
 						p.page_namespace = $namespace
