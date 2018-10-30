@@ -11,6 +11,7 @@
 	"pendingreviews": "Pending reviews",
 	"watchanalytics": "Watch analytics",
 	"pagestatistics": "Page statistics",
+  "clearpendingreviews": "Clear pending reviews",
 	"pendingreviews-user-page": "Pending reviews for User:$1",
 	"watchanalytics-pages-specialpage": "Page watch statistics",
 	"watchanalytics-users-specialpage": "User watch statistics",
@@ -116,4 +117,3 @@
 	"pendingreviews-watch-suggestion-watchlink": "Watch"
 
 }
-
