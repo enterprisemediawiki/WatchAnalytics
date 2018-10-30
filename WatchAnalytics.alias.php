@@ -13,4 +13,5 @@ $specialPageAliases = array();
 $specialPageAliases['en'] = array(
 	'WatchAnalytics' => array( 'WatchAnalytics' ),
 	'PendingReviews' => array( 'PendingReviews' ),
+	'PageStatistics' => array( 'PageStatistics' ),
 );
