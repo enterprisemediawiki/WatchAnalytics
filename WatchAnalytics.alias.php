@@ -13,5 +13,6 @@ $specialPageAliases = array();
 $specialPageAliases['en'] = array(
 	'WatchAnalytics' => array( 'WatchAnalytics' ),
 	'PendingReviews' => array( 'PendingReviews' ),
-	'ClearPendingReviews' => array( 'ClearPendingReviews' )
+	'ClearPendingReviews' => array( 'ClearPendingReviews' ),
+	'PageStatistics' => array( 'PageStatistics' ),
 );

@@ -31,31 +31,31 @@ class SpecialClearPendingReviews extends SpecialPage {
 		$output->addHTML('<button type="button" action="$action" method="post">Clear Pending Reviews</button>');
 
 		$dbw = wfGetDB( DB_MASTER );
-		// $res = $dbw->select(
-    //   array(
-    //     'tables' => array(
-    //       'w' => 'watchlist',
-    //       'p' => 'page',
-    //       'c' => 'categorylinks',
-    //     ),
-    //     'fields' => array(
-    //       'w.*',
-    //     ),
-    //     'join_conds' => array(
-    //       'p' => array(
-    //         'JOIN', 'w.wl_title=p.page_title'
-    //       ),
-    //       'c' => array(
-    //         'LEFT OUTER JOIN', 'c.cl_from = p.page_id'
-    //       ),
-    //     ),
-    //     'conds' => "c.cl_to => 'Test'",
-    //   )
-    // );
-    //
-    // foreach ($res as $value) {
-    //   $output->addHTML($value);
-    // }
+		$res = $dbw->select(
+      array(
+        'tables' => array(
+          'w' => 'watchlist',
+          'p' => 'page',
+          'c' => 'categorylinks',
+        ),
+        'fields' => array(
+          'w.*',
+        ),
+        'join_conds' => array(
+          'p' => array(
+            'LEFT JOIN', 'w.wl_title=p.page_title'
+          ),
+          'c' => array(
+            'LEFT JOIN', 'c.cl_from = p.page_id'
+          ),
+        ),
+        'conds' => "c.cl_to=Test"
+      )
+    );
+
+    foreach ($res as $value) {
+      $output->addHTML($value);
+    }
   }
   // static public function removePendingReviewsByCategory($start, $category) {
   //   return array(
