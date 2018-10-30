@@ -80,34 +80,38 @@ class PendingReview {
 	 */
 	public $log;
 
-	public function __construct ( $row ) {
+	public function __construct( $row, Title $title = null ) {
 
-		$pageID = $row['page_id'];
 		$notificationTimestamp = $row['notificationtimestamp'];
 
-		if ( $pageID ) {
-			$title = Title::newFromID( $pageID );
+		$this->notificationTimestamp = $notificationTimestamp;
+		$this->numReviewers = intval( $row['num_reviewed'] );
+
+		if ( $title ) {
+			$pageID = $title->getArticleID();
+			$namespace = $title->getNamespace();
+			$titleDBkey = $title->getDBkey();
 		}
 		else {
-			$title = false;
+			$pageID = $row['page_id'];
+			$namespace = $row['namespace'];
+			$titleDBkey = $row['title'];
+
+			if ( $pageID ) {
+				$title = Title::newFromID( $pageID );
+			}
+			else {
+				$title = false;
+			}
 		}
 
 		if ( $pageID && $title->exists() ) {
 
 			$dbr = wfGetDB( DB_SLAVE );
 
-
 			$revResults = $dbr->select(
 				array( 'r' => 'revision' ),
 				Revision::selectFields(),
-				// array(
-				// 	'r.rev_id AS rev_id',
-				// 	'r.rev_comment AS rev_comment',
-				// 	'r.rev_user AS rev_user_id',
-				// 	'r.rev_user_text AS rev_user_name',
-				// 	'r.rev_timestamp AS rev_timestamp',
-				// 	'r.rev_len AS rev_len',
-				// ),
 				"r.rev_page=$pageID AND r.rev_timestamp>=$notificationTimestamp",
 				__METHOD__,
 				array( 'ORDER BY' => 'rev_timestamp ASC' ),
@@ -121,14 +125,6 @@ class PendingReview {
 			$logResults = $dbr->select(
 				array( 'l' => 'logging' ),
 				array( '*' ),
-				// array(
-				// 	'l.log_id AS log_id',
-				// 	'l.log_type AS log_type',
-				// 	'l.log_action AS log_action',
-				// 	'l.log_timestamp AS log_timestamp',
-				// 	'l.log_user AS log_user_id',
-				// 	'l.log_user_text AS log_user_name',
-				// ),
 				"l.log_page=$pageID AND l.log_timestamp>=$notificationTimestamp
 					AND l.log_type NOT IN ('interwiki','newusers','patrol','rights','upload')",
 				__METHOD__,
@@ -146,22 +142,20 @@ class PendingReview {
 
 		}
 		else {
-			$deletedNS = $row['namespace'];
-			$deletedTitle = $row['title'];
+			$deletedNS = $namespace;
+			$deletedTitle = $titleDBkey;
 			$deletionLog = $this->getDeletionLog( $deletedTitle, $deletedNS, $notificationTimestamp );
 			$logPending = false;
 			$revsPending = false;
 		}
 
 
-		$this->notificationTimestamp = $notificationTimestamp;
 		$this->title = $title;
 		$this->newRevisions = $revsPending;
 		$this->deletedTitle = $deletedTitle;
 		$this->deletedNS = $deletedNS;
 		$this->deletionLog = $deletionLog;
 		$this->log = $logPending;
-		$this->numReviewers = intval( $row['num_reviewed'] );
 
 	}
 
