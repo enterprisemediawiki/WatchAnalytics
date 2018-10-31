@@ -129,6 +129,8 @@ class SpecialPendingReviews extends SpecialPage {
 		$html .= '<table class="pendingreviews-list">';
 		$rowCount = 0;
 
+		$useApprovedRevs = class_exists( 'ApprovedRevs' );
+
 		// loop through pending reviews
 		foreach ( $this->pendingReviewList as $item ) {
 			// if the title exists, then the page exists (and hence it has not
@@ -136,6 +138,12 @@ class SpecialPendingReviews extends SpecialPage {
 			if ( $item->title ) {
 				$html .= $this->getStandardChangeRow( $item, $rowCount );
 			}
+
+			// if ApprovedRevs installed...
+			else if ( $useApprovedRevs && $item->log_action == 'pending_approval' ) {
+				$html .= $this->getApprovedRevsChangeRow( $item, $rowCount );
+			}
+
 			// page has been deleted (or moved w/o a redirect)
 			else {
 				$html .= $this->getDeletedPageRow( $item, $rowCount );
@@ -322,6 +330,27 @@ class SpecialPendingReviews extends SpecialPage {
 			. '</strong>';
 
 		return $this->getRowHTML( $item, $rowCount, $displayTitle, $acceptDeletionButton, $talkToDeleterButton, $changes );
+	}
+
+	/**
+	 * Generates row for a pending ApprovedRevs revision.
+	 *
+	 * @param PendingReview $item
+	 * @param int $rowCount used to determine if the row is odd or even
+	 * @return string HTML for row
+	 */
+	public function getApprovedRevsChangeRow ( PendingReview $item, $rowCount ) {
+
+		$changes = '<ul><li>' . wfMessage( 'pendingreviews-pending-approvedrev' )->parse() . '</li></ul>';
+
+		$buttonOne = '';
+
+		$historyButton = $this->getHistoryButton( $item );
+
+		$displayTitle = '<strong>' . $item->title->getFullText() . '</strong>';
+
+		return $this->getRowHTML( $item, $rowCount, $displayTitle, $buttonOne, $historyButton, $changes );
+
 	}
 
 	/**
