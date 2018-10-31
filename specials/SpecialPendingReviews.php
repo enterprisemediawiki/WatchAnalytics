@@ -348,7 +348,12 @@ class SpecialPendingReviews extends SpecialPage {
 
 		$historyButton = $this->getHistoryButton( $item );
 
-		$displayTitle = '<strong>' . $item->title->getFullText() . '</strong>';
+		$displayTitle = '<strong>' .
+			wfMessage(
+				'pendingreviews-pending-approvedrev-title',
+				$item->title->getFullText()
+			)->parse() .
+			'</strong>';
 
 		return $this->getRowHTML( $item, $rowCount, $displayTitle, $buttonOne, $historyButton, $changes );
 
