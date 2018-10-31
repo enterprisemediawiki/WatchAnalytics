@@ -321,58 +321,6 @@ class PendingReview {
 
 	}
 
-	/**
-	 * Get an array of pages user can approve that require approvals
-	 * @param User $user
-	 * @return Array
-	 */
-	static public function getUserPendingApprovals ( User $user ) {
-
-		$dbr = wfGetDB( DB_REPLICA );
-
-		$queryInfo = ApprovedRevs::getQueryInfoPageApprovals( 'notlatest' );
-		$latestNotApproved = $dbr->select(
-			$queryInfo['tables'],
-			$queryInfo['fields'],
-			$queryInfo['conds'],
-			__METHOD__,
-			$queryInfo['options'],
-			$queryInfo['join_conds']
-		);
-		$pagesUserCanApprove = [];
-
-		while ( $page = $latestNotApproved->fetchRow() ) {
-
-			// $page with keys id, rev_id, latest_id
-			$title = Title::newFromID( $page['id'] );
-
-			// Remove this if Yaron merges https://gerrit.wikimedia.org/r/c/mediawiki/extensions/ApprovedRevs/+/470620
-			if ( is_bool( ApprovedRevs::$mUserCanApprove ) ) {
-				unset( ApprovedRevs::$mUserCanApprove );
-			}
-
-			if ( ApprovedRevs::userCanApprove( $user, $title ) ) {
-
-				// FIXME: May want to get these in there so PendingReviews can
-				// show the list of revs in the approval.
-				//     'approved_rev_id' => $page['rev_id']
-				//     'latest_rev_id' => $page['latest_id']
-				$pagesUserCanApprove = new self(
-					[
-						'log_action' => 'pending_approval', // fake log action
-						'notificationtimestamp' => null,
-						'num_reviewed' => 0, // if page has pending approval, zero people have approved
-					],
-					$title
-				);
-
-			}
-
-		}
-
-		return $pagesUserCanApprove;
-
-	}
 
 	/**
 	 * Clears a pending reviews of a particular page for a particular user.
