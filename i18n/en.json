@@ -1,17 +1,20 @@
 {
-    "@metadata": {
-        "authors": [
-            "James Montalvo"
-        ]
-    },
-    "watchanalytics-desc": "Encouraging good distribution of watchers",
+		"@metadata": {
+				"authors": [
+						"James Montalvo"
+				]
+		},
+	"watchanalytics-desc": "Encouraging good distribution of watchers",
 	"watchanalytics-personal-url": "Pending reviews ($1)",
 	"watchanalytics-personal-url-old": "{{PLURAL:$1|1 review|$1 reviews}} (oldest: {{PLURAL:$2|1 day|$2 days}})",
 	"watchanalytics-view": "View:",
 	"pendingreviews": "Pending reviews",
 	"watchanalytics": "Watch analytics",
 	"pagestatistics": "Page statistics",
-  "clearpendingreviews": "Clear pending reviews",
+	"clearpendingreviews": "Clear pending reviews",
+	"clearpendingreview-category": "Select page category",
+	"clearpendingreview-start-time": "Start time",
+	"clearpendingreview-submit": "Submit",
 	"pendingreviews-user-page": "Pending reviews for User:$1",
 	"watchanalytics-pages-specialpage": "Page watch statistics",
 	"watchanalytics-users-specialpage": "User watch statistics",
