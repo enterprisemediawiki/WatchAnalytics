@@ -349,6 +349,7 @@ class SpecialPendingReviews extends SpecialPage {
 		$historyButton = $this->getHistoryButton( $item );
 
 		$displayTitle = '<strong>' .
+			'<span style="color:#00b050;">★</span> ' .
 			wfMessage(
 				'pendingreviews-pending-approvedrev-title',
 				$item->title->getFullText()
