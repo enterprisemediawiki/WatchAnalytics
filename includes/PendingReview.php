@@ -352,17 +352,20 @@ class PendingReview {
 			}
 
 			if ( ApprovedRevs::userCanApprove( $user, $title ) ) {
-				$pagesUserCanApprove[] = [
-					'page_id' => $page['id'],
-					'log_action' => 'pending_approval', // fake log action
-					'namespace' => $title->getNamespace(),
-					'title' => $title->getDBkey(),
-					'notificationtimestamp' => null,
-					'num_reviewed' => 0, // if page has pending approval, zero people have approved
-					'approved_rev_id' => $page['rev_id'],
-					'latest_rev_id' => $page['latest_id'],
-					'title_object' => $title,
-				];
+
+				// FIXME: May want to get these in there so PendingReviews can
+				// show the list of revs in the approval.
+				//     'approved_rev_id' => $page['rev_id']
+				//     'latest_rev_id' => $page['latest_id']
+				$pagesUserCanApprove = new self(
+					[
+						'log_action' => 'pending_approval', // fake log action
+						'notificationtimestamp' => null,
+						'num_reviewed' => 0, // if page has pending approval, zero people have approved
+					],
+					$title
+				);
+
 			}
 
 		}
