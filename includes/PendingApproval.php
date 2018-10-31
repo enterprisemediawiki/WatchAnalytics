@@ -92,7 +92,7 @@ class PendingApproval extends PendingReview {
 				// show the list of revs in the approval.
 				//     'approved_rev_id' => $page['rev_id']
 				//     'latest_rev_id' => $page['latest_id']
-				$pagesUserCanApprove = new self(
+				$pagesUserCanApprove[] = new self(
 					[
 						'notificationtimestamp' => null,
 						'num_reviewed' => 0, // if page has pending approval, zero people have approved

@@ -248,7 +248,7 @@ class PendingReview {
 		// If ApprovedRevs is installed, append any pages in need of approvals
 		// to the front of the Pending Reviews list
 		if ( class_exists( 'ApprovedRevs' ) ) {
-			$pending = array_merge( self::getUserPendingApprovals( $user ), $pending );
+			$pending = array_merge( PendingApproval::getUserPendingApprovals( $user ), $pending );
 		}
 
 		return $pending;
