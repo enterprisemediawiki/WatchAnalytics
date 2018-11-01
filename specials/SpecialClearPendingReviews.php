@@ -1,4 +1,3 @@
-
 <?php
 /**
 * ClearPendingReviews SpecialPage
@@ -9,7 +8,7 @@
 
 class SpecialClearPendingReviews extends FormSpecialPage {
 	public function __construct() {
-		parent::__construct( 'ClearPendingReviews' );
+		parent::__construct( 'ClearPendingReviews', 'clearpendingreviews' );
 	}
 
 	protected function getFormFields() {
@@ -17,16 +16,41 @@ class SpecialClearPendingReviews extends FormSpecialPage {
 			'category' => [
 				'label-message' => 'clearpendingreview-category',
 				'type' => 'text',
-				'required' => 'false',
+			],
+			'page' => [
+				'label-message' => 'clearpendingreview-page-title',
+				'type' => 'text',
 			],
 			'start' => [
 				'label-message' => 'clearpendingreview-start-time',
 				'type' => 'text',
 				'required' => 'true',
+				'validation-callback' => function ( $val ) {
+					return $this->validateISO( $val );
+				},
+			],
+			'end' => [
+				'label-message' => 'clearpendingreview-end-time',
+				'type' => 'text',
+				'required' => 'true',
+				'validation-callback' => function ( $val ) {
+					return $this->validateISO( $val );
+				},
 			],
 		];
 	}
 
+	public function validateISO( $val ) {
+		if ( !is_string( $val ) ) {
+			return false;
+		}
+
+		$dateTime = DateTime::createFromFormat( 'YmdHis', $val );
+		if ( $dateTime ) {
+				return $dateTime->format( 'YmdHis' ) === $val;
+		}
+		return false;
+	}
 	/**
 	*TO DO
 	*Add field validation to protect
@@ -42,25 +66,30 @@ class SpecialClearPendingReviews extends FormSpecialPage {
 	*/
 
 	/**
-	 * @param HTMLForm $form
-	 */
+	* @param HTMLForm $form
+	*/
 	protected function alterForm( HTMLForm $form ) {
 		$form->setSubmitTextMsg( 'clearpendingreview-submit' );
 	}
 
 	/**
-	*TO DO
+	* @param array $data
+	* @return Status
 	*/
-
-	/**
- * @param array $data
- * @return Status
- */
 	public function onSubmit( array $data ) {
-		$currentTime = date("YmdHis");
 		$dbw = wfGetDB( DB_MASTER );
 		$category = preg_replace('/\s+/', '', $data['category']);
+		$page = preg_replace('/\s+/', '_', $data['page']);
 		$start = preg_replace('/\s+/', '', $data['start']);
+		$end = preg_replace('/\s+/', '', $data['end']);
+		$conditions = '';
+
+		if ($category) {
+			$conditions .= "c.cl_to='$category' AND ";
+		}
+		if ($page) {
+			$conditions .= "w.wl_title LIKE '$page%' AND ";
+		}
 
 		$res = $dbw->select(
 				array(
@@ -71,7 +100,9 @@ class SpecialClearPendingReviews extends FormSpecialPage {
 				array(
 					'w.*'
 				),
-				"c.cl_to='$category' AND w.wl_notificationtimestamp IS NOT NULL AND w.wl_notificationtimestamp < $currentTime AND w.wl_notificationtimestamp > $start",
+				"$conditions w.wl_notificationtimestamp IS NOT NULL AND w.wl_notificationtimestamp < $end AND w.wl_notificationtimestamp > $start",
+				__METHOD__,
+				'DISTINCT',
 				array(
 					'p' => array(
 						'LEFT JOIN', 'w.wl_title=p.page_title'
@@ -81,9 +112,11 @@ class SpecialClearPendingReviews extends FormSpecialPage {
 					)
 				)
 			);
+
 		$request = $this->getRequest();
 		$output = $this->getOutput();
 		$this->setHeaders();
+		$output->addHTML("The following pages will be cleared:");
 		$output->addHTML("<table>");
 		$output->addHTML("<tr><th>ID</th><th>User</th><th>Namespace</th><th>Title</th><th>Notification TimeStamp</th></tr>");
 		foreach ($res as $value) {
@@ -96,9 +129,6 @@ class SpecialClearPendingReviews extends FormSpecialPage {
 			$output->addHTML("</tr>");
 		}
 		$output->addHTML("</table>");
-
-		$output->addHTML("<b>Start time:</b>".$start."<br>");
-		$output->addHTML("<b>End time:</b>".$currentTime);
 		return Status::newGood();
 	}
 }
