@@ -12,7 +12,7 @@
 	"watchanalytics": "Watch analytics",
 	"pagestatistics": "Page statistics",
 	"clearpendingreviews": "Clear pending reviews",
-	"clearpendingreview-category": "Select page category:",
+	"clearpendingreview-category": "Select page category (optional):",
 	"clearpendingreview-start-time": "Start time:",
 	"clearpendingreview-end-time": "End time:",
 	"clearpendingreview-page-title": "Page title like (optional):",
