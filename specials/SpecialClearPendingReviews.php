@@ -167,4 +167,11 @@ class SpecialClearPendingReviews extends FormSpecialPage {
 			$output->addHTML("</table>");
 		}
 	}
+
+	/**
+	 * @inheritDoc
+	 */
+	protected function getDisplayFormat() {
+		return 'ooui';
+	}
 }
