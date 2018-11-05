@@ -69,14 +69,42 @@ class SpecialClearPendingReviews extends FormSpecialPage {
 	* @param HTMLForm $form
 	*/
 	protected function alterForm( HTMLForm $form ) {
-		$form->setSubmitTextMsg( 'clearpendingreview-submit' );
+		$form->setSubmitTextMsg( 'clearpendingreview-preview' );
+		$form->addButton( array('name' => 'continue', 'value' => 'click to continue', 'type' => 'submit' ) );
 	}
 
-	/**
-	* @param array $data
-	* @return Status
-	*/
-	public function onSubmit( array $data ) {
+	public static function doSearchQuery( array $data ) {
+		$dbw = wfGetDB( DB_REPLICA );
+		$category = preg_replace('/\s+/', '', $data['category']);
+		$page = preg_replace('/\s+/', '_', $data['page']);
+		$start = preg_replace('/\s+/', '', $data['start']);
+		$end = preg_replace('/\s+/', '', $data['end']);
+		$conditions = '';
+
+		if ($category) {
+			$conditions .= "c.cl_to='$category' AND ";
+		}
+		if ($page) {
+			$conditions .= "w.wl_title LIKE '$page%' AND ";
+		}
+
+		$tables = array( 'w' => 'watchlist', 'p' => 'page', 'c' => 'categorylinks' );
+		$vars = array( 'w.*' );
+		$conditions .= "w.wl_notificationtimestamp IS NOT NULL AND w.wl_notificationtimestamp < $end AND w.wl_notificationtimestamp > $start";
+		$join_conds = array(
+			'p' => array(
+				'LEFT JOIN', 'w.wl_title=p.page_title'
+			),
+			'c' => array(
+				'LEFT JOIN', 'c.cl_from=p.page_id'
+			)
+		);
+
+		return $dbw->select( $tables, $vars, $conditions, __METHOD__, 'DISTINCT', $join_conds );
+
+	}
+
+	public static function doClearQuery( array $data ) {
 		$dbw = wfGetDB( DB_MASTER );
 		$category = preg_replace('/\s+/', '', $data['category']);
 		$page = preg_replace('/\s+/', '_', $data['page']);
@@ -91,44 +119,52 @@ class SpecialClearPendingReviews extends FormSpecialPage {
 			$conditions .= "w.wl_title LIKE '$page%' AND ";
 		}
 
-		$res = $dbw->select(
-				array(
-					'w' => 'watchlist',
-					'p' => 'page',
-					'c' => 'categorylinks',
-				),
-				array(
-					'w.*'
-				),
-				"$conditions w.wl_notificationtimestamp IS NOT NULL AND w.wl_notificationtimestamp < $end AND w.wl_notificationtimestamp > $start",
-				__METHOD__,
-				'DISTINCT',
-				array(
-					'p' => array(
-						'LEFT JOIN', 'w.wl_title=p.page_title'
-					),
-					'c' => array(
-						'LEFT JOIN', 'c.cl_from=p.page_id'
-					)
-				)
-			);
+		$tables = array( 'w' => 'watchlist', 'p' => 'page', 'c' => 'categorylinks' );
+		$values = array( 'w.wl_notificationtimestamp' => 'NULL' );
+		$conditions .= "w.wl_notificationtimestamp IS NOT NULL AND w.wl_notificationtimestamp < $end AND w.wl_notificationtimestamp > $start";
+		$join_conds = array(
+			'p' => array(
+				'LEFT JOIN', 'w.wl_title=p.page_title'
+			),
+			'c' => array(
+				'LEFT JOIN', 'c.cl_from=p.page_id'
+			)
+		);
+
+		//FIXME this query doesn't work
+		return $dbw->update( $tables, $values, $conditions, __METHOD__, 'DISTINCT', $join_conds );
+	}
+
+	/**
+	* @param array $data
+	* @return Status
+	*/
+
+	public function onSubmit( array $data ) {
 
 		$request = $this->getRequest();
 		$output = $this->getOutput();
 		$this->setHeaders();
-		$output->addHTML("The following pages will be cleared:");
-		$output->addHTML("<table>");
-		$output->addHTML("<tr><th>ID</th><th>User</th><th>Namespace</th><th>Title</th><th>Notification TimeStamp</th></tr>");
-		foreach ($res as $value) {
-			$output->addHTML("<tr>");
-			$output->addHTML("<td>".$value->wl_id."</td>");
-			$output->addHTML("<td>".$value->wl_user."</td>");
-			$output->addHTML("<td>".$value->wl_namespace."</td>");
-			$output->addHTML("<td>".$value->wl_title."</td>");
-			$output->addHTML("<td>".$value->wl_notificationtimestamp."</td>");
-			$output->addHTML("</tr>");
+
+		if (isset($_POST['continue'])) {
+				$output->addHTML("<h3>Test</h3>");
+				$res = $this->doClearQuery( $data );
+				return Status::newGood();
+		} else {
+			$res = $this->doSearchQuery( $data );
+			$output->addHTML("<h3>The following pages will be cleared:</h3>");
+			$output->addHTML("<table class='wikitable' style='text-align: center'>");
+			$output->addHTML("<tr><th>ID</th><th>User</th><th>Namespace</th><th>Title</th><th>Notification TimeStamp</th></tr>");
+			foreach ($res as $value) {
+				$output->addHTML("<tr>");
+				$output->addHTML("<td>".$value->wl_id."</td>");
+				$output->addHTML("<td>".$value->wl_user."</td>");
+				$output->addHTML("<td>".$value->wl_namespace."</td>");
+				$output->addHTML("<td>".$value->wl_title."</td>");
+				$output->addHTML("<td>".$value->wl_notificationtimestamp."</td>");
+				$output->addHTML("</tr>");
+			}
+			$output->addHTML("</table>");
 		}
-		$output->addHTML("</table>");
-		return Status::newGood();
 	}
 }
