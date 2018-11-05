@@ -70,7 +70,7 @@ class SpecialClearPendingReviews extends FormSpecialPage {
 	*/
 	protected function alterForm( HTMLForm $form ) {
 		$form->setSubmitTextMsg( 'clearpendingreview-preview' );
-		$form->addButton( array('name' => 'continue', 'value' => 'click to continue', 'type' => 'submit' ) );
+		$form->addButton( array('name' => 'continue', 'value' => $this->msg( 'clearpendingreview-clear' )->text(), 'type' => 'submit' ) );
 	}
 
 	public static function doSearchQuery( array $data ) {
