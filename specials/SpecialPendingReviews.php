@@ -386,7 +386,7 @@ class SpecialPendingReviews extends SpecialPage {
 			) );
 
 			$diffLink = Xml::element( 'a',
-				array( 'href' => $diffURL, 'class' => 'pendingreviews-green-button' ),
+				array( 'href' => $diffURL, 'class' => 'pendingreviews-green-button', 'target' => "_blank" ),
 				wfMessage(
 					'watchanalytics-pendingreviews-diff-revisions',
 					count( $item->newRevisions )
@@ -399,7 +399,7 @@ class SpecialPendingReviews extends SpecialPage {
 			$diffURL = $item->title->getLocalURL( array( 'oldid' => $latest->getId() ) );
 
 			$diffLink = Xml::element( 'a',
-				array( 'href' => $diffURL, 'class' => 'pendingreviews-green-button' ),
+				array( 'href' => $diffURL, 'class' => 'pendingreviews-green-button', 'target' => "_blank" ),
 				$this->msg( 'watchanalytics-pendingreviews-users-first-view' )->text()
 			);
 
@@ -418,7 +418,8 @@ class SpecialPendingReviews extends SpecialPage {
 		return Xml::element( 'a',
 			array(
 				'href' => $item->title->getLocalURL( array( 'action' => 'history' ) ),
-				'class' => 'pendingreviews-dark-blue-button'
+				'class' => 'pendingreviews-dark-blue-button',
+				'target' => "_blank"
 			),
 			wfMessage( 'watchanalytics-pendingreviews-history-link' )->text()
 		);
