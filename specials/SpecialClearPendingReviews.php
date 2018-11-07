@@ -120,7 +120,7 @@ class SpecialClearPendingReviews extends FormSpecialPage {
 		}
 
 		$tables = array( 'w' => 'watchlist', 'p' => 'page', 'c' => 'categorylinks' );
-		$values = array( 'w.wl_notificationtimestamp' => 'NULL' );
+		$vars = array( 'wl_id' );
 		$conditions .= "w.wl_notificationtimestamp IS NOT NULL AND w.wl_notificationtimestamp < $end AND w.wl_notificationtimestamp > $start";
 		$join_conds = array(
 			'p' => array(
@@ -131,8 +131,20 @@ class SpecialClearPendingReviews extends FormSpecialPage {
 			)
 		);
 
-		//FIXME this query doesn't work
-		return $dbw->update( $tables, $values, $conditions, __METHOD__, 'DISTINCT', $join_conds );
+		$results = $dbw->select( $tables, $vars, $conditions, __METHOD__, 'DISTINCT', $join_conds );
+
+		$pagesToClear = null;
+
+		foreach ($results as $row) {
+			$values = array('wl_notificationtimestamp' => null );
+			$conds = array( 'wl_id' => $row->wl_id );
+			$options = array();
+			$dbw->update( 'watchlist', $values, $conds, __METHOD__, $options );
+			$pagesToClear[] = $row->wl_id;
+		}
+
+		return $pagesToClear;
+
 	}
 
 	/**
@@ -149,6 +161,13 @@ class SpecialClearPendingReviews extends FormSpecialPage {
 		if (isset($_POST['continue'])) {
 				$output->addHTML("<h3>Test</h3>");
 				$res = $this->doClearQuery( $data );
+				$output->addHTML("<table class='wikitable' style='text-align: center'>");
+				foreach ($res as $value) {
+					$output->addHTML("<tr>");
+					$output->addHTML("<td>".$value."</td>");
+					$output->addHTML("</tr>");
+				}
+				$output->addHTML("</table>");
 				return Status::newGood();
 		} else {
 			$res = $this->doSearchQuery( $data );
