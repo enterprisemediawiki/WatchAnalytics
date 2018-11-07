@@ -171,18 +171,32 @@ class SpecialClearPendingReviews extends FormSpecialPage {
 				return Status::newGood();
 		} else {
 			$res = $this->doSearchQuery( $data );
+			$output->addHTML("<table class='wikitable' style='width:100%'>");
+			$output->addHTML("<tr>");
+			$output->addHTML("<td>");
 			$output->addHTML("<h3>The following pages will be cleared:</h3>");
-			$output->addHTML("<table class='wikitable' style='text-align: center'>");
-			$output->addHTML("<tr><th>ID</th><th>User</th><th>Namespace</th><th>Title</th><th>Notification TimeStamp</th></tr>");
+			$output->addHTML("<ul>");
 			foreach ($res as $value) {
-				$output->addHTML("<tr>");
-				$output->addHTML("<td>".$value->wl_id."</td>");
-				$output->addHTML("<td>".$value->wl_user."</td>");
-				$output->addHTML("<td>".$value->wl_namespace."</td>");
-				$output->addHTML("<td>".$value->wl_title."</td>");
-				$output->addHTML("<td>".$value->wl_notificationtimestamp."</td>");
-				$output->addHTML("</tr>");
+				$page = Title::makeTitle( $value->wl_namespace, $value->wl_title );
+				$pageLinkHtml = Linker::link( $page );
+				$output->addHTML("<li>".$pageLinkHtml."</li>");
 			}
+			$output->addHTML("</ul>");
+			$output->addHTML("</td>");
+			$output->addHTML("<td>");
+
+			$output->addHTML("<h3>The following people will be impacted:</h3>");
+			$output->addHTML("<ul>");
+			foreach ($res as $value) {
+				$user = User::newFromId( $value->wl_user );
+				$userTitleObj = $user->getUserPage();
+				$userLinkHtml = Linker::link( $userTitleObj );
+				// $output->addHTML("<td>".$value->wl_user."</td>");
+				$output->addHTML("<li>".$userLinkHtml."</li>");
+			}
+			$output->addHTML("</ul>");
+			$output->addHTML("</td>");
+			$output->addHTML("</tr>");
 			$output->addHTML("</table>");
 		}
 	}
