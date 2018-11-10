@@ -185,6 +185,16 @@
 			"WatchAnalyticsUpdaterHooks::onParserTestTables"
 		]
 	},
+	"LogTypes": [ "pendingreviews" ],
+	"LogNames": {
+			"pendingreviews": "pendingreviews"
+	},
+	"LogHeaders": {
+			"pendingreviews": "pendingreviews-header"
+	},
+	"LogActionsHandlers": {
+			"pendingreviews/*": "LogFormatter"
+	},
 	"config": {
 		"_prefix": "eg",
 		"WatchAnalyticsPageCounter": false,

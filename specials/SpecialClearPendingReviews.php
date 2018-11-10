@@ -68,7 +68,8 @@ class SpecialClearPendingReviews extends FormSpecialPage {
 	*/
 	protected function alterForm( HTMLForm $form ) {
 		$form->setSubmitTextMsg( 'clearpendingreview-preview' );
-		$form->addButton( array('name' => 'continue', 'value' => $this->msg( 'clearpendingreview-clear' )->text(), 'type' => 'submit' ) );
+		$form->addButton( array('name' => 'continue', 'value' =>
+		$this->msg( 'clearpendingreview-clear' )->text(), 'type' => 'submit' ) );
 		$form->addPreText('<b>Current time:</b> '.date('YmdHi'));
 	}
 
@@ -99,7 +100,13 @@ class SpecialClearPendingReviews extends FormSpecialPage {
 			)
 		);
 
-		return $dbw->select( $tables, $vars, $conditions, __METHOD__, 'DISTINCT', $join_conds );
+		$vars2 = array( 'wl_id' );
+
+		$pageIDs = $dbw->select( $tables, $vars2, $conditions, __METHOD__, 'DISTINCT', $join_conds );
+
+		$resultsTable = $dbw->select( $tables, $vars, $conditions, __METHOD__, 'DISTINCT', $join_conds );
+
+		return array( $resultsTable, $pageIDs );
 
 	}
 
@@ -167,9 +174,20 @@ class SpecialClearPendingReviews extends FormSpecialPage {
 					$output->addHTML("</tr>");
 				}
 				$output->addHTML("</table>");
+				$logEntry = new ManualLogEntry( 'pendingreviews', 'clearreivews' );
+				$logEntry->setPerformer( $this->getUser() );
+				$logEntry->setTarget( $this->getPageTitle() );
+				$logEntry->setParameters( [
+					'4::paramname' => '(Number of pages)',
+					'5::paramname' => '('.$data['category'].')',
+					'6::paramname' => '('.$data['page'].')',
+					] );
+				$logid = $logEntry->insert();
+				$logEntry->publish( $logid );
 				return Status::newGood();
 		} else {
-			$res = $this->doSearchQuery( $data );
+			$res = $this->doSearchQuery( $data )[0];
+			$pageIDs = $this->doSearchQuery( $data )[1];
 			$output->addHTML("<table class='wikitable' style='width:100%'>");
 			$output->addHTML("<tr>");
 			$output->addHTML("<td>");
