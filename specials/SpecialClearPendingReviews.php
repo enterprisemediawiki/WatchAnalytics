@@ -55,10 +55,8 @@ class SpecialClearPendingReviews extends FormSpecialPage {
 	*TO DO
 	*Add field validation to protect
 	**No malicious inputs allowed
-	**Validate entered time is real time
 	**Verify category entered exists on wiki
 	**Allow for wild card pagename entry in lieu of category
-	*Get rid of warning "Cannot modify header information"
 	*Allow for end time or just use current time
 	*Display current time in ISO on the page for reference
 	*Show number of pages/categories that will be cleared before clearpendingreview
@@ -71,6 +69,7 @@ class SpecialClearPendingReviews extends FormSpecialPage {
 	protected function alterForm( HTMLForm $form ) {
 		$form->setSubmitTextMsg( 'clearpendingreview-preview' );
 		$form->addButton( array('name' => 'continue', 'value' => $this->msg( 'clearpendingreview-clear' )->text(), 'type' => 'submit' ) );
+		$form->addPreText('<b>Current time:</b> '.date('YmdHi'));
 	}
 
 	public static function doSearchQuery( array $data ) {
