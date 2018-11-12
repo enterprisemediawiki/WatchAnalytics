@@ -6,74 +6,96 @@
 * @ingroup Extensions
 */
 
-class SpecialClearPendingReviews extends FormSpecialPage {
+class SpecialClearPendingReviews extends SpecialPage {
 	public function __construct() {
-		parent::__construct( 'ClearPendingReviews', 'clearpendingreviews' );
+		parent::__construct( 'ClearPendingReviews', 'clearreviews' );
 	}
 
-	protected function getFormFields() {
-		return [
-			'category' => [
-				'label-message' => 'clearpendingreview-category',
-				'type' => 'text',
-			],
-			'page' => [
-				'label-message' => 'clearpendingreview-page-title',
-				'type' => 'text',
-			],
-			'start' => [
-				'label-message' => 'clearpendingreview-start-time',
-				'type' => 'text',
-				'required' => 'true',
-				'validation-callback' => function ( $val ) {
-					return $this->validateISO( $val );
-				},
-			],
-			'end' => [
-				'label-message' => 'clearpendingreview-end-time',
-				'type' => 'text',
-				'required' => 'true',
-				'validation-callback' => function ( $val ) {
-					return $this->validateISO( $val );
-				},
-			],
-		];
-	}
+	public function execute( $par ) {
+		global $wgOut;
 
-	public function validateISO( $val ) {
-		if ( !is_string( $val ) ) {
-			return false;
+		if ( !$this->getUser()->isAllowed( 'clearreviews' ) ) {
+			throw new PermissionsError( 'clearreviews' );
 		}
 
-		$dateTime = DateTime::createFromFormat( 'YmdHis', $val );
+		$this->setHeaders();
+		$wgOut->addModules( 'ext.watchanalytics.clearpendingreviews.scripts' );
+		$output = $this->getOutput();
+
+		$formDescriptor = [
+				'start' => [
+					'section' => 'section1',
+					'label-message' => 'clearpendingreview-start-time',
+					'type' => 'text',
+					'required' => 'true',
+					'validation-callback' => [ $this, 'validateTime' ],
+				],
+				'end' => [
+					'section' => 'section1',
+					'label-message' => 'clearpendingreview-end-time',
+					'type' => 'text',
+					'required' => 'true',
+					'validation-callback' => [ $this, 'validateTime' ],
+					'help' => '<b>Current time:</b> '.date('YmdHis'),
+				],
+				'category' => [
+					'section' => 'section2',
+					'label-message' => 'clearpendingreview-category',
+					'type' => 'text',
+					'validation-callback' => [ $this, 'validateCategory' ],
+				],
+				'page' => [
+					'section' => 'section2',
+					'label-message' => 'clearpendingreview-page-title',
+					'type' => 'text',
+				],
+			];
+
+			$form = HTMLForm::factory( 'ooui', $formDescriptor, $this->getContext(), 'clearform' );
+
+			$form->setSubmitText( 'Preview' );
+			$form->setSubmitName( 'preview' );
+			$form->setSubmitCallback( [ $this, 'trySubmit' ] );
+			$form->show();
+
+	}
+
+	public function validateTime( $dateField, $allData ) {
+		if ( !is_string( $dateField ) ) {
+			return wfMessage( 'clearpendingreviews-date-invalid' )->inContentLanguage();
+		}
+
+		$dateTime = DateTime::createFromFormat( 'YmdHis', $dateField );
 		if ( $dateTime ) {
-				return $dateTime->format( 'YmdHis' ) === $val;
+				return $dateTime->format( 'YmdHis' ) === $dateField;
 		}
-		return false;
-	}
-	/**
-	*TO DO
-	*Add field validation to protect
-	**No malicious inputs allowed
-	**Verify category entered exists on wiki
-	**Allow for wild card pagename entry in lieu of category
-	*Allow for end time or just use current time
-	*Display current time in ISO on the page for reference
-	*Show number of pages/categories that will be cleared before clearpendingreview
-	*only allow sysop to do this, add new userright
-	*/
-
-	/**
-	* @param HTMLForm $form
-	*/
-	protected function alterForm( HTMLForm $form ) {
-		$form->setSubmitTextMsg( 'clearpendingreview-preview' );
-		$form->addButton( array('name' => 'continue', 'value' =>
-		$this->msg( 'clearpendingreview-clear' )->text(), 'type' => 'submit' ) );
-		$form->addPreText('<b>Current time:</b> '.date('YmdHi'));
+		return wfMessage( 'clearpendingreviews-date-invalid' )->inContentLanguage();
 	}
 
-	public static function doSearchQuery( array $data ) {
+	public function validateCategory( $categoryField, $allData ) {
+		$bad_cat_name = false;
+
+		if ( empty( $categoryField ) && empty ( $allData['page'] ) ) {
+			return wfMessage( 'clearpendingreviews-missing-date-category' )->inContentLanguage();
+		}
+		if ( empty ( $categoryField ) ) {
+			return true;
+		} else {
+			$category_title = Title::makeTitleSafe( NS_CATEGORY, $categoryField );
+			if ( !$category_title->exists() ) {
+				return wfMessage( 'clearpendingreviews-category-invalid' )->inContentLanguage();
+			}
+		}
+		return true;
+	}
+
+	/**
+	* @param array $data
+	* @param bool $clearPages
+	* @return $results
+	*/
+
+	public static function doSearchQuery( $data, $clearPages ) {
 		$dbw = wfGetDB( DB_REPLICA );
 		$category = preg_replace('/\s+/', '', $data['category']);
 		$page = preg_replace('/\s+/', '_', $data['page']);
@@ -100,128 +122,112 @@ class SpecialClearPendingReviews extends FormSpecialPage {
 			)
 		);
 
-		$vars2 = array( 'wl_id' );
-
-		$pageIDs = $dbw->select( $tables, $vars2, $conditions, __METHOD__, 'DISTINCT', $join_conds );
-
-		$resultsTable = $dbw->select( $tables, $vars, $conditions, __METHOD__, 'DISTINCT', $join_conds );
-
-		return array( $resultsTable, $pageIDs );
-
-	}
-
-	public static function doClearQuery( array $data ) {
-		$dbw = wfGetDB( DB_MASTER );
-		$category = preg_replace('/\s+/', '', $data['category']);
-		$page = preg_replace('/\s+/', '_', $data['page']);
-		$start = preg_replace('/\s+/', '', $data['start']);
-		$end = preg_replace('/\s+/', '', $data['end']);
-		$conditions = '';
-
-		if ($category) {
-			$conditions .= "c.cl_to='$category' AND ";
-		}
-		if ($page) {
-			$conditions .= "w.wl_title LIKE '$page%' AND ";
-		}
-
-		$tables = array( 'w' => 'watchlist', 'p' => 'page', 'c' => 'categorylinks' );
-		$vars = array( 'wl_id' );
-		$conditions .= "w.wl_notificationtimestamp IS NOT NULL AND w.wl_notificationtimestamp < $end AND w.wl_notificationtimestamp > $start";
-		$join_conds = array(
-			'p' => array(
-				'LEFT JOIN', 'w.wl_title=p.page_title'
-			),
-			'c' => array(
-				'LEFT JOIN', 'c.cl_from=p.page_id'
-			)
-		);
-
 		$results = $dbw->select( $tables, $vars, $conditions, __METHOD__, 'DISTINCT', $join_conds );
 
-		$pagesToClear = null;
+		if ( $clearPages == True ) {
+			$dbw = wfGetDB( DB_MASTER );
 
-		foreach ($results as $row) {
-			$values = array('wl_notificationtimestamp' => null );
-			$conds = array( 'wl_id' => $row->wl_id );
-			$options = array();
-			$dbw->update( 'watchlist', $values, $conds, __METHOD__, $options );
-			$pagesToClear[] = $row->wl_id;
+			foreach ($results as $result ) {
+				$values = array('wl_notificationtimestamp' => null );
+				$conds = array( 'wl_id' => $result->wl_id );
+				$options = array();
+				$dbw->update( 'watchlist', $values, $conds, __METHOD__, $options );
+			}
 		}
 
-		return $pagesToClear;
-
+		return $results;
 	}
 
 	/**
 	* @param array $data
+	* @param object $form
 	* @return Status
 	*/
 
-	public function onSubmit( array $data ) {
-
+	public function trySubmit( $data, $form ) {
 		$request = $this->getRequest();
 		$output = $this->getOutput();
 		$this->setHeaders();
 
-		if (isset($_POST['continue'])) {
-				$output->addHTML("<h3>Test</h3>");
-				$res = $this->doClearQuery( $data );
-				$output->addHTML("<table class='wikitable' style='text-align: center'>");
-				foreach ($res as $value) {
-					$output->addHTML("<tr>");
-					$output->addHTML("<td>".$value."</td>");
-					$output->addHTML("</tr>");
-				}
-				$output->addHTML("</table>");
-				$logEntry = new ManualLogEntry( 'pendingreviews', 'clearreivews' );
-				$logEntry->setPerformer( $this->getUser() );
-				$logEntry->setTarget( $this->getPageTitle() );
-				$logEntry->setParameters( [
-					'4::paramname' => '(Number of pages)',
-					'5::paramname' => '('.$data['category'].')',
-					'6::paramname' => '('.$data['page'].')',
-					] );
-				$logid = $logEntry->insert();
-				$logEntry->publish( $logid );
-				return Status::newGood();
-		} else {
-			$res = $this->doSearchQuery( $data )[0];
-			$pageIDs = $this->doSearchQuery( $data )[1];
-			$output->addHTML("<table class='wikitable' style='width:100%'>");
-			$output->addHTML("<tr>");
-			$output->addHTML("<td>");
-			$output->addHTML("<h3>The following pages will be cleared:</h3>");
-			$output->addHTML("<ul>");
-			foreach ($res as $value) {
-				$page = Title::makeTitle( $value->wl_namespace, $value->wl_title );
-				$pageLinkHtml = Linker::link( $page );
-				$output->addHTML("<li>".$pageLinkHtml."</li>");
-			}
-			$output->addHTML("</ul>");
-			$output->addHTML("</td>");
-			$output->addHTML("<td>");
+		if (isset($_POST['clearpages'])) {
+			//Clears pending reviews
+			$results = $this->doSearchQuery( $data, True );
 
-			$output->addHTML("<h3>The following people will be impacted:</h3>");
-			$output->addHTML("<ul>");
-			foreach ($res as $value) {
-				$user = User::newFromId( $value->wl_user );
+			//Count how many pages were cleared
+			$pageCount = 0;
+			foreach ( $results as $result ) {
+				$pageCount = $pageCount + 1;
+			}
+
+			//Log when pages are cleared in Special:Log
+			$logEntry = new ManualLogEntry( 'pendingreviews', 'clearreivews' );
+			$logEntry->setPerformer( $this->getUser() );
+			$logEntry->setTarget( $this->getPageTitle() );
+			$logEntry->setParameters( [
+				'4::paramname' => '('.$pageCount.')',
+				'5::paramname' => '('.$data['category'].')',
+				'6::paramname' => '('.$data['page'].')',
+				] );
+			$logid = $logEntry->insert();
+			$logEntry->publish( $logid );
+
+			$output->addHTML( wfMessage( 'clearpendingreviews-success' )->numParams( $pageCount )->plain() );
+
+			//Don't reload the form after clearing pages.
+			return true;
+
+		} else {
+			$results = $this->doSearchQuery( $data, False );
+			$table = '';
+			$table .= "<table class='wikitable' style='width:100%'>";
+			$table .= "<tr>";
+			$table .= "<td>";
+			$table .= "<h3>".wfMessage( 'clearpendingreviews-pages-cleared' )."</h3>";
+			$table .= "<ul>";
+			$impactedPages = array();
+			foreach ($results as $result) {
+				$page = Title::makeTitle( $result->wl_namespace, $result->wl_title );
+				$pageLinkHtml = Linker::link( $page );
+				$impactedPages[] = $pageLinkHtml;
+			}
+
+			$impactedPages = array_unique( $impactedPages );
+			foreach ($impactedPages as $impactedPage ) {
+				$table .= "<li>".$impactedPage."</li>";
+			}
+
+			$table .= "</ul>";
+			$table .= "</td>";
+			$table .= "<td>";
+			$table .= "<h3>".wfMessage( 'clearpendingreviews-people-impacted' )."</h3>";
+			$table .= "<ul>";
+			$impactedUsers = array();
+			foreach ($results as $result ) {
+				$user = User::newFromId( $result->wl_user );
 				$userTitleObj = $user->getUserPage();
 				$userLinkHtml = Linker::link( $userTitleObj );
-				// $output->addHTML("<td>".$value->wl_user."</td>");
-				$output->addHTML("<li>".$userLinkHtml."</li>");
+				$impactedUsers[] = $userLinkHtml;
 			}
-			$output->addHTML("</ul>");
-			$output->addHTML("</td>");
-			$output->addHTML("</tr>");
-			$output->addHTML("</table>");
-		}
-	}
 
-	/**
-	 * @inheritDoc
-	 */
-	protected function getDisplayFormat() {
-		return 'ooui';
+			$impactedUsers = array_unique( $impactedUsers );
+			foreach ($impactedUsers as $impactedUser ) {
+				$table .= "<li>".$impactedUser."</li>";
+			}
+
+			$table .= "</ul>";
+			$table .= "</td>";
+			$table .= "</tr>";
+			$table .= "</table>";
+
+			$form->setSubmitText( 'Clear pages' );
+			$form->setSubmitName( 'clearpages' );
+			$form->setSubmitDestructive();
+			$form->setCancelTarget( $this->getPageTitle());
+			$form->showCancel();
+			//Display preview of pages to be cleared
+			$form->setPostText( $table );
+
+			return false;
+		}
 	}
 }

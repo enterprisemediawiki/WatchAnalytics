@@ -19,7 +19,7 @@
 	"AvailableRights": [
 		"viewpagescore",
 		"pendingreviewslink",
-		"clearpendingreviews"
+		"clearreviews"
 	],
 	"SpecialPages": {
 		"WatchAnalytics": "SpecialWatchAnalytics",
@@ -91,6 +91,13 @@
 		"ext.watchanalytics.pendingreviews.scripts": {
 			"position": "bottom",
 			"scripts": "pendingreviews/ext.watchanalytics.pendingreviews.js",
+			"dependencies": [
+				"mediawiki.Title"
+			]
+		},
+		"ext.watchanalytics.clearpendingreviews.scripts": {
+			"position": "bottom",
+			"scripts": "clearpendingreviews/ext.watchanalytics.clearpendingreviews.js",
 			"dependencies": [
 				"mediawiki.Title"
 			]
