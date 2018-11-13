@@ -10,7 +10,7 @@
 	"GroupPermissions": {
 		"sysop": {
 			"viewpagescore": true,
-			"clearpendingreviews": true
+			"clearreviews": true
 		},
 		"user": {
 			"pendingreviewslink": true
