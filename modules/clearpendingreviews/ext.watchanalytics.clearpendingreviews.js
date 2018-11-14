@@ -2,15 +2,10 @@ $( function ()  {
 	$(document).ready( function () {
 		$('.oo-ui-inputWidget-input').change(
 			function() {
-				var clearButton = document.getElementsByClassName("oo-ui-buttonElement-button");
-				var clearButtonText = clearButton[1].childNodes;
-				clearButton[1].value = "Preview";
-				clearButton[1].name = "Preview";
-				clearButton[1].style.backgroundColor = '#36c';
-				clearButton[1].style.borderColor = '#36c';
-				clearButtonText[1].innerHTML = 'Preview';
+				$(".oo-ui-buttonElement-button[name=clearpages]").css({ "value": "Preview", "name":"Preview", "background-color": "#36c", "border-color": "#36c"  });
+				$(".oo-ui-buttonElement-button[name=clearpages]").attr( "name", "preview");
+				$(".oo-ui-buttonElement-button[name=preview]").html("Preview");
 			}
 		);
 	});
-
 } );
