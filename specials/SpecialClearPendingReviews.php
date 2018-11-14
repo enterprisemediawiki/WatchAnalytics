@@ -36,7 +36,7 @@ class SpecialClearPendingReviews extends SpecialPage {
 					'type' => 'text',
 					'required' => 'true',
 					'validation-callback' => [ $this, 'validateTime' ],
-					'help' => '<b>Current time:</b> '.date('YmdHis'),
+					'help' => '<b>Current time:</b> '.date('YmdHi').'00',
 				],
 				'category' => [
 					'section' => 'section2',
