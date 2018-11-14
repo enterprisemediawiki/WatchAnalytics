@@ -65,10 +65,15 @@ class SpecialClearPendingReviews extends SpecialPage {
 			return wfMessage( 'clearpendingreviews-date-invalid' )->inContentLanguage();
 		}
 
+		if ( $allData['start'] > $allData['end'] ) {
+			return wfMessage( 'clearpendingreviews-date-order-invalid' )->inContentLanguage();
+		}
+
 		$dateTime = DateTime::createFromFormat( 'YmdHis', $dateField );
 		if ( $dateTime ) {
 				return $dateTime->format( 'YmdHis' ) === $dateField;
 		}
+
 		return wfMessage( 'clearpendingreviews-date-invalid' )->inContentLanguage();
 	}
 

@@ -20,6 +20,7 @@
 	"clearpendingreview-clear": "Clear reviews",
 	"clearpendingreviews-legend": "Search criteria",
 	"clearpendingreviews-date-invalid": "Not a valid date",
+	"clearpendingreviews-date-order-invalid": "Start date must be before end date",
 	"clearpendingreviews-missing-date-category":"Must input either category or title.",
 	"clearpendingreviews-category-invalid": "Category does not exist.",
 	"clearpendingreviews-success": "Successfully cleared pending reviews from $1 pages.",
