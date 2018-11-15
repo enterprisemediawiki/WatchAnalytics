@@ -180,10 +180,10 @@ class SpecialClearPendingReviews extends SpecialPage {
 				] );
 			$logid = $logEntry->insert();
 			$logEntry->publish( $logid );
+			Hooks::run( 'PendingReviewsCleared', [&$data, &$results, &$pageCount] );
 
 			//Create link back to Special:ClearPendingReviews
 			$pageLinkHtml = Linker::link( $this->getPageTitle() );
-
 			$output->addHTML( "<b>" );
 			$output->addHTML( wfMessage( 'clearpendingreviews-success' )->numParams( $pageCount )->plain() );
 			$output->addHTML( "</b>" );
@@ -242,6 +242,7 @@ class SpecialClearPendingReviews extends SpecialPage {
 			$form->setSubmitDestructive();
 			$form->setCancelTarget( $this->getPageTitle());
 			$form->showCancel();
+			Hooks::run( 'PendingReviewsPreview', [&$data, &$results] );
 			//Display preview of pages to be cleared
 			$form->setPostText( $table );
 
