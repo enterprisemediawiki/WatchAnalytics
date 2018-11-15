@@ -194,7 +194,7 @@ class SpecialClearPendingReviews extends SpecialPage {
 			$table = '';
 			$table .= "<table class='wikitable' style='width:100%'>";
 			$table .= "<tr>";
-			$table .= "<td>";
+			$table .= "<td style='vertical-align:top;'>";
 			$table .= "<h3>".wfMessage( 'clearpendingreviews-pages-cleared' )."</h3>";
 			$table .= "<ul>";
 			$impactedPages = array();
@@ -211,7 +211,7 @@ class SpecialClearPendingReviews extends SpecialPage {
 
 			$table .= "</ul>";
 			$table .= "</td>";
-			$table .= "<td>";
+			$table .= "<td style='vertical-align:top;'>";
 			$table .= "<h3>".wfMessage( 'clearpendingreviews-people-impacted' )."</h3>";
 			$table .= "<ul>";
 			$impactedUsers = array();
