@@ -24,6 +24,7 @@
 	"clearpendingreviews-missing-date-category":"Must input either category or title.",
 	"clearpendingreviews-category-invalid": "Category does not exist.",
 	"clearpendingreviews-success": "Successfully cleared pending reviews from $1 pages.",
+	"clearpendingreviews-success-return": "Return to: ",
 	"clearpendingreviews-pages-cleared": "The following pages will be cleared:",
 	"clearpendingreviews-people-impacted": "The following people will be impacted:",
 	"action-clearreviews": "clear pending reviews",
