@@ -22,6 +22,7 @@ class SpecialClearPendingReviews extends SpecialPage {
 		$wgOut->addModules( 'ext.watchanalytics.clearpendingreviews.scripts' );
 		$output = $this->getOutput();
 
+		//Defines input form
 		$formDescriptor = [
 				'start' => [
 					'section' => 'section1',
@@ -65,10 +66,12 @@ class SpecialClearPendingReviews extends SpecialPage {
 			return wfMessage( 'clearpendingreviews-date-invalid' )->inContentLanguage();
 		}
 
+		//Validates start time is before end time
 		if ( $allData['start'] > $allData['end'] ) {
 			return wfMessage( 'clearpendingreviews-date-order-invalid' )->inContentLanguage();
 		}
 
+		//Verifys input format is ISO
 		$dateTime = DateTime::createFromFormat( 'YmdHis', $dateField );
 		if ( $dateTime ) {
 				return $dateTime->format( 'YmdHis' ) === $dateField;
@@ -80,12 +83,14 @@ class SpecialClearPendingReviews extends SpecialPage {
 	public function validateCategory( $categoryField, $allData ) {
 		$bad_cat_name = false;
 
+		//Validates either Category or Title field is used
 		if ( empty( $categoryField ) && empty ( $allData['page'] ) ) {
 			return wfMessage( 'clearpendingreviews-missing-date-category' )->inContentLanguage();
 		}
 		if ( empty ( $categoryField ) ) {
 			return true;
 		} else {
+			//Verifys category exists in wiki
 			$category_title = Title::makeTitleSafe( NS_CATEGORY, $categoryField );
 			if ( !$category_title->exists() ) {
 				return wfMessage( 'clearpendingreviews-category-invalid' )->inContentLanguage();
@@ -102,7 +107,7 @@ class SpecialClearPendingReviews extends SpecialPage {
 
 	public static function doSearchQuery( $data, $clearPages ) {
 		$dbw = wfGetDB( DB_REPLICA );
-		$category = preg_replace('/\s+/', '', $data['category']);
+		$category = preg_replace('/\s+/', '_', $data['category']);
 		$page = preg_replace('/\s+/', '_', $data['page']);
 		$start = preg_replace('/\s+/', '', $data['start']);
 		$end = preg_replace('/\s+/', '', $data['end']);
