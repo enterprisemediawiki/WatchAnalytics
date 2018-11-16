@@ -188,7 +188,7 @@ class SpecialClearPendingReviews extends SpecialPage {
 			$output->addHTML( wfMessage( 'clearpendingreviews-success' )->numParams( $pageCount )->plain() );
 			$output->addHTML( "</b>" );
 			$output->addHTML( "<br>" );
-			$output->addHTML( wfMessage( 'clearpendingreviews-success-return' )->numParams( $pageCount )->plain() );
+			$output->addHTML( wfMessage( 'clearpendingreviews-success-return' ) );
 			$output->addHTML( $pageLinkHtml );
 
 			//Don't reload the form after clearing pages.
