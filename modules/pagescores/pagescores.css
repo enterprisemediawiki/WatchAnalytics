@@ -35,13 +35,13 @@
 }
 
 .ext-watchanalytics-pagescores-danger > div {
-	background-color: red;
-	border-color: red;
+	background-color: #d33;
+	border-color: #d33;
 	color: white;
 }
 .ext-watchanalytics-pagescores-warning > div {
-	background-color: orange; /* was orangered */
-	border-color: orange;
+	background-color: #fc3;
+	border-color: #fc3;
 	color: white;
 }
 .ext-watchanalytics-pagescores-okay > div {
@@ -55,8 +55,8 @@
 	color: #333;
 }
 .ext-watchanalytics-pagescores-excellent > div {
-	background-color: green;
-	border-color: green;
+	background-color: #00af89;
+	border-color: #00af89;
 	color: white;
 }
 

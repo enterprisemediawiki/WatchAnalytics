@@ -188,7 +188,7 @@ class PendingReview {
 		ORDER BY w.wl_notificationtimestamp ASC;
 
 	*/
-	static public function getPendingReviewsList ( User $user ) {
+	static public function getPendingReviewsList ( User $user, $limit, $offset ) {
 
 		$tables = array(
 			'w' => 'watchlist',
@@ -214,7 +214,8 @@ class PendingReview {
 
 		$options = array(
 			'ORDER BY' => 'num_reviewed ASC, w.wl_notificationtimestamp ASC',
-			// 'LIMIT' => $limit,
+			'OFFSET' => $offset,
+			'LIMIT' => $limit,
 		);
 
 		$join_conds = array(

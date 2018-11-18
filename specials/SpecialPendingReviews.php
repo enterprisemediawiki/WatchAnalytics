@@ -120,11 +120,12 @@ class SpecialPendingReviews extends SpecialPage {
 
 		// how many reviews to display
 		$this->setReviewLimit();
+		// result to start displaying from
+		$this->setReviewOffset();
 
-		// FIXME: is this using a limit?
-		$this->pendingReviewList = PendingReview::getPendingReviewsList( $this->mUser );
+		$this->pendingReviewList = PendingReview::getPendingReviewsList( $this->mUser, $this->reviewLimit, $this->reviewOffset );
 
-		$html = $this->getPageHeader();
+		$html = $this->getPageHeader( $wgUser );
 
 		$html .= '<table class="pendingreviews-list">';
 		$rowCount = 0;
@@ -142,10 +143,7 @@ class SpecialPendingReviews extends SpecialPage {
 			}
 
 			$rowCount++;
-			if ( $rowCount >= $this->reviewLimit ) {
-				break;
-			}
-		}// die();
+		}
 		$html .= '</table>';
 
 		global $egPendingReviewsShowWatchSuggestionsIfReviewsUnder; // FIXME: crazy long name...
@@ -225,6 +223,20 @@ class SpecialPendingReviews extends SpecialPage {
 		}
 		else {
 			$this->reviewLimit = 20;
+		}
+	}
+
+	/**
+	 * Sets the offset for reviews to allow for pagination
+	 *
+	 * @return null
+	 */
+	public function setReviewOffset () {
+		if ( $this->getRequest()->getVal( 'offset' ) ) {
+			$this->reviewOffset = $this->getRequest()->getVal( 'offset' );
+		}
+		else {
+			$this->reviewOffset = 0;
 		}
 	}
 
@@ -445,7 +457,7 @@ class SpecialPendingReviews extends SpecialPage {
 	 *
 	 * @return string HTML for button
 	 */
- 	public function getClearNotificationButton ( $titleText, $namespace, $buttonMsg, $buttonClass ) {
+	 public function getClearNotificationButton ( $titleText, $namespace, $buttonMsg, $buttonClass ) {
 		return Xml::element( 'a',
 			array(
 				'href' => $this->getTitle()->getLocalURL( array(
@@ -538,7 +550,7 @@ class SpecialPendingReviews extends SpecialPage {
 
 		return Xml::element( 'a',
 			array(
-				'href' => $userTalk->getLocalURL( $talkQueryString ),
+				'href' => $userTalk->getURL( $talkQueryString ),
 				'class' => 'pendingreviews-dark-blue-button' // pendingreviews-delete-talk-button
 			),
 			wfMessage( 'pendingreviews-page-deleted-talk', $user->getUserPage()->getFullText() )->text()
@@ -550,8 +562,11 @@ class SpecialPendingReviews extends SpecialPage {
 	 *
 	 * @return string HTML for header
 	 */
-	public function getPageHeader() {
-		$numPendingReviews = count( $this->pendingReviewList );
+	public function getPageHeader( $user ) {
+		$userWatch = new UserWatchesQuery();
+		$watchStats = $userWatch->getUserWatchStats( $user );
+		$numPendingReviews = $watchStats['num_pending'];
+
 		$html = '';
 
 		if ( $numPendingReviews > 0 ) {
@@ -559,19 +574,48 @@ class SpecialPendingReviews extends SpecialPage {
 		}
 
 		// message like "You have X pending reviews"
-		$html .= '<p>' . wfMessage( 'pendingreviews-num-reviews', $numPendingReviews )->text();
-
-		// message like "showing the most important Y reviews"
-		if ( $numPendingReviews > $this->reviewLimit ) {
-			$html .= ' ' . wfMessage( 'pendingreviews-num-shown', $this->reviewLimit )->text();
-		}
+		$html .= '<p>' . wfMessage( 'pendingreviews-num-reviews', $numPendingReviews, $this->reviewLimit )->text();
 
 		// close out header
 		$html .= '</p>';
 
+		$nextReviewSet = $this->reviewOffset + $this->reviewLimit;
+		$prevReviewSet = max( array( 0, $this->reviewOffset - $this->reviewLimit ) );
+		$currentURL = $this->getPageTitle()->getLocalUrl();
+
+		$viewingUser = '';
+		// if ( $this->mUser ) {
+		// 	$viewingUser = '&user='.$this->mUser;
+		// }
+
+		if ( $this->reviewOffset != 0 ) {
+			//$html .= "<span class='pendingreviews-nav-button'>";
+			$html .= Xml::element(
+				'a',
+				array(
+					'href' => $currentURL.'?offset='.$prevReviewSet.$viewingUser,
+					'class' => 'pendingreviews-nav-link',
+				),
+				wfMessage( 'watchanalytics-pendingreviews-prev-revisions' )->text()
+			);
+			//$html .= '</span>';
+		}
+
+		if ( $nextReviewSet < $numPendingReviews ) {
+			//$html .= "<span class='pendingreviews-nav-button'>";
+			$html .= Xml::element(
+				'a',
+				array(
+					'href' => $currentURL.'?offset='.$nextReviewSet.$viewingUser,
+					'class' => 'pendingreviews-nav-link',
+				),
+				wfMessage( 'watchanalytics-pendingreviews-next-revisions' )->text()
+			);
+			//$html .= '</span>';
+		}
+
 		return $html;
 	}
-
 
 	/**
 	 * Creates a legend for PendingReviews showing what colors mean regarding priority of pages
@@ -763,4 +807,3 @@ class SpecialPendingReviews extends SpecialPage {
 	}
 
 }
-
