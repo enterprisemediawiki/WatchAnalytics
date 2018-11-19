@@ -167,3 +167,9 @@ a.pendingreviews-nav-link:hover, a.pendingreviews-nav-link:focus {
 	border-width: 1.5px;
 	text-decoration: none;
 }
+
+.pendingreviews-nav-link-inactive {
+	background-color: #a2a9b1;
+	pointer-events: none;
+	cursor: default;
+}
