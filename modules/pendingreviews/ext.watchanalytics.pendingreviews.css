@@ -51,13 +51,13 @@ tr.pendingreviews-row-hover td {
 }
 
 tr.pendingreviews-criticality-red td:first-child {
-	border-left: solid red 5px;
+	border-left: solid #d33 5px;
 }
 tr.pendingreviews-criticality-orange td:first-child {
-	border-left: solid orange 5px;
+	border-left: solid #fc3 5px;
 }
 tr.pendingreviews-criticality-green td:first-child {
-	border-left: solid green 5px;
+	border-left: solid #00af89 5px;
 }
 
 .pendingreviews-legend {
@@ -79,7 +79,7 @@ td.pendingreviews-review-links a {
 	border-radius: 6px;
 	display: inline-block;
 	margin-bottom: 0;
-	font-weight: 400;
+	font-weight: bold;
 	text-align: center;
 	vertical-align: middle;
 	cursor: pointer;
@@ -99,49 +99,95 @@ td.pendingreviews-review-links a:hover {
 }
 
 .pendingreviews-dark-blue-button {
-	background-color: #347BFF;
-	border-color: #347BFF;
+	background-color: #36c;
+	border-color: #36c;
 }
 .pendingreviews-dark-blue-button:hover {
-	background-color: #2456B3;
-	border-color: #347BFF;
+	background-color: #2a4b8d;
+	border-color: #36c;
 }
 
 .pendingreviews-green-button {
-	background-color: #5cb85c;
-	border-color: #4cae4c;
+	background-color: #00af89;
+	border-color: #00af89;
 }
 
 .pendingreviews-green-button:hover {
-	background-color: #449d44;
-	border-color: #398439;
+	background-color: #14866d;
+	border-color: #00af89;
 }
 
 .pendingreviews-light-blue-button {
-	background-color: #5bc0de;
-	border-color: #46b8da;
+	background-color: #eaf3ff;
+	border-color: #36c;
 }
 
 .pendingreviews-light-blue-button:hover {
-	background-color: #31b0d5;
-	border-color: #269abc;
+	background-color: #36c;
+	border-color: #36c;
 }
 
 .pendingreviews-orange-button {
-	background-color: #ec971f;
-	border-color: #d58512;
+	background-color: #fc3;
+	border-color: #fc3;
 }
 
 .pendingreviews-orange-button:hover {
-	background-color: #ec971f;
-	border-color: #d58512;
+	background-color: #ac6600;
+	border-color: #fc3;
 }
 
 .pendingreviews-red-button {
-	background-color: #d9534f;
-	border-color: #d43f3a;
+	background-color: #d33;
+	border-color: #d33;
 }
 .pendingreviews-red-button:hover {
-	background-color: #c9302c;
-	border-color: #ac2925;
+	background-color: #b32424;
+	border-color: #d33;
 }
+
+.pendingreviews-nav-link {
+	background-color: #f8f9fa;
+	border: 1px solid #eaecf0;
+	display: inline-block;
+	text-align: center;
+	line-height: normal;
+	white-space: nowrap;
+	padding: 8px;
+	border-radius: 6px;
+	margin-left: 4px;
+	min-width: 50px;
+	text-decoration: none;
+	font-weight: bold;
+	font-size: 1em;
+}
+
+a.pendingreviews-nav-link:hover, a.pendingreviews-nav-link:focus {
+	background-color: #eaecf0;
+	text-decoration: none;
+}
+
+a.pendingreviews-nav-link-inactive {
+	background-color: #f8f9fa;
+	pointer-events: none;
+	cursor: default;
+	color: #c8ccd1;
+	border: 1px solid #eaecf0;
+	display: inline-block;
+	text-align: center;
+	line-height: normal;
+	white-space: nowrap;
+	padding: 8px;
+	border-radius: 6px;
+	margin-left: 4px;
+	min-width: 50px;
+	text-decoration: none;
+	font-weight: bold;
+	font-size: 1em;
+}
+
+a.pendingreviews-nav-link-inactive:visited {
+	color: #c8ccd1;
+}
+
+
