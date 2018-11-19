@@ -164,7 +164,6 @@ td.pendingreviews-review-links a:hover {
 
 a.pendingreviews-nav-link:hover, a.pendingreviews-nav-link:focus {
 	background-color: #eaecf0;
-	border-width: 1.5px;
 	text-decoration: none;
 }
 
