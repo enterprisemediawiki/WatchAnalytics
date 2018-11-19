@@ -172,7 +172,7 @@ a.pendingreviews-nav-link:hover, a.pendingreviews-nav-link:focus {
 	background-color: #f8f9fa;
 	pointer-events: none;
 	cursor: default;
-	font: #c8ccd1;
+	color: #c8ccd1;
 	border: 1px solid #eaecf0;
 	display: inline-block;
 	text-align: center;
