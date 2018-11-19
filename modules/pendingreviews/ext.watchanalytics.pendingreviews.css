@@ -168,9 +168,21 @@ a.pendingreviews-nav-link:hover, a.pendingreviews-nav-link:focus {
 	text-decoration: none;
 }
 
-.pendingreviews-nav-link .pendingreviews-nav-link-inactive {
+.pendingreviews-nav-link-inactive {
 	background-color: #f8f9fa;
 	pointer-events: none;
 	cursor: default;
 	font: #c8ccd1;
+	border: 1px solid #eaecf0;
+	display: inline-block;
+	text-align: center;
+	line-height: normal;
+	white-space: nowrap;
+	padding: 8px;
+	border-radius: 6px;
+	margin-left: 4px;
+	min-width: 50px;
+	text-decoration: none;
+	font-weight: bold;
+	font-size: 1em;
 }
