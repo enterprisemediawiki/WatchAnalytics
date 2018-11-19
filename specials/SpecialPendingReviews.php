@@ -591,10 +591,10 @@ class SpecialPendingReviews extends SpecialPage {
 		$linkClass = "pendingreviews-nav-link";
 		$prevLinkClass = $linkClass; 
 		$nextLinkClass = $linkClass;
-		if ( $this->reviewOffset = 0 ) {
+		if ( $this->reviewOffset == 0 ) {
 			$prevLinkClass .= $linkClass." pendingreviews-nav-link-inactive";
 		}
-		if ( $nextReviewSet < $numPendingReviews ) {
+		if ( $nextReviewSet >= $numPendingReviews ) {
 			$nextLinkClass .= $linkClass." pendingreviews-nav-link-inactive";
 		}
 		
