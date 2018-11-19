@@ -457,7 +457,7 @@ class SpecialPendingReviews extends SpecialPage {
 	 *
 	 * @return string HTML for button
 	 */
-	 public function getClearNotificationButton ( $titleText, $namespace, $buttonMsg, $buttonClass ) {
+	public function getClearNotificationButton ( $titleText, $namespace, $buttonMsg, $buttonClass ) {
 		return Xml::element( 'a',
 			array(
 				'href' => $this->getTitle()->getLocalURL( array(
@@ -599,7 +599,7 @@ class SpecialPendingReviews extends SpecialPage {
 		} else {
 			$nextLinkClass = $linkClass;
 		}
-		
+
 		$html .= Xml::element(
 			'a',
 			array(
@@ -608,7 +608,7 @@ class SpecialPendingReviews extends SpecialPage {
 			),
 			wfMessage( 'watchanalytics-pendingreviews-prev-revisions' )->text()
 		);
-		
+
 		$html .= Xml::element(
 			'a',
 			array(
@@ -617,7 +617,7 @@ class SpecialPendingReviews extends SpecialPage {
 			),
 			wfMessage( 'watchanalytics-pendingreviews-next-revisions' )->text()
 		);
-		
+
 		return $html;
 	}
 
