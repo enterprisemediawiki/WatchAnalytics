@@ -588,32 +588,33 @@ class SpecialPendingReviews extends SpecialPage {
 		// 	$viewingUser = '&user='.$this->mUser;
 		// }
 
-		if ( $this->reviewOffset != 0 ) {
-			//$html .= "<span class='pendingreviews-nav-button'>";
-			$html .= Xml::element(
-				'a',
-				array(
-					'href' => $currentURL.'?offset='.$prevReviewSet.$viewingUser,
-					'class' => 'pendingreviews-nav-link',
-				),
-				wfMessage( 'watchanalytics-pendingreviews-prev-revisions' )->text()
-			);
-			//$html .= '</span>';
+		$linkClass = "pendingreviews-nav-link";
+		$nextLinkClass = "pendingreviews-nav-link";
+		if ( $this->reviewOffset = 0 ) {
+			$prevLinkClass .= $linkClass." pendingreviews-nav-link-inactive";
 		}
-
 		if ( $nextReviewSet < $numPendingReviews ) {
-			//$html .= "<span class='pendingreviews-nav-button'>";
-			$html .= Xml::element(
-				'a',
-				array(
-					'href' => $currentURL.'?offset='.$nextReviewSet.$viewingUser,
-					'class' => 'pendingreviews-nav-link',
-				),
-				wfMessage( 'watchanalytics-pendingreviews-next-revisions' )->text()
-			);
-			//$html .= '</span>';
+			$nextLinkClass .= $linkClass." pendingreviews-nav-link-inactive";
 		}
-
+		
+		$html .= Xml::element(
+			'a',
+			array(
+				'href' => $currentURL.'?offset='.$prevReviewSet.$viewingUser,
+				'class' => $prevLinkClass,
+			),
+			wfMessage( 'watchanalytics-pendingreviews-prev-revisions' )->text()
+		);
+		
+		$html .= Xml::element(
+			'a',
+			array(
+				'href' => $currentURL.'?offset='.$nextReviewSet.$viewingUser,
+				'class' => $nextLinkClass,
+			),
+			wfMessage( 'watchanalytics-pendingreviews-next-revisions' )->text()
+		);
+		
 		return $html;
 	}
 
