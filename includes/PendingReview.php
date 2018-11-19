@@ -202,12 +202,12 @@ class PendingReview {
 			'w.wl_namespace AS namespace',
 			'w.wl_title AS title',
 			'w.wl_notificationtimestamp AS notificationtimestamp',
-			'(SELECT COUNT(*) FROM watchlist AS subwatch
+			"(SELECT COUNT(*) FROM {$GLOBALS['wgDBprefix']}watchlist AS subwatch
 			  WHERE
 				subwatch.wl_namespace = w.wl_namespace
 				AND subwatch.wl_title = w.wl_title
 				AND subwatch.wl_notificationtimestamp IS NULL
-			) AS num_reviewed',
+			) AS num_reviewed",
 		);
 
 		$conds = 'w.wl_user=' . $user->getId() . ' AND w.wl_notificationtimestamp IS NOT NULL';
