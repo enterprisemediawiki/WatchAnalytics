@@ -589,13 +589,15 @@ class SpecialPendingReviews extends SpecialPage {
 		// }
 
 		$linkClass = "pendingreviews-nav-link";
-		$prevLinkClass = $linkClass; 
-		$nextLinkClass = $linkClass;
 		if ( $this->reviewOffset == 0 ) {
-			$prevLinkClass .= $linkClass." pendingreviews-nav-link-inactive";
+			$prevLinkClass = "pendingreviews-nav-link-inactive";
+		} else {
+			$prevLinkClass = $linkClass;
 		}
 		if ( $nextReviewSet >= $numPendingReviews ) {
-			$nextLinkClass .= $linkClass." pendingreviews-nav-link-inactive";
+			$nextLinkClass = "pendingreviews-nav-link-inactive";
+		} else {
+			$nextLinkClass = $linkClass;
 		}
 		
 		$html .= Xml::element(
