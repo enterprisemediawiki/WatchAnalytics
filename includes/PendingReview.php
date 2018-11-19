@@ -99,7 +99,7 @@ class PendingReview {
 
 			$revResults = $dbr->select(
 				array( 'r' => 'revision' ),
-				Revision::selectFields(),
+				Revision::getQueryInfo()['fields'],
 				// array(
 				// 	'r.rev_id AS rev_id',
 				// 	'r.rev_comment AS rev_comment',
