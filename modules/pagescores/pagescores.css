@@ -29,35 +29,25 @@
 	margin: 0;
 	float: left;
 	border-radius: 4px;
-
 	border-width: 1px;
 	border-style: solid;
+	font-weight: bold;
 }
 
 .ext-watchanalytics-pagescores-danger > div {
 	background-color: #d33;
 	border-color: #d33;
-	color: white;
-}
-.ext-watchanalytics-pagescores-warning > div {
-	background-color: #fc3;
-	border-color: #fc3;
-	color: white;
+	color: #fff;
 }
 .ext-watchanalytics-pagescores-okay > div {
-	background-color: khaki;
-	border-color: khaki;
-	color: #333;
-}
-.ext-watchanalytics-pagescores-good > div {
-	background-color: greenyellow;
-	border-color: greenyellow;
-	color: #333;
+	background-color: #fc3;
+	border-color: #fc3;
+	color: #fff;
 }
 .ext-watchanalytics-pagescores-excellent > div {
 	background-color: #00af89;
 	border-color: #00af89;
-	color: white;
+	color: #fff;
 }
 
 .ext-watchanalytics-pagescores-left {

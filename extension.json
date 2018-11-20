@@ -211,8 +211,16 @@
 		"PendingReviewsNumberWatchSuggestions": 20,
 		"PendingReviewsShowWatchSuggestionsIfReviewsUnder": 5,
 		"WatchAnalyticsPageScoreNamespaces": [0, 1],
-		"WatchAnalyticsWatchQualityColors": [5, 1.5],
-		"WatchAnalyticsReviewStatusColors": [4, 2]
+		"WatchAnalyticsWatchQualityColors": {
+			"5" : "excellent",
+			"1.5" : "okay",
+			"0" : "danger"
+		},
+		"WatchAnalyticsReviewStatusColors": {
+			"4" : "excellent",
+			"2" : "okay",
+			"0" : "danger"
+		}
 	},
 	"manifest_version": 1
 }

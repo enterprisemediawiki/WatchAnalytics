@@ -117,16 +117,6 @@ td.pendingreviews-review-links a:hover {
 	border-color: #00af89;
 }
 
-.pendingreviews-light-blue-button {
-	background-color: #eaf3ff;
-	border-color: #36c;
-}
-
-.pendingreviews-light-blue-button:hover {
-	background-color: #36c;
-	border-color: #36c;
-}
-
 .pendingreviews-orange-button {
 	background-color: #fc3;
 	border-color: #fc3;
@@ -189,5 +179,3 @@ a.pendingreviews-nav-link-inactive {
 a.pendingreviews-nav-link-inactive:visited {
 	color: #c8ccd1;
 }
-
-
