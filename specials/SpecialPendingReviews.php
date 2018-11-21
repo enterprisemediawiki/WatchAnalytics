@@ -114,6 +114,7 @@ class SpecialPendingReviews extends SpecialPage {
 		// functions causes the CSS to load later, which makes the page styles
 		// apply late. This looks bad.
 		$wgOut->addModuleStyles( [
+			'ext.watchanalytics.base',
 			'ext.watchanalytics.specials',
 			'ext.watchanalytics.pendingreviews.styles',
 		] );
@@ -352,16 +353,12 @@ class SpecialPendingReviews extends SpecialPage {
 		// FIXME: wow this is ugly
 		$rowClass = ( $rowCount % 2 === 0 ) ? 'pendingreviews-even-row' : 'pendingreviews-odd-row';
 
-		if ( $item->numReviewers > $GLOBALS['egPendingReviewsOrangePagesThreshold'] ) {
-			$reviewCriticality = 'green'; // page is "green" because it has lots of reviewers
+		$scoreArr = $GLOBALS['egWatchAnalyticsReviewStatusColors'];
+		foreach ($scoreArr as $scoreThreshold => $style) {
+			if ( $item->numReviewers >= $scoreThreshold ) {
+				$reviewCriticalityClass = 'ext-watchanalytics-criticality-' .$style;
+			}
 		}
-		else if ( $item->numReviewers > $GLOBALS['egPendingReviewsRedPagesThreshold'] ) {
-			$reviewCriticality = 'orange';
-		}
-		else {
-			$reviewCriticality = 'red'; // page is red because it has very few reviewers
-		}
-		$reviewCriticalityClass = 'pendingreviews-criticality-' . $reviewCriticality;
 
 		$classAndAttr = "class='pendingreviews-row $rowClass $reviewCriticalityClass pendingreviews-row-$rowCount' pendingreviews-row-count='$rowCount'";
 
@@ -628,29 +625,20 @@ class SpecialPendingReviews extends SpecialPage {
 	 */
 	public function getPendingReviewsLegend () {
 
-		$redMaxReviewers = $GLOBALS['egPendingReviewsRedPagesThreshold'] - 1;
-		$orangeMaxReviewers =  $GLOBALS['egPendingReviewsOrangePagesThreshold'] - 1;
+		$scoreArr = $GLOBALS['egWatchAnalyticsReviewStatusColors'];
 
-		$redReviewersMsg = $this->msg(
-			'pendingreviews-reviewer-criticality-red',
-			$redMaxReviewers
-		)->text();
+		$html = "<table class='pendingreviews-legend'>";
+		foreach ($scoreArr as $scoreThreshold => $style) {
+			$msg = $this->msg(
+				"pendingreviews-reviewer-criticality-$style",
+				$scoreThreshold
+				)->text();
 
-		$orangeReviewersMsg = $this->msg(
-			'pendingreviews-reviewer-criticality-orange',
-			$orangeMaxReviewers
-		)->text();
+			$html .= "<tr class='ext-watchanalytics-criticality-$style'><td>$msg</td></tr>";
+		}
+		$html .= '</table>';
 
-		$greenReviewersMsg = $this->msg(
-			'pendingreviews-reviewer-criticality-green',
-			$orangeMaxReviewers
-		)->text();
-
-		return "<table class='pendingreviews-legend'>
-			<tr class='pendingreviews-criticality-red'><td>$redReviewersMsg</td></tr>
-			<tr class='pendingreviews-criticality-orange'><td>$orangeReviewersMsg</td></tr>
-			<tr class='pendingreviews-criticality-green'><td>$greenReviewersMsg</td></tr>
-		</table>";
+		return $html;
 
 	}
 

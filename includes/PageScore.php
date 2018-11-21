@@ -102,7 +102,7 @@ class PageScore {
 		$scoreArr = $GLOBALS[ $configVariable ];
 
 		foreach ($scoreArr as $scoreThreshold => $style) {
-			if ( $score > $scoreThreshold ) {
+			if ( $score >= $scoreThreshold ) {
 				return $style;
 			}
 		}
@@ -144,7 +144,7 @@ class PageScore {
 		}
 
 		return
-			"<div class='ext-watchanalytics-pagescores-$color'>
+			"<div class='ext-watchanalytics-criticality-$color'>
 				<div class='ext-watchanalytics-pagescores-left'$leftStyle>
 					$label
 				</div>

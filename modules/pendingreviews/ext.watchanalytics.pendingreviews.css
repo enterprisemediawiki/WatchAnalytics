@@ -37,7 +37,6 @@ table.pendingreviews-list td.pendingreviews-top-cell {
 }
 
 tr.pendingreviews-row td:first-child {
-	border-left: solid #ddd 5px;
 	padding-left: 5px;
 }
 /*tr.pendingreviews-row-hover td:first-child {
@@ -48,16 +47,6 @@ tr.pendingreviews-row-hover td.pendingreviews-bottom-cell {
 }
 tr.pendingreviews-row-hover td {
 	background-color: #f9f9f9;
-}
-
-tr.pendingreviews-criticality-red td:first-child {
-	border-left: solid #d33 5px;
-}
-tr.pendingreviews-criticality-orange td:first-child {
-	border-left: solid #fc3 5px;
-}
-tr.pendingreviews-criticality-green td:first-child {
-	border-left: solid #00af89 5px;
 }
 
 .pendingreviews-legend {

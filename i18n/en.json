@@ -86,9 +86,9 @@
 	"pendingreviews-timediff-just-now": "Changed just now",
 	"pendingreviews-no-revisions": "No page content changes",
 	"pendingreviews-num-reviews": "You have $1 pending {{PLURAL:$1|review|reviews}}.",
-	"pendingreviews-reviewer-criticality-red": "Pages reviewed by {{PLURAL:$1|1 person|$1 people}} or fewer",
-	"pendingreviews-reviewer-criticality-orange": "Pages reviewed by {{PLURAL:$1|1 person|$1 people}} or fewer",
-	"pendingreviews-reviewer-criticality-green": "Pages reviewed by more than {{PLURAL:$1|1 person|$1 people}}",
+	"pendingreviews-reviewer-criticality-danger": "Pages reviewed by {{PLURAL:$1|1 person|$1 people}} or fewer",
+	"pendingreviews-reviewer-criticality-okay": "Pages reviewed by {{PLURAL:$1|1 person|$1 people}} or fewer",
+	"pendingreviews-reviewer-criticality-excellent": "Pages reviewed by $1 or more people",
 
 	"watch-analytics-page-score-tooltip": "Scores indicate how well this page is being reviewed",
 	"watch-analytics-page-score-scrutiny-label": "Scrutiny",
@@ -98,8 +98,8 @@
 	"watchanalytics-pagestats-editors-list-title": "Page editors",
 	"watchanalytics-pagestats-editors-list-item": "$1 - {{PLURAL:$2|1 revision|$2 revisions}}",
 	"watchanalytics-pagestats-watchers-title": "Page watchers",
-	"watchanalytics-pagestats-watchers-list-item-reviewed": "$1 - <span style='color:green;'>reviewed latest</span>",
-	"watchanalytics-pagestats-watchers-list-item-unreviewed": "$1 - <span style='color:red;'>review pending</span>",
+	"watchanalytics-pagestats-watchers-list-item-reviewed": "$1 - <span style='color:#00af89'>reviewed latest</span>",
+	"watchanalytics-pagestats-watchers-list-item-unreviewed": "$1 - <span style='color:#d33;'>review pending</span>",
 	"watchanalytics-pagestats-chart-header": "Number of reviewers over time",
 
 	"watchanalytics-unreview-button": "Defer review",
