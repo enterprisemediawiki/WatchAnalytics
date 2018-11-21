@@ -6,7 +6,7 @@ php:
   - "5.6"
 before_script:
   # ref: https://stackoverflow.com/questions/45213498/how-to-syntax-check-php-files-in-travis-ci
-  - '! find . -type f -name "*.php" -exec php -l {} \; 2>&1 >&- | grep "^"'
+  - '! find . -type f -name "*.php" -exec php -d error_reporting=32767 -l {} \; 2>&1 >&- | grep "^"'
 script:
   - bash ./build/travis/run-tests.sh
 
