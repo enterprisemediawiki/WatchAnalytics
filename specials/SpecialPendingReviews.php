@@ -354,9 +354,13 @@ class SpecialPendingReviews extends SpecialPage {
 		$rowClass = ( $rowCount % 2 === 0 ) ? 'pendingreviews-even-row' : 'pendingreviews-odd-row';
 
 		$scoreArr = $GLOBALS['egWatchAnalyticsReviewStatusColors'];
+		//making sure array is sorted from highest to lowest
+		krsort( $scoreArr, SORT_NUMERIC );
 		foreach ($scoreArr as $scoreThreshold => $style) {
 			if ( $item->numReviewers >= $scoreThreshold ) {
 				$reviewCriticalityClass = 'ext-watchanalytics-criticality-' .$style;
+			} else {
+				$reviewCriticalityClass = 'ext-watchanalytics-criticality-danger';
 			}
 		}
 
@@ -626,16 +630,32 @@ class SpecialPendingReviews extends SpecialPage {
 	public function getPendingReviewsLegend () {
 
 		$scoreArr = $GLOBALS['egWatchAnalyticsReviewStatusColors'];
+		//making sure array is sorted from highest to lowest
+		krsort( $scoreArr, SORT_NUMERIC );
 
 		$html = "<table class='pendingreviews-legend'>";
 		foreach ($scoreArr as $scoreThreshold => $style) {
 			$msg = $this->msg(
-				"pendingreviews-reviewer-criticality-$style",
+				"pendingreviews-reviewer-criticality-generic",
 				$scoreThreshold
 				)->text();
 
 			$html .= "<tr class='ext-watchanalytics-criticality-$style'><td>$msg</td></tr>";
 		}
+
+		//bottom threshold will always be "danger" class
+		//Get lowest value in array
+		end( $scoreArr );
+		$smallestThreshold = key( $scoreArr );
+
+		if ( $smallestThreshold == 1) {
+			$msg = $this->msg( "pendingreviews-reviewer-criticality-danger-zero" )->text();
+		} else {
+			$msg = $this->msg( "pendingreviews-reviewer-criticality-danger", $smallestThreshold-1 )->text();
+		}
+
+		$html .= "<tr class='ext-watchanalytics-criticality-danger'><td>$msg</td></tr>";
+
 		$html .= '</table>';
 
 		return $html;

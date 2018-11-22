@@ -100,6 +100,7 @@ class PageScore {
 	public function getScoreColor ( $score, $configVariable ) {
 
 		$scoreArr = $GLOBALS[ $configVariable ];
+		krsort( $scoreArr, SORT_NUMERIC );
 
 		foreach ($scoreArr as $scoreThreshold => $style) {
 			if ( $score >= $scoreThreshold ) {

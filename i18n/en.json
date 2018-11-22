@@ -86,9 +86,9 @@
 	"pendingreviews-timediff-just-now": "Changed just now",
 	"pendingreviews-no-revisions": "No page content changes",
 	"pendingreviews-num-reviews": "You have $1 pending {{PLURAL:$1|review|reviews}}.",
-	"pendingreviews-reviewer-criticality-danger": "Pages reviewed by {{PLURAL:$1|1 person|$1 people}} or fewer",
-	"pendingreviews-reviewer-criticality-okay": "Pages reviewed by {{PLURAL:$1|1 person|$1 people}} or fewer",
-	"pendingreviews-reviewer-criticality-excellent": "Pages reviewed by $1 or more people",
+	"pendingreviews-reviewer-criticality-danger": "Pages reviewed by 0 - {{PLURAL:$1|1 person|$1 people}}",
+	"pendingreviews-reviewer-criticality-danger-zero": "Pages reviewed by 0 people",
+	"pendingreviews-reviewer-criticality-generic": "Pages reviewed by $1 or more people",
 
 	"watch-analytics-page-score-tooltip": "Scores indicate how well this page is being reviewed",
 	"watch-analytics-page-score-scrutiny-label": "Scrutiny",

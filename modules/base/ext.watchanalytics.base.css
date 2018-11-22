@@ -24,6 +24,32 @@ tr.ext-watchanalytics-criticality-danger td:first-child {
 	border-left: solid #d33 5px;
 }
 
+.ext-watchanalytics-criticality-plaid > div {
+	background:
+				repeating-linear-gradient(
+						-45deg,
+						transparent 0%,
+						transparent 25%,
+						#eaf3ff 0,
+						#eaf3ff 50%
+			 ),
+			 repeating-linear-gradient(
+						45deg,
+						transparent 0,
+						transparent 25%,
+						#d5fdf4 0,
+						#d5fdf4 50%
+				),
+				repeating-linear-gradient(
+						transparent 20%,
+						transparent 25%,
+						#fef6e7 0,
+						#fef6e7 50%
+				), white;
+		background-blend-mode: multiply;
+		background-size: 10px 10px;
+}
+
 .ext-watchanalytics-criticality-okay > div {
 	background-color: #fc3;
 	border-color: #fc3;
