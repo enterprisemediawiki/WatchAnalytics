@@ -550,7 +550,7 @@ class SpecialPendingReviews extends SpecialPage {
 
 		return Xml::element( 'a',
 			array(
-				'href' => $userTalk->getURL( $talkQueryString ),
+				'href' => $userTalk->getLocalURL( $talkQueryString ),
 				'class' => 'pendingreviews-dark-blue-button' // pendingreviews-delete-talk-button
 			),
 			wfMessage( 'pendingreviews-page-deleted-talk', $user->getUserPage()->getFullText() )->text()
