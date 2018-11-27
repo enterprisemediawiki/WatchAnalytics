@@ -28,12 +28,10 @@
 	},
 	"scripts": {
 		"test": [
-			"phpcs -p -s",
-			"minus-x check ."
+			"phpcs -p -s"
 		],
 		"fix": [
-			"phpcbf",
-			"minus-x fix ."
+			"phpcbf"
 		]
 	}
 }
