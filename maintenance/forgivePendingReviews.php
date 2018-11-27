@@ -101,8 +101,7 @@ class WatchAnalyticsForgivePendingReviews extends Maintenance {
 
 			$namesForDB = $dbw->makeList( $namesArray );
 			$usernames = "AND u.user_name IN ($namesForDB)";
-		}
-		else {
+		} else {
 			$usernames = '';
 		}
 

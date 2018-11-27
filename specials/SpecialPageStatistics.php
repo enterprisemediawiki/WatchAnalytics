@@ -53,12 +53,10 @@ class SpecialPageStatistics extends SpecialPage {
 
 			$wgOut->addHTML( $this->getPageHeader() );
 			$this->renderPageStats();
-		}
-		elseif ( $requestedPage ) {
+		} elseif ( $requestedPage ) {
 			// @todo FIXME: internationalize
 			$wgOut->addHTML( "<p>\"$requestedPage\" is either not a page or is not watchable</p>" );
-		}
-		else {
+		} else {
 			$wgOut->addHTML( "<p>No page requested</p>" );
 		}
 	}
@@ -213,8 +211,7 @@ class SpecialPageStatistics extends SpecialPage {
 
 			if ( is_null( $row->wl_notificationtimestamp ) ) {
 				$watcherMsg = 'watchanalytics-pagestats-watchers-list-item-reviewed';
-			}
-			else {
+			} else {
 				$watcherMsg = 'watchanalytics-pagestats-watchers-list-item-unreviewed';
 			}
 

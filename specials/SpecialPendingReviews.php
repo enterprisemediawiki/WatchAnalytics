@@ -194,14 +194,12 @@ class SpecialPendingReviews extends SpecialPage {
 			$this->mUser = User::newFromName( $requestUser );
 			if ( $this->mUser->getId() === $viewingUser ) {
 				$this->mUserIsViewer = true;
-			}
-			else {
+			} else {
 				$this->mUserIsViewer = false;
 			}
 			$this->getOutput()->setPageTitle( wfMessage( 'pendingreviews-user-page', $this->mUser->getName() )->text() );
 
-		}
-		else {
+		} else {
 			$this->mUser = $viewingUser;
 		}
 
@@ -216,8 +214,7 @@ class SpecialPendingReviews extends SpecialPage {
 	public function setReviewLimit() {
 		if ( $this->getRequest()->getVal( 'limit' ) ) {
 			$this->reviewLimit = $this->getRequest()->getVal( 'limit' ); // FIXME: for consistency, shouldn't this be just "limit"
-		}
-		else {
+		} else {
 			$this->reviewLimit = 20;
 		}
 	}
@@ -230,8 +227,7 @@ class SpecialPendingReviews extends SpecialPage {
 	public function setReviewOffset() {
 		if ( $this->getRequest()->getVal( 'offset' ) ) {
 			$this->reviewOffset = $this->getRequest()->getVal( 'offset' );
-		}
-		else {
+		} else {
 			$this->reviewOffset = 0;
 		}
 	}
@@ -271,8 +267,7 @@ class SpecialPendingReviews extends SpecialPage {
 
 		if ( $item->title->isRedirect() ) {
 			$reviewButton = $this->getAcceptRedirectButton( $item );
-		}
-		else {
+		} else {
 			$reviewButton = $this->getReviewButton( $item );
 		}
 
@@ -299,8 +294,7 @@ class SpecialPendingReviews extends SpecialPage {
 			if ( $item->deletionLog[$i]->log_type == 'move' ) {
 				$pageWasMoved = true;
 				break;
-			}
-			elseif ( $item->deletionLog[$i]->log_type == 'delete' ) {
+			} elseif ( $item->deletionLog[$i]->log_type == 'delete' ) {
 				$pageWasMoved = false;
 				break;
 			}
@@ -311,8 +305,7 @@ class SpecialPendingReviews extends SpecialPage {
 		if ( $pageWasMoved ) {
 			$acceptDeletionButton = $this->getAcceptMoveWithoutRedirectButton( $item->deletedTitle, $item->deletedNS );
 			$displayMessage = 'pendingreviews-page-moved-no-redirect';
-		}
-		else {
+		} else {
 			$acceptDeletionButton = $this->getMarkDeleteReviewedButton( $item->deletedTitle, $item->deletedNS );
 			$displayMessage = 'pendingreviews-page-deleted';
 		}
@@ -344,11 +337,9 @@ class SpecialPendingReviews extends SpecialPage {
 
 		if ( $item->numReviewers > $GLOBALS['egPendingReviewsOrangePagesThreshold'] ) {
 			$reviewCriticality = 'green'; // page is "green" because it has lots of reviewers
-		}
-		elseif ( $item->numReviewers > $GLOBALS['egPendingReviewsRedPagesThreshold'] ) {
+		} elseif ( $item->numReviewers > $GLOBALS['egPendingReviewsRedPagesThreshold'] ) {
 			$reviewCriticality = 'orange';
-		}
-		else {
+		} else {
 			$reviewCriticality = 'red'; // page is red because it has very few reviewers
 		}
 		$reviewCriticalityClass = 'pendingreviews-criticality-' . $reviewCriticality;
@@ -374,8 +365,7 @@ class SpecialPendingReviews extends SpecialPage {
 			// returns essentially the negative-oneth revision...the one before
 			// the wl_notificationtimestamp revision...or null/false if none exists?
 			$mostRecentReviewed = Revision::newFromRow( $item->newRevisions[0] )->getPrevious();
-		}
-		else {
+		} else {
 			$mostRecentReviewed = false; // no previous revision, the user has not reviewed the first!
 		}
 
@@ -393,8 +383,7 @@ class SpecialPendingReviews extends SpecialPage {
 					count( $item->newRevisions )
 				)->text()
 			);
-		}
-		else {
+		} else {
 
 			$latest = Revision::newFromTitle( $item->title );
 			$diffURL = $item->title->getLocalURL( [ 'oldid' => $latest->getId() ] );
@@ -530,8 +519,7 @@ class SpecialPendingReviews extends SpecialPage {
 
 		if ( $userTalk->exists() ) {
 			$talkQueryString = [];
-		}
-		else {
+		} else {
 			$talkQueryString = [ 'action' => 'edit' ];
 		}
 
@@ -669,8 +657,7 @@ class SpecialPendingReviews extends SpecialPage {
 
 			if ( $revTs > $logTs ) {
 				$combinedArray[] = array_shift( $log );
-			}
-			else {
+			} else {
 				$combinedArray[] = array_shift( $revisions );
 			}
 
@@ -761,8 +748,7 @@ class SpecialPendingReviews extends SpecialPage {
 			if ( isset( $change->log_timestamp ) ) {
 				$changeTs = $change->log_timestamp;
 				$changeText = $this->getLogChangeMessage( $change );
-			}
-			else {
+			} else {
 				$rev = Revision::newFromRow( $change );
 				$changeTs = $change->rev_timestamp;
 				$userPage = Title::makeTitle( NS_USER, $change->rev_user_text )->getFullText();
@@ -771,8 +757,7 @@ class SpecialPendingReviews extends SpecialPage {
 				if ( $comment ) {
 					$comment = '<span class="comment">' . Linker::formatComment( $comment ) . '</span>';
 					$changeText = ' ' . wfMessage( 'pendingreviews-with-comment', [ $userPage ] )->parse() . ' ' . $comment;
-				}
-				else {
+				} else {
 					$changeText = ' ' . wfMessage( 'pendingreviews-edited-by', $userPage )->parse();
 				}
 			}

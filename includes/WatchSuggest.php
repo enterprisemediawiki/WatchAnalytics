@@ -163,11 +163,9 @@ class WatchSuggest {
 
 		if ( count( $namespaces ) > 1 ) {
 			$namespaceCondition = 'AND p.page_namespace IN (' . $this->dbr->makeList( $namespaces ) . ')';
-		}
-		elseif ( count( $namespaces ) === 1 ) {
+		} elseif ( count( $namespaces ) === 1 ) {
 			$namespaceCondition = 'AND p.page_namespace = ' . $namespaces[0];
-		}
-		else {
+		} else {
 			$namespaceCondition = '';
 		}
 
@@ -267,15 +265,13 @@ class WatchSuggest {
 		while ( $row = $linkedPagesResult->fetchObject() ) {
 			if ( ! isset( $linkedPages[ $row->pl_from_id ] ) ) {
 				$linkedPages[ $row->pl_from_id ] = 1;
-			}
-			else {
+			} else {
 				$linkedPages[ $row->pl_from_id ]++;
 			}
 
 			if ( ! isset( $linkedPages[ $row->pl_to_id ] ) ) {
 				$linkedPages[ $row->pl_to_id ] = 1;
-			}
-			else {
+			} else {
 				$linkedPages[ $row->pl_to_id ]++;
 			}
 		}
@@ -299,8 +295,7 @@ class WatchSuggest {
 			if ( isset( $pageData[ 'num_watches' ] ) ) {
 				$numWatches = intval( $pageData[ 'num_watches' ] );
 				$numViews = intval( $pageData[ 'num_views' ] );
-			}
-			else {
+			} else {
 				$numWatches = 0;
 				$numViews = 0;
 			}
