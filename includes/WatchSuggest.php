@@ -164,12 +164,12 @@ class WatchSuggest {
 		if ( count( $namespaces ) > 1 ) {
 			$namespaceCondition = 'AND p.page_namespace IN (' . $this->dbr->makeList( $namespaces ) . ')';
 		}
- elseif ( count( $namespaces ) === 1 ) {
+		elseif ( count( $namespaces ) === 1 ) {
 			$namespaceCondition = 'AND p.page_namespace = ' . $namespaces[0];
-	}
- else {
+		}
+		else {
 			$namespaceCondition = '';
-	}
+		}
 
 		$userId = $user->getId();
 

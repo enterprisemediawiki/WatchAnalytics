@@ -775,7 +775,7 @@ class SpecialPendingReviews extends SpecialPage {
 				else {
 					$changeText = ' ' . wfMessage( 'pendingreviews-edited-by', $userPage )->parse();
 				}
-	}
+			}
 
 			$changeTs = Xml::element( 'span',
 				[ 'class' => 'pendingreviews-changes-list-time' ],
