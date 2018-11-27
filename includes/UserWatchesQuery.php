@@ -21,7 +21,7 @@
  * @file
  * @ingroup Extensions
  * @author James Montalvo
- * @licence MIT License
+ * @license MIT License
  */
 
 # Alert the user that this is not a valid entry point to MediaWiki if they try to access the special pages file directly.
@@ -56,7 +56,7 @@ class UserWatchesQuery extends WatchesQuery {
 			),
 		1), 3) AS engagement_score';
 
-	protected $fieldNames = array(
+	protected $fieldNames = [
 		'user_name'               => 'watchanalytics-special-header-user',
 		'num_watches'             => 'watchanalytics-special-header-watches',
 		'num_pending'             => 'watchanalytics-special-header-pending-watches',
@@ -64,18 +64,17 @@ class UserWatchesQuery extends WatchesQuery {
 		'max_pending_minutes'     => 'watchanalytics-special-header-pending-maxtime',
 		'avg_pending_minutes'     => 'watchanalytics-special-header-pending-averagetime',
 		'engagement_score'        => 'watchanalytics-special-header-engagement-score',
-	);
+	];
 
 	public function getQueryInfo( $conds = null ) {
-
-		$this->tables = array(
+		$this->tables = [
 			'w' => 'watchlist',
 			'u' => 'user',
 			'p' => 'page',
 			'log' => 'logging',
-		);
+		];
 
-		$this->fields = array(
+		$this->fields = [
 			$this->sqlUserName,
 			$this->sqlNumWatches,
 			$this->sqlNumPending,
@@ -83,39 +82,38 @@ class UserWatchesQuery extends WatchesQuery {
 			$this->sqlMaxPendingMins,
 			$this->sqlAvgPendingMins,
 			$this->sqlEngagementScore,
-		);
+		];
 
-		$this->conds = $conds ? $conds : array();
+		$this->conds = $conds ? $conds : [];
 
-		$this->join_conds = array(
-			'u' => array(
+		$this->join_conds = [
+			'u' => [
 				'LEFT JOIN', 'u.user_id=w.wl_user'
-			),
-			'p' => array(
+			],
+			'p' => [
 				'LEFT JOIN', 'p.page_namespace=w.wl_namespace AND p.page_title=w.wl_title'
-			),
-			'log' => array(
+			],
+			'log' => [
 				'LEFT JOIN',
 				'log.log_namespace = w.wl_namespace '
 				. ' AND log.log_title = w.wl_title'
 				. ' AND p.page_namespace IS NULL'
 				. ' AND p.page_title IS NULL'
 				. ' AND log.log_action = "delete"'
-			),
-		);
+			],
+		];
 
 		// optionally join the 'user_groups' table to filter by user group
 		if ( $this->userGroupFilter ) {
 			$this->tables['ug'] = 'user_groups';
-			$this->join_conds['ug'] = array(
+			$this->join_conds['ug'] = [
 				'RIGHT JOIN', "w.wl_user = ug.ug_user AND ug.ug_group = \"{$this->userGroupFilter}\""
-			);
+			];
 
 			$noNullUsers = 'w.wl_user IS NOT NULL';
 			if ( is_array( $this->conds ) ) {
 				$this->conds[] = $noNullUsers;
-			}
-			else if ( is_string( $this->conds ) ) {
+			} elseif ( is_string( $this->conds ) ) {
 				$this->conds .= ' AND ' . $noNullUsers;
 			}
 		}
@@ -125,12 +123,11 @@ class UserWatchesQuery extends WatchesQuery {
 			$this->setCategoryFilterQueryInfo();
 		}
 
-		$this->options = array(
+		$this->options = [
 			'GROUP BY' => 'w.wl_user'
-		);
+		];
 
 		return parent::getQueryInfo();
-
 	}
 
 	/**
@@ -141,11 +138,10 @@ class UserWatchesQuery extends WatchesQuery {
 	 * @return array returns user watch info in an array with keys the same as
 	 * $this->fieldNames.
 	 */
-	public function getUserWatchStats ( User $user ) {
-
+	public function getUserWatchStats( User $user ) {
 		$qInfo = $this->getQueryInfo();
 
-		$dbr = wfGetDB( DB_SLAVE );
+		$dbr = wfGetDB( DB_REPLICA );
 
 		$res = $dbr->select(
 			$qInfo['tables'],
@@ -161,7 +157,7 @@ class UserWatchesQuery extends WatchesQuery {
 		// if user doesn't have any pages in watchlist, then no data will be
 		// returned by this query. Create a "blank" row instead.
 		if ( $row === false ) {
-			$row = array();
+			$row = [];
 			foreach ( $this->fieldNames as $name => $msg ) {
 				$row[ $name ] = 0;
 			}
@@ -178,42 +174,41 @@ class UserWatchesQuery extends WatchesQuery {
 	 * @return Array returns user watch info in an array with user IDs as keys
 	 * and values being objects with params num_watches and num_pending.
 	 */
-	public function getMultiUserWatchStats ( Array $userIds ) {
-
+	public function getMultiUserWatchStats( array $userIds ) {
 		if ( ! count( $userIds ) ) {
-			return array();
+			return [];
 		}
 
-		$fields = array(
+		$fields = [
 			'w.wl_user',
 			$this->sqlNumWatches,
 			$this->sqlNumPending,
-		);
+		];
 
-		$dbr = wfGetDB( DB_SLAVE );
+		$dbr = wfGetDB( DB_REPLICA );
 
 		$res = $dbr->select(
-			array(
+			[
 				'w' => 'watchlist'
-			),
+			],
 			$fields,
-			array(
+			[
 				'w.wl_user' => $userIds
-			),
+			],
 			__METHOD__,
-			array(
+			[
 				'GROUP BY' => 'w.wl_user'
-			), // no options
+			], // no options
 			null // no joins
 		);
 
-		$return = array();
+		$return = [];
 		while ( $row = $res->fetchObject() ) {
-			$return[] = (object)array(
+			$return[] = (object)[
 				'wl_user' => $row->wl_user,
 				'num_watches' => $row->num_watches,
 				'num_pending' => $row->num_pending,
-			);
+			];
 		}
 
 		return $return;

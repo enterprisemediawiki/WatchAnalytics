@@ -29,12 +29,12 @@
 // Allow people to have different layouts.
 if ( ! isset( $IP ) ) {
 	$IP = __DIR__ . '/../../../';
-	if ( getenv("MW_INSTALL_PATH") ) {
-		$IP = getenv("MW_INSTALL_PATH");
+	if ( getenv( "MW_INSTALL_PATH" ) ) {
+		$IP = getenv( "MW_INSTALL_PATH" );
 	}
 }
 
-require_once( "$IP/maintenance/Maintenance.php" );
+require_once "$IP/maintenance/Maintenance.php";
 
 class WatchAnalyticsForgivePendingReviews extends Maintenance {
 
@@ -63,7 +63,6 @@ class WatchAnalyticsForgivePendingReviews extends Maintenance {
 			'reviewedby',
 			'Limit forgiveness to pages which have been reviewed by at least the specified number of people (default ' . $this->forgiveBefore . ')',
 			false, true );
-
 	}
 
 	// $query =
@@ -107,7 +106,6 @@ class WatchAnalyticsForgivePendingReviews extends Maintenance {
 			$usernames = '';
 		}
 
-
 		$forgiveBefore = $this->getOption( 'forgivebefore', $this->forgiveBefore );
 		$reviewedBy = $this->getOption( 'reviewedby', $this->reviewedBy );
 
@@ -144,4 +142,4 @@ class WatchAnalyticsForgivePendingReviews extends Maintenance {
 }
 
 $maintClass = "WatchAnalyticsForgivePendingReviews";
-require_once( DO_MAINTENANCE );
+require_once RUN_MAINTENANCE_IF_MAIN;

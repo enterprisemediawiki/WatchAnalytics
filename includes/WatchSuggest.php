@@ -21,7 +21,7 @@
  * @file
  * @ingroup Extensions
  * @author James Montalvo
- * @licence MIT License
+ * @license MIT License
  */
 
 # Alert the user that this is not a valid entry point to MediaWiki if they try to access the special pages file directly.
@@ -45,9 +45,9 @@ class WatchSuggest {
 	 */
 	public $dbr;
 
-	public function __construct ( User $user ) {
+	public function __construct( User $user ) {
 		$this->mUser = $user;
-		$this->dbr = wfGetDB( DB_SLAVE );
+		$this->dbr = wfGetDB( DB_REPLICA );
 	}
 
 	/**
@@ -55,20 +55,18 @@ class WatchSuggest {
 	 *
 	 * @return bool
 	 */
-	public function getWatchSuggestionList () {
-
+	public function getWatchSuggestionList() {
 		$html = '';
 
 		// gets id, NS and title of all pages in users watchlist in NS_MAIN
 		$userWatchlist = $this->getUserWatchlist( $this->mUser, NS_MAIN );
-		$linkedPages = array();
+		$linkedPages = [];
 
 		// if the user has pages from NS_MAIN in their watchlist then find all
 		// pages linked to/from those pages
 		if ( count( $userWatchlist ) > 0 ) {
 			$linkedPages = $this->getPagesRelatedByLinks( $userWatchlist );
 		}
-
 
 		if ( count( $linkedPages ) == 0 ) {
 
@@ -82,17 +80,15 @@ class WatchSuggest {
 				__METHOD__
 			);
 
-			$linkedPages = array();
+			$linkedPages = [];
 
 			// create "fake" $linkedPages where all pages in NS_MAIN are given the same number
 			// of inbound/outbound links from the users watchlist
 			while ( $row = $noWatchlist->fetchObject() ) {
-				$linkedPages[ $row->page_id ] = array( 'num_links' => 1 );
+				$linkedPages[ $row->page_id ] = [ 'num_links' => 1 ];
 			}
 
 		}
-
-
 
 		$pageWatchQuery = new PageWatchesQuery;
 		$pageWatchesAndViews = $pageWatchQuery->getPageWatchesAndViews( array_keys( $linkedPages ) );
@@ -105,11 +101,8 @@ class WatchSuggest {
 
 		$sortedPages = $this->sortPagesByWatchImportance( $linkedPages );
 
-
 		global $wgUser;
 		$userIsViewer = $wgUser->getId() == $this->mUser->getId();
-
-
 
 		$count = 1;
 		$watchSuggestionsTitle = wfMessage( 'pendingreviews-watch-suggestion-title' )->text();
@@ -117,7 +110,7 @@ class WatchSuggest {
 
 		global $egPendingReviewsNumberWatchSuggestions;
 
-		$watchSuggestionsLIs = array();
+		$watchSuggestionsLIs = [];
 		foreach ( $sortedPages as $pageId => $pageInfo ) {
 
 			$suggestedTitle = Title::newFromID( $pageInfo[ 'page_id' ] );
@@ -132,8 +125,7 @@ class WatchSuggest {
 
 			if ( $userIsViewer ) {
 				$watchLink = '<strong>' . self::getWatchLink( $suggestedTitle ) . ':</strong> ';
-			}
-			else {
+			} else {
 				$watchLink = '';
 			}
 
@@ -159,79 +151,72 @@ class WatchSuggest {
 			. WatchAnalyticsHtmlHelper::formatListArray( $this->getMostWatchesListArray( $numTopWatchers ), 2 );
 
 		return $html;
-
 	}
 
-
-
-	public function getUserWatchlist ( User $user, $namespaces = array() ) {
-
+	public function getUserWatchlist( User $user, $namespaces = [] ) {
 		if ( ! is_array( $namespaces ) ) {
 			if ( intval( $namespaces ) < 0 ) {
 				throw new MWException( __METHOD__ . ' argument $namespace requires integer or array' );
 			}
-			$namespaces = array( $namespaces );
+			$namespaces = [ $namespaces ];
 		}
 
 		if ( count( $namespaces ) > 1 ) {
 			$namespaceCondition = 'AND p.page_namespace IN (' . $this->dbr->makeList( $namespaces ) . ')';
 		}
-		else if ( count( $namespaces ) === 1 ) {
+ elseif ( count( $namespaces ) === 1 ) {
 			$namespaceCondition = 'AND p.page_namespace = ' . $namespaces[0];
-		}
-		else {
+	}
+ else {
 			$namespaceCondition = '';
-		}
+	}
 
 		$userId = $user->getId();
 
 		// SELECT
-		// 	p.page_id AS p_id,
-		// 	w.wl_title AS p_title
+		// p.page_id AS p_id,
+		// w.wl_title AS p_title
 		// FROM page AS p
 		// LEFT JOIN watchlist AS w
-		// 	ON (
-		// 		w.wl_namespace = p.page_namespace
-		// 		AND w.wl_title = p.page_title
-		// 	)
+		// ON (
+		// w.wl_namespace = p.page_namespace
+		// AND w.wl_title = p.page_title
+		// )
 		// WHERE
-		// 	w.wl_user = $userId
-		// 	AND p.page_namespace = 0
+		// w.wl_user = $userId
+		// AND p.page_namespace = 0
 		$userWatchlist = $this->dbr->select(
-			array(
+			[
 				'p' => 'page',
 				'w' => 'watchlist',
-			),
-			array(
+			],
+			[
 				'p.page_id AS p_id',
 				'w.wl_namespace AS p_namespace',
 				'w.wl_title AS p_title',
- 			),
+			],
 			"w.wl_user=$userId " . $namespaceCondition,
 			__METHOD__,
-			array(), // options
-			array(
-				'w' => array(
+			[], // options
+			[
+				'w' => [
 					'LEFT JOIN',
 					'w.wl_namespace = p.page_namespace AND w.wl_title = p.page_title'
-				)
-			)
+				]
+			]
 		);
 
-		$return = array();
+		$return = [];
 		while ( $row = $userWatchlist->fetchObject() ) {
 			$return[] = $row;
 		}
 
-
 		return $return;
 	}
 
-
-	public function getPagesRelatedByLinks ( $userWatchlist ) {
-
-		$userWatchlistPageIds = array();
-		$userWatchlistPageTitles = array();
+	public function getPagesRelatedByLinks( $userWatchlist ) {
+		$userWatchlistPageIds = [];
+		$userWatchlistPageTitles = [];
 		foreach ( $userWatchlist as $row ) {
 			$userWatchlistPageIds[] = $row->p_id;
 
@@ -244,42 +229,41 @@ class WatchSuggest {
 		$titles = $this->dbr->makeList( $userWatchlistPageTitles );
 
 		// SELECT
-		// 	pl.pl_from AS pl_from_id,
-		// 	p_to.page_id AS pl_to_id
+		// pl.pl_from AS pl_from_id,
+		// p_to.page_id AS pl_to_id
 		// FROM pagelinks AS pl
 		// INNER JOIN page AS p_to
-		// 	ON (
-		// 		pl.pl_namespace = p_to.page_namespace
-		// 		AND pl.pl_title = p_to.page_title
-		// 	)
+		// ON (
+		// pl.pl_namespace = p_to.page_namespace
+		// AND pl.pl_title = p_to.page_title
+		// )
 		// WHERE
-		// 	pl.pl_from IN ( <LIST OF all p_id found above> )
-		// 	OR ( pl.pl_namespace = 0 AND pl.pl_title IN ( <LIST OF ALL p_title found above> ) )
+		// pl.pl_from IN ( <LIST OF all p_id found above> )
+		// OR ( pl.pl_namespace = 0 AND pl.pl_title IN ( <LIST OF ALL p_title found above> ) )
 		$where =
 			"pl.pl_from IN ($ids) " .
 			" OR ( pl.pl_namespace = 0 AND pl.pl_title IN ($titles) )";
 
-
 		$linkedPagesResult = $this->dbr->select(
-			array(
+			[
 				'pl' => 'pagelinks',
 				'p_to' => 'page',
-			),
-			array(
+			],
+			[
 				'pl.pl_from AS pl_from_id',
 				'p_to.page_id AS pl_to_id',
- 			),
+			],
 			$where,
 			__METHOD__,
-			array(), // options
-			array(
-				'p_to' => array(
+			[], // options
+			[
+				'p_to' => [
 					'INNER JOIN',
 					'pl.pl_namespace = p_to.page_namespace AND pl.pl_title = p_to.page_title'
-				),
-			)
+				],
+			]
 		);
-		$linkedPages = array();
+		$linkedPages = [];
 		while ( $row = $linkedPagesResult->fetchObject() ) {
 			if ( ! isset( $linkedPages[ $row->pl_from_id ] ) ) {
 				$linkedPages[ $row->pl_from_id ] = 1;
@@ -296,24 +280,21 @@ class WatchSuggest {
 			}
 		}
 
-		$linkedPagesToKeep = array();
+		$linkedPagesToKeep = [];
 		foreach ( $linkedPages as $pageId => $numLinks ) {
 			if ( ! in_array( $pageId, $userWatchlistPageIds ) ) {
-				$linkedPagesToKeep[ $pageId ] = array( 'num_links' => $numLinks );
+				$linkedPagesToKeep[ $pageId ] = [ 'num_links' => $numLinks ];
 			}
 		}
 
 		return $linkedPagesToKeep;
-
 	}
 
-
-	public function sortPagesByWatchImportance ( $pages ) {
-
-		$watches = array();
-		$links = array();
-		$watchNeedArray = array();
-		$sortedPages = array();
+	public function sortPagesByWatchImportance( $pages ) {
+		$watches = [];
+		$links = [];
+		$watchNeedArray = [];
+		$sortedPages = [];
 		foreach ( $pages as $pageId => $pageData ) {
 			if ( isset( $pageData[ 'num_watches' ] ) ) {
 				$numWatches = intval( $pageData[ 'num_watches' ] );
@@ -327,13 +308,13 @@ class WatchSuggest {
 
 			$watchNeed = $numLinks * pow( $numViews, 2 );
 
-			$sortedPages[] = array(
+			$sortedPages[] = [
 				'page_id' => $pageId,
 				'num_watches' => $numWatches,
 				'num_links' => $numLinks,
 				'num_views' => $numViews,
 				'watch_need' => $watchNeed,
-			);
+			];
 			$watches[] = $numWatches;
 			$links[] = $numLinks;
 			$watchNeedArray[] = $watchNeed;
@@ -344,61 +325,60 @@ class WatchSuggest {
 	}
 
 	// SELECT
-	// 	u.user_name AS uname,
-	// 	u.user_real_name AS name,
-	// 	COUNT( * ) AS user_watches
+	// u.user_name AS uname,
+	// u.user_real_name AS name,
+	// COUNT( * ) AS user_watches
 	// FROM
-	// 	watchlist AS w
+	// watchlist AS w
 	// RIGHT JOIN page AS p ON
-	// 	(w.wl_namespace = p.page_namespace AND w.wl_title = p.page_title)
+	// (w.wl_namespace = p.page_namespace AND w.wl_title = p.page_title)
 	// LEFT JOIN user AS u ON
-	// 	(w.wl_user = u.user_id)
+	// (w.wl_user = u.user_id)
 	// WHERE
-	// 	p.page_is_redirect = 0
+	// p.page_is_redirect = 0
 	// GROUP BY w.wl_user
 	// ORDER BY user_watches DESC
-	public function getMostWatchesListArray ( $limit = 20 ) {
-
+	public function getMostWatchesListArray( $limit = 20 ) {
 		$mostWatches = $this->dbr->select(
-			array(
+			[
 				'w' => 'watchlist',
 				'p' => 'page',
 				'u' => 'user',
-			),
-			array(
+			],
+			[
 				'u.user_name AS user_name',
 				'u.user_real_name AS real_name',
 				'COUNT( * ) AS user_watches',
- 			),
+			],
 			'p.page_is_redirect = 0 AND w.wl_user != 0', // no redirects, and don't include maintenance scripts and other non-users
 			__METHOD__,
-			array(
+			[
 				'GROUP BY' => 'w.wl_user',
 				'ORDER BY' => 'user_watches DESC',
 				'LIMIT' => $limit,
-			),
-			array(
-				'p' => array(
+			],
+			[
+				'p' => [
 					'RIGHT JOIN',
 					'w.wl_namespace = p.page_namespace AND w.wl_title = p.page_title'
-				),
-				'u' => array(
+				],
+				'u' => [
 					'LEFT JOIN',
 					'w.wl_user = u.user_id'
-				),
-			)
+				],
+			]
 		);
 
-		$return = array();
+		$return = [];
 		$count = 0;
 		while ( $user = $mostWatches->fetchObject() ) {
 			$count++;
 			// CONSIDERING usering real name
 			// if ( $user->real_name ) {
-			// 	$displayName = $user->real_name;
+			// $displayName = $user->real_name;
 			// }
 			// else {
-			// 	$displayName = $user->user_name;
+			// $displayName = $user->user_name;
 			// }
 
 			$watchUser = User::newFromName( $user->user_name );
@@ -414,33 +394,30 @@ class WatchSuggest {
 		}
 
 		return $return;
-
 	}
 
-	public static function getWatchLink ( Title $title ) {
-
+	public static function getWatchLink( Title $title ) {
 		global $wgUser;
 
 		// action=watch&token=9d1186bca6dd20866e607538b92be6c8%2B%5C
-		$watchLinkURL = $title->getLinkURL( array(
+		$watchLinkURL = $title->getLinkURL( [
 			'action' => 'watch',
 			'token' => WatchAction::getWatchToken( $title, $wgUser ),
-		) );
+		] );
 
 		$watchLink =
 			Xml::element(
 				'a',
-				array(
+				[
 					'href' => $watchLinkURL,
 					'class' => 'pendingreviews-watch-suggest-link',
 					'suggest-title-prefixed-text' => $title->getPrefixedDBkey(),
 					'thanks-msg' => wfMessage( 'pendingreviews-watch-suggestion-thanks' )->text()// FIXME: there's a better way
-				),
+				],
 				wfMessage( 'pendingreviews-watch-suggestion-watchlink' )->text()
 			);
 
 		return $watchLink;
-
 	}
 
 }

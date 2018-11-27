@@ -21,7 +21,7 @@
  * @file
  * @ingroup Extensions
  * @author James Montalvo
- * @licence MIT License
+ * @license MIT License
  */
 
 # Alert the user that this is not a valid entry point to MediaWiki if they try to access the special pages file directly.
@@ -35,14 +35,14 @@ EOT;
 
 class WikiWatchesQuery extends WatchesQuery {
 
-	protected $fieldNames = array(
+	protected $fieldNames = [
 		'tracking_timestamp'          => 'watchanalytics-special-header-timestamp',
 
 		'num_pages'                   => 'watchanalytics-special-header-num-pages',
-		'num_watches'                 =>   'watchanalytics-special-header-watches',
-		'num_pending'                 =>   'watchanalytics-special-header-pending-watches',
-		'max_pending_minutes'         =>   'watchanalytics-special-header-pending-maxtime',
-		'avg_pending_minutes'         =>   'watchanalytics-special-header-pending-averagetime',
+		'num_watches'                 => 'watchanalytics-special-header-watches',
+		'num_pending'                 => 'watchanalytics-special-header-pending-watches',
+		'max_pending_minutes'         => 'watchanalytics-special-header-pending-maxtime',
+		'avg_pending_minutes'         => 'watchanalytics-special-header-pending-averagetime',
 
 		'num_unwatched'               => 'watchanalytics-special-header-num-unwatched',
 		'num_one_watched'             => 'watchanalytics-special-header-num-one-watched',
@@ -59,15 +59,14 @@ class WikiWatchesQuery extends WatchesQuery {
 		// 'content_num_one_watched'     => 'watchanalytics-special-header-main-num-one-watched',
 		// 'content_num_unreviewed'      => 'watchanalytics-special-header-main-num-unreviewed',
 		// 'content_num_one_reviewed'    => 'watchanalytics-special-header-main-num-one-reviewed',
-	);
+	];
 
 	public function getQueryInfo( $conds = null ) {
-
-		$this->tables = array(
+		$this->tables = [
 			'w' => 'watch_tracking_wiki'
-		);
+		];
 
-		$this->fields = array(
+		$this->fields = [
 			'tracking_timestamp',
 
 			'num_pages',
@@ -91,16 +90,15 @@ class WikiWatchesQuery extends WatchesQuery {
 			// 'content_num_one_watched',
 			// 'content_num_unreviewed',
 			// 'content_num_one_reviewed',
-		);
+		];
 
-		$this->conds = $conds ? $conds : array();
+		$this->conds = $conds ? $conds : [];
 
-		$this->join_conds = array();
+		$this->join_conds = [];
 
-		$this->options = array();
+		$this->options = [];
 
 		return parent::getQueryInfo();
-
 	}
 
 }

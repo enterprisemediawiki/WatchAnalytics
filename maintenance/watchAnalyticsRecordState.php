@@ -29,12 +29,12 @@
 // Allow people to have different layouts.
 if ( ! isset( $IP ) ) {
 	$IP = __DIR__ . '/../../../';
-	if ( getenv("MW_INSTALL_PATH") ) {
-		$IP = getenv("MW_INSTALL_PATH");
+	if ( getenv( "MW_INSTALL_PATH" ) ) {
+		$IP = getenv( "MW_INSTALL_PATH" );
 	}
 }
 
-require_once( "$IP/maintenance/Maintenance.php" );
+require_once "$IP/maintenance/Maintenance.php";
 
 class WatchAnalyticsRecordState extends Maintenance {
 
@@ -52,4 +52,4 @@ class WatchAnalyticsRecordState extends Maintenance {
 }
 
 $maintClass = "WatchAnalyticsRecordState";
-require_once( DO_MAINTENANCE );
+require_once RUN_MAINTENANCE_IF_MAIN;

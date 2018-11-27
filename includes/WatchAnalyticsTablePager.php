@@ -2,7 +2,7 @@
 
 abstract class WatchAnalyticsTablePager extends TablePager {
 
-	public function __construct( $page, $conds, $filters = array() ) {
+	public function __construct( $page, $conds, $filters = [] ) {
 		$this->page = $page;
 		$this->limit = $page->limit;
 		$this->offset = $page->offset;
@@ -32,32 +32,27 @@ abstract class WatchAnalyticsTablePager extends TablePager {
 	}
 
 	public function getIndexField() {
-
 		global $wgRequest;
 
 		$sortField = $wgRequest->getVal( 'sort' );
 		if ( isset( $sortField ) && $this->isFieldSortable( $sortField ) ) {
 			return $sortField;
-		}
-		else {
+		} else {
 			return $this->getDefaultSort();
 		}
-
 	}
 
 	public function isNavigationBarShown() {
 		return true;
 	}
 
-	public function isFieldSortable ( $field ) {
+	public function isFieldSortable( $field ) {
 		if ( ! isset( $this->isSortable[$field] ) ) {
 			return false;
-		}
-		else {
+		} else {
 			return $this->isSortable[ $field ];
 		}
 	}
-
 
 	/**
 	 * Do a query with specified parameters, rather than using the object
@@ -78,18 +73,18 @@ abstract class WatchAnalyticsTablePager extends TablePager {
 
 		// code below adapted from MW 1.22 core, Pager.php,
 		// IndexPager::buildQueryInfo()
-		$sortColumns = array_merge( array( $this->mIndexField ), $this->mExtraSortFields );
+		$sortColumns = array_merge( [ $this->mIndexField ], $this->mExtraSortFields );
 		if ( $descending ) {
 			$options['ORDER BY'] = $sortColumns;
 		} else {
-			$orderBy = array();
+			$orderBy = [];
 			foreach ( $sortColumns as $col ) {
 				$orderBy[] = $col . ' DESC';
 			}
 			$options['ORDER BY'] = $orderBy;
 		}
 		if ( $offset != '' ) {
-			if ( intval ( $offset ) < 0 ) {
+			if ( intval( $offset ) < 0 ) {
 				$offset = 0;
 			}
 			$options['OFFSET'] = $offset;
@@ -97,10 +92,9 @@ abstract class WatchAnalyticsTablePager extends TablePager {
 		$options['LIMIT'] = intval( $limit );
 		// end adapted code
 
-		$dbr = wfGetDB( DB_SLAVE );
+		$dbr = wfGetDB( DB_REPLICA );
 		return $dbr->select( $tables, $fields, $conds, __METHOD__, $options, $join_conds );
 	}
-
 
 	/**
 	 * Override IndexPager in includes/Pager.php.
@@ -115,17 +109,14 @@ abstract class WatchAnalyticsTablePager extends TablePager {
 
 		if ( isset( $this->offset ) ) {
 			$offset = $this->offset;
-		}
-		else {
+		} else {
 			$offset = 0;
 		}
-
 
 		if ( $offset <= 0 ) {
 			$queries['prev'] = false;
 			$queries['first'] = false;
-		}
-		else if ( isset( $queries['prev']['offset'] ) ) {
+		} elseif ( isset( $queries['prev']['offset'] ) ) {
 			$queries['prev']['offset'] = $offset - $this->limit;
 		}
 
@@ -134,9 +125,7 @@ abstract class WatchAnalyticsTablePager extends TablePager {
 		}
 
 		return $queries;
-
 	}
-
 
 	/**
 	 * Creates form to filter Watch Analytics results (e.g. by user group or
@@ -150,14 +139,13 @@ abstract class WatchAnalyticsTablePager extends TablePager {
 		global $wgScript;
 
 		// user group filter
-		$groups = array( $this->msg( 'watchanalytics-user-group-no-filter' )->text() => '' );
+		$groups = [ $this->msg( 'watchanalytics-user-group-no-filter' )->text() => '' ];
 		$rawGroups = User::getAllGroups();
 		foreach ( $rawGroups as $group ) {
 			$labelMsg = $this->msg( 'group-' . $group );
 			if ( $labelMsg->exists() ) {
 				$label = $labelMsg->text();
-			}
-			else {
+			} else {
 				$label = $group;
 			}
 			$groups[ $label ] = $group;
@@ -166,15 +154,15 @@ abstract class WatchAnalyticsTablePager extends TablePager {
 		$groupFilter->addOptions( $groups );
 
 		// category filter
-		$dbr = wfGetDB( DB_SLAVE );
+		$dbr = wfGetDB( DB_REPLICA );
 		$result = $dbr->select(
 			'categorylinks',
 			'cl_to',
 			'',
 			__METHOD__,
-			array( 'DISTINCT' )
+			[ 'DISTINCT' ]
 		);
-		$categories = array( $this->msg( 'watchanalytics-category-no-filter' )->text() => '' );
+		$categories = [ $this->msg( 'watchanalytics-category-no-filter' )->text() => '' ];
 		while ( $row = $result->fetchRow() ) {
 			$category = Category::newFromName( $row['cl_to'] );
 			$label = $category->getTitle()->getText();
@@ -186,7 +174,7 @@ abstract class WatchAnalyticsTablePager extends TablePager {
 
 		$out =
 			// create the form element
-			Xml::openElement( 'form', array( 'method' => 'get', 'action' => $wgScript, 'id' => 'ext-watchanalytics-form' ) ) .
+			Xml::openElement( 'form', [ 'method' => 'get', 'action' => $wgScript, 'id' => 'ext-watchanalytics-form' ] ) .
 
 			// create fieldset
 			Xml::fieldset( $this->msg( 'allmessages-filter-legend' )->text() ) .
@@ -195,8 +183,7 @@ abstract class WatchAnalyticsTablePager extends TablePager {
 			Html::hidden( 'title', $this->getTitle()->getPrefixedText() ) .
 
 			// create table for form elements
-			Xml::openElement( 'table', array( 'class' => 'ext-watchanalytics-stats-filter-table' ) ) . "\n" .
-
+			Xml::openElement( 'table', [ 'class' => 'ext-watchanalytics-stats-filter-table' ] ) . "\n" .
 
 			// filter results by user group
 			'<tr>
@@ -247,7 +234,7 @@ abstract class WatchAnalyticsTablePager extends TablePager {
 
 			// FIXME: are all of these needed? are additional need to support
 			// WatchAnalytics fields?
-			$this->getHiddenFields( array( 'title', 'prefix', 'filter', 'lang', 'limit', 'groupfilter', 'categoryfilter' ) ) .
+			$this->getHiddenFields( [ 'title', 'prefix', 'filter', 'lang', 'limit', 'groupfilter', 'categoryfilter' ] ) .
 
 			// close fieldset and form elements
 			Xml::closeElement( 'fieldset' ) .

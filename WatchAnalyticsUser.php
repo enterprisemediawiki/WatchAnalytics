@@ -21,7 +21,7 @@
  * @file
  * @ingroup Extensions
  * @author James Montalvo
- * @licence MIT License
+ * @license MIT License
  */
 
 # Alert the user that this is not a valid entry point to MediaWiki if they try to access the special pages file directly.
@@ -38,10 +38,9 @@ class WatchAnalyticsUser {
 	protected $user;
 	protected $pendingWatches;
 
-	public function __construct ( User $user ) {
+	public function __construct( User $user ) {
 		$this->user = $user;
 	}
-
 
 	/*
 	SELECT watchlist.wl_title, user.user_name
@@ -60,33 +59,31 @@ class WatchAnalyticsUser {
 		// user.user_real_name AS real_name
 	// FROM watchlist
 	// LEFT JOIN user ON user.user_id = watchlist.wl_user
-	public function getPendingWatches () {
-
-		$dbr = wfGetDB( DB_SLAVE );
+	public function getPendingWatches() {
+		$dbr = wfGetDB( DB_REPLICA );
 
 		$res = $dbr->select(
-			array( 'w' => 'watchlist' ),
-			array(
+			[ 'w' => 'watchlist' ],
+			[
 				'w.wl_namespace AS namespace_id',
 				'w.wl_title AS title_text',
 				'w.wl_notificationtimestamp AS notification_timestamp',
-			),
+			],
 			'w.wl_notificationtimestamp IS NOT NULL AND w.wl_user=' . $this->user->getId(),
 			__METHOD__,
-			array(
+			[
 				// "DISTINCT",
 				// "GROUP BY" => "w.hit_year, w.hit_month, w.hit_day",
 				// "ORDER BY" => "w.hit_year DESC, w.hit_month DESC, w.hit_day DESC",
 				"LIMIT" => "100000",
-			),
+			],
 			null // array( 'u' => array( 'LEFT JOIN', 'u.user-id=w.wl_user' ) )
 		);
-		$this->pendingWatches = array();
+		$this->pendingWatches = [];
 		while ( $row = $dbr->fetchRow( $res ) ) {
 
 			// $title = Title::newFromText( $row['title_text'], $row['notification_timestamp'] );
 			$this->pendingWatches[] = $row;
-
 
 		}
 

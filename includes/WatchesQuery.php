@@ -21,7 +21,7 @@
  * @file
  * @ingroup Extensions
  * @author James Montalvo
- * @licence MIT License
+ * @license MIT License
  */
 
 # Alert the user that this is not a valid entry point to MediaWiki if they try to access the special pages file directly.
@@ -79,12 +79,10 @@ class WatchesQuery {
 	 */
 	protected $categoryFilter = false;
 
-
-	public function __construct () {
+	public function __construct() {
 	}
 
-	public function createTimeStringFromMinutes ( $totalMinutes ) {
-
+	public function createTimeStringFromMinutes( $totalMinutes ) {
 		$remainder = $totalMinutes;
 
 		$minutesInDay = 60 * 24;
@@ -98,7 +96,7 @@ class WatchesQuery {
 
 		$minutes = $remainder;
 
-		$time = array();
+		$time = [];
 		if ( $days ) {
 			$time[] = $days . ' day' . ( ( $days > 1 ) ? 's' : '' );
 		}
@@ -118,7 +116,7 @@ class WatchesQuery {
 	}
 
 	public function getFieldNames() {
-		$output = array();
+		$output = [];
 
 		foreach ( $this->fieldNames as $dbKey => $msg ) {
 			$output[$dbKey] = wfMessage( $msg )->text();
@@ -128,45 +126,43 @@ class WatchesQuery {
 	}
 
 	public function getQueryInfo() {
+		$this->conds = $this->conds ? $this->conds : [];
 
-		$this->conds = $this->conds ? $this->conds : array();
-
-		if ( isset ( $this->limit ) ) {
+		if ( isset( $this->limit ) ) {
 			$this->options['LIMIT'] = $this->limit;
 		}
-		if ( isset ( $this->offset ) ) {
+		if ( isset( $this->offset ) ) {
 			$this->options['OFFSET'] = $this->offset;
 		}
 
-		$return = array(
+		$return = [
 			'tables' => $this->tables,
 			'fields' => $this->fields,
 			'join_conds' => $this->join_conds,
 			'conds' => $this->conds,
 			'options' => $this->options,
-		);
+		];
 
 		return $return;
-
 	}
 
-	public function setUserGroupFilter ( $ugf ) {
+	public function setUserGroupFilter( $ugf ) {
 		if ( $ugf ) {
 			$this->userGroupFilter = $ugf;
 		}
 	}
 
-	public function setCategoryFilter ( $cf ) {
+	public function setCategoryFilter( $cf ) {
 		if ( $cf ) {
 			$this->categoryFilter = $cf;
 		}
 	}
 
-	public function setCategoryFilterQueryInfo () {
+	public function setCategoryFilterQueryInfo() {
 		$this->tables['cat'] = 'categorylinks';
-		$this->join_conds['cat'] = array(
+		$this->join_conds['cat'] = [
 			'RIGHT JOIN', 'cat.cl_from = p.page_id AND cat.cl_to = "' . $this->categoryFilter . '"'
-		);
+		];
 	}
 
 }

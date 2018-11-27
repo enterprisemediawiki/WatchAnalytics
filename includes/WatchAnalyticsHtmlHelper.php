@@ -21,7 +21,7 @@
  * @file
  * @ingroup Extensions
  * @author James Montalvo
- * @licence MIT License
+ * @license MIT License
  */
 
 # Alert the user that this is not a valid entry point to MediaWiki if they try to access the special pages file directly.
@@ -35,8 +35,7 @@ EOT;
 
 class WatchAnalyticsHtmlHelper {
 
-	static public function formatListArray ( $list, $columns = 1, $listType = 'ol' ) {
-
+	public static function formatListArray( $list, $columns = 1, $listType = 'ol' ) {
 		// number of <li> elements
 		$numLI = count( $list );
 
@@ -45,8 +44,7 @@ class WatchAnalyticsHtmlHelper {
 
 		if ( $columns > 1 ) {
 			$perCol = ceil( $numLI / $columns );
-		}
-		else {
+		} else {
 			$perCol = $numLI + 1;
 		}
 
@@ -76,7 +74,6 @@ class WatchAnalyticsHtmlHelper {
 		$html .= "</td></tr></table>";
 
 		return $html;
-
 	}
 
 }
