@@ -135,9 +135,9 @@ class SpecialPendingReviews extends SpecialPage {
 			// been deleted)
 			if ( $item->title ) {
 				$html .= $this->getStandardChangeRow( $item, $rowCount );
-			}
+
 			// page has been deleted (or moved w/o a redirect)
-			else {
+			} else {
 				$html .= $this->getDeletedPageRow( $item, $rowCount );
 			}
 
@@ -728,10 +728,8 @@ class SpecialPendingReviews extends SpecialPage {
 
 			return wfMessage( $messages[ $logEntry->log_type ][ $logEntry->log_action ], $messageParams );
 
-		}
-
 		// if no message exists for the log type and action, handling with "unknown change"
-		else {
+		} else {
 			return wfMessage( 'pendingreviews-log-unknown-change', $userPage );
 		}
 	}
