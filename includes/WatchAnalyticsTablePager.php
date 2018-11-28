@@ -58,12 +58,12 @@ abstract class WatchAnalyticsTablePager extends TablePager {
 	 * Do a query with specified parameters, rather than using the object
 	 * context
 	 *
-	 * @param int $offset index offset, inclusive
+	 * @param string $offset index offset, inclusive
 	 * @param int $limit exact query limit
 	 * @param bool $descending Boolean: query direction, false for ascending, true for descending
 	 * @return ResultWrapper
 	 */
-	public function reallyDoQuery( int $offset, int $limit, bool $descending ) {
+	public function reallyDoQuery( $offset, $limit, $descending ) {
 		$qInfo = $this->getQueryInfo( $offset, $limit, $descending );
 		$tables = $qInfo['tables'];
 		$fields = $qInfo['fields'];
