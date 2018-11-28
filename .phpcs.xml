@@ -2,11 +2,34 @@
 <ruleset name="MediaWiki">
 	<file>.</file>
 	<rule ref="./vendor/mediawiki/mediawiki-codesniffer/MediaWiki">
+
+		<!-- These exclusions taken from Extension:Echo and should be re-assessed -->
 		<exclude name="MediaWiki.Files.ClassMatchesFilename.NotMatch" />
 		<exclude name="MediaWiki.Commenting.FunctionComment.MissingDocumentationProtected" />
 		<exclude name="MediaWiki.Commenting.FunctionComment.MissingDocumentationPublic" />
 		<exclude name="MediaWiki.NamingConventions.LowerCamelFunctionsName.FunctionName" />
 		<exclude name="MediaWiki.WhiteSpace.SpaceBeforeSingleLineComment.NewLineComment" />
+
+		<!-- Allow non-wg prefix (e.g. $egWatchAnalyticsPageCounter) -->
+		<exclude name="MediaWiki.NamingConventions.ValidGlobalName.allowedPrefix" />
+		<!-- Same as above, but for PHP 5.6 (using MW CodeSniffer 19.1.0) -->
+		<exclude name="MediaWiki.NamingConventions.ValidGlobalName.wgPrefix" />
+
+		<!-- All -->
+		<exclude name="MediaWiki.PHP70Features.ScalarTypeHintUsage.Found" />
+		<exclude name="MediaWiki.PHP70Features.ScalarTypeHintUsage.ReturnTypeFound" />
+
+		<!--
+			Consider fixing while( $var = something() ) due to this:
+			https://www.mediawiki.org/wiki/Manual:Coding_conventions/PHP#Assignment_expressions
+		-->
+		<exclude name="MediaWiki.ControlStructures.AssignmentInControlStructures.AssignmentInControlStructures" />
+
+		<!--
+			This exclusion required because we use the database query() function directly rather
+			than using select() or other more specific functions
+		-->
+		<exclude name="MediaWiki.Usage.DbrQueryUsage.DbrQueryFound" />
 	</rule>
 	<rule ref="Generic.Files.LineLength">
 		<properties>

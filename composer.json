@@ -24,7 +24,7 @@
 		"php": ">=5.6.0"
 	},
 	"require-dev": {
-		"mediawiki/mediawiki-codesniffer": "23.0.0"
+		"mediawiki/mediawiki-codesniffer": "19.1.0 || 23.0.0"
 	},
 	"scripts": {
 		"test": [
