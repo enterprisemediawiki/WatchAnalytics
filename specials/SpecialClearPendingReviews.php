@@ -103,7 +103,6 @@ class SpecialClearPendingReviews extends SpecialPage {
 	 * @param bool $clearPages
 	 * @return $results
 	 */
-
 	public static function doSearchQuery( $data, $clearPages ) {
 		$dbw = wfGetDB( DB_REPLICA );
 		$category = preg_replace( '/\s+/', '_', $data['category'] );
@@ -152,7 +151,6 @@ class SpecialClearPendingReviews extends SpecialPage {
 	 * @param object $form
 	 * @return Status
 	 */
-
 	public function trySubmit( $data, $form ) {
 		$request = $this->getRequest();
 		$output = $this->getOutput();

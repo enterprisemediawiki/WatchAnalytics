@@ -5,15 +5,12 @@ class WatchAnalyticsHooks {
 	/**
 	 * Handler for PersonalUrls hook. Replace the "watchlist" item on the user
 	 * toolbar ('personal URLs') with a link to Special:PendingReviews.
-	 *
 	 * @see http://www.mediawiki.org/wiki/Manual:Hooks/PersonalUrls
 	 *
-	 * @param &$personal_urls Array of URLs to append to.
-	 * @param &$title Title of page being visited.
-	 *
-	 * @return bool true in all cases
+	 * @param array &$personal_urls Array of URLs to append to.
+	 * @return bool
 	 */
-	public static function onPersonalUrls( &$personal_urls /*, &$title ,$sk*/ ) {
+	public static function onPersonalUrls( array &$personal_urls ) {
 		global $wgUser, $wgOut;
 		$user = $wgUser;
 
@@ -204,7 +201,7 @@ class WatchAnalyticsHooks {
 	 *
 	 * @see FIXME (include link to hook documentation)
 	 *
-	 * @param Array $magicWordVariableIDs array of names of magic words
+	 * @param Array &$magicWordVariableIDs array of names of magic words
 	 *
 	 * @return bool
 	 */
@@ -219,8 +216,8 @@ class WatchAnalyticsHooks {
 	 *
 	 * @see FIXME (include link to hook documentation)
 	 *
-	 * @param Parser $parser reference to MediaWiki parser.
-	 * @param string $text FIXME html/wikitext? of output page before complete
+	 * @param Parser &$parser reference to MediaWiki parser.
+	 * @param string &$text FIXME html/wikitext? of output page before complete
 	 *
 	 * @return bool
 	 */
@@ -278,12 +275,12 @@ class WatchAnalyticsHooks {
 	 *
 	 * @see https://www.mediawiki.org/wiki/Manual:Hooks/PageContentSaveComplete
 	 *
-	 * @param WikiPage $article
+	 * @param WikiPage $wikipage
 	 *
 	 * @return bool
 	 */
-	public static function onPageContentSaveComplete( $article ) {
-		WatchStateRecorder::recordPageChange( $article );
+	public static function onPageContentSaveComplete( WikiPage $wikipage ) {
+		WatchStateRecorder::recordPageChange( $wikipage );
 		return true;
 	}
 

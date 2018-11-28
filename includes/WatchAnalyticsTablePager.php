@@ -58,12 +58,12 @@ abstract class WatchAnalyticsTablePager extends TablePager {
 	 * Do a query with specified parameters, rather than using the object
 	 * context
 	 *
-	 * @param string $offset index offset, inclusive
-	 * @param $limit Integer: exact query limit
-	 * @param $descending Boolean: query direction, false for ascending, true for descending
+	 * @param int $offset index offset, inclusive
+	 * @param int $limit exact query limit
+	 * @param bool $descending Boolean: query direction, false for ascending, true for descending
 	 * @return ResultWrapper
 	 */
-	public function reallyDoQuery( $offset, $limit, $descending ) {
+	public function reallyDoQuery( int $offset, int $limit, bool $descending ) {
 		$qInfo = $this->getQueryInfo( $offset, $limit, $descending );
 		$tables = $qInfo['tables'];
 		$fields = $qInfo['fields'];
@@ -134,6 +134,8 @@ abstract class WatchAnalyticsTablePager extends TablePager {
 	 * FIXME: this is the ugly method taken from SpecialAllmessages...I'm
 	 * hoping MW has a better way (templating engine?) to do this now than it
 	 * did when SpecialAllmessages was created...
+	 *
+	 * @return string
 	 */
 	public function buildForm() {
 		global $wgScript;

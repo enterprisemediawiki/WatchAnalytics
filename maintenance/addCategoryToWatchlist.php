@@ -39,12 +39,6 @@ require_once "$IP/maintenance/Maintenance.php";
 
 class WatchAnalyticsAddCategoryToWatchlist extends Maintenance {
 
-	/**
-	 * Add description
-	 *
-	 * @param string $varName add description
-	 * @return null
-	 */
 	public function __construct() {
 		parent::__construct();
 
@@ -67,12 +61,6 @@ class WatchAnalyticsAddCategoryToWatchlist extends Maintenance {
 		// false, true );
 	}
 
-	/**
-	 * Add description
-	 *
-	 * @param string $varName add description
-	 * @return null
-	 */
 	public function execute() {
 		$dbw = wfGetDB( DB_MASTER );
 

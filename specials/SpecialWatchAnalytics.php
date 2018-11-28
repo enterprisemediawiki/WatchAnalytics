@@ -161,7 +161,7 @@ class SpecialWatchAnalytics extends SpecialPage {
 	}
 
 	public function createTablePager( $titleMsg, WatchAnalyticsTablePager $tablePager ) {
-		global $wgOut, $wgRequest;
+		global $wgOut;
 
 		$wgOut->setPageTitle( wfMessage( $titleMsg )->text() );
 
@@ -191,18 +191,6 @@ class SpecialWatchAnalytics extends SpecialPage {
 		$wgOut->addModules( 'ext.watchanalytics.forcegraph.scripts' );
 		// Load the styles for the D3.js force directed graph
 		$wgOut->addModuleStyles( 'ext.watchanalytics.forcegraph.styles' );
-
-		// SELECT
-		// watchlist.wl_title AS title,
-		// watchlist.wl_notificationtimestamp AS notification,
-		// user.user_name AS user_name,
-		// user.user_real_name AS real_name
-		// FROM watchlist
-		// LEFT JOIN user ON user.user_id = watchlist.wl_user
-		// WHERE
-		// wl_namespace = 0
-		// AND user.user_name IN (\'Lwelsh\',\'Swray\',\'Balpert\',\'Ejmontal\',\'Cmavridi\', \'Sgeffert\', \'Smulhern\', \'Kgjohns1\', \'Bscheib\', \'Ssjohns5\')
-		// LIMIT 20000
 
 		$res = $dbr->select(
 			[

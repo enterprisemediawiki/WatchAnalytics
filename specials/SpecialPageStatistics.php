@@ -3,12 +3,6 @@
 class SpecialPageStatistics extends SpecialPage {
 
 	public $mMode;
-	// protected $header_links = array(
-	// 'watchanalytics-pages-specialpage' => '',
-	// 'watchanalytics-users-specialpage' => 'users',
-	// 'watchanalytics-wikihistory-specialpage'  => 'wikihistory',
-	// 'watchanalytics-watch-forcegraph-specialpage' => 'forcegraph',
-	// );
 
 	public function __construct() {
 		parent::__construct(

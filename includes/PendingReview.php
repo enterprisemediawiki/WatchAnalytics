@@ -1,37 +1,4 @@
 <?php
-/**
- * MediaWiki Extension: WatchAnalytics
- * http://www.mediawiki.org/wiki/Extension:WatchAnalytics
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * This program is distributed WITHOUT ANY WARRANTY.
- */
-
-/**
- *
- * @file
- * @ingroup Extensions
- * @author James Montalvo
- * @license MIT License
- */
-
-# Alert the user that this is not a valid entry point to MediaWiki if they try to access the special pages file directly.
-if ( !defined( 'MEDIAWIKI' ) ) {
-	echo <<<EOT
-To install this extension, put the following line in LocalSettings.php:
-require_once( "$IP/extensions/WatchAnalytics/WatchAnalytics.php" );
-EOT;
-	exit( 1 );
-}
 
 class PendingReview {
 
@@ -159,29 +126,6 @@ class PendingReview {
 		$this->numReviewers = intval( $row['num_reviewed'] );
 	}
 
-	/*
-		Make more like this:
-
-		SELECT
-			p.page_id AS id,
-			w.wl_namespace AS namespace,
-			w.wl_title AS title,
-			w.wl_notificationtimestamp AS notificationtimestamp
-		FROM `watchlist` `w`
-		LEFT JOIN `page` `p` ON
-			((p.page_namespace=w.wl_namespace AND p.page_title=w.wl_title))
-		LEFT JOIN `logging` `log` ON
-			log.log_namespace = w.wl_namespace
-			AND log.log_title = w.wl_title
-			AND p.page_namespace IS NULL
-			AND p.page_title IS NULL
-			AND log.log_action = 'delete'
-		WHERE
-			w.wl_user=1
-			AND w.wl_notificationtimestamp IS NOT NULL
-		ORDER BY w.wl_notificationtimestamp ASC;
-
-	*/
 	public static function getPendingReviewsList( User $user, $limit, $offset ) {
 		$tables = [
 			'w' => 'watchlist',
@@ -284,13 +228,11 @@ class PendingReview {
 		return $logDeletes;
 	}
 
-	/**
-	 * FIXME: This was copied from LogEntry::getParameters() because
-	 * I couldn't find a cleaner way to do it.
-	 *
-	 * var $logParams is the content of the column log_params in the logging table
-	 */
-	public static function getMoveTarget( $logParams ) {
+	public static function getMoveTarget( mixed $logParams ) {
+		// FIXME: This was copied from LogEntry::getParameters() because
+		// I couldn't find a cleaner way to do it.
+		// $logParams the content of the column log_params in the logging table
+
 		wfSuppressWarnings();
 		$unserializedParams = unserialize( $logParams );
 		wfRestoreWarnings();

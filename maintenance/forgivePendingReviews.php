@@ -65,30 +65,6 @@ class WatchAnalyticsForgivePendingReviews extends Maintenance {
 			false, true );
 	}
 
-	// $query =
-		// "SELECT
-			// u.user_name AS user_name,
-			// p.page_title AS title,
-			// w.wl_notificationtimestamp AS pending_since
-		// FROM watchlist AS w
-		// LEFT JOIN page AS p ON
-			// w.wl_title = p.page_title
-			// AND w.wl_namespace = p.page_namespace
-		// LEFT JOIN user AS u ON
-			// u.user_id = w.wl_user
-		// WHERE
-			// w.wl_notificationtimestamp IS NOT NULL
-			// AND w.wl_notificationtimestamp < $forgiveBefore
-			// AND (
-				// SELECT COUNT(*)
-				// FROM watchlist AS w2
-				// WHERE
-					// w.wl_namespace = w2.wl_namespace
-					// AND w.wl_title = w2.wl_title
-					// AND w2.wl_notificationtimestamp IS NULL
-			// ) >= $reviewedBy
-			// $usernames
-		// ORDER BY w.wl_notificationtimestamp DESC;";
 	public function execute() {
 		$dbw = wfGetDB( DB_MASTER );
 

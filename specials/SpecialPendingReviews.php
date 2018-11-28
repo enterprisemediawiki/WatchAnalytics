@@ -160,6 +160,7 @@ class SpecialPendingReviews extends SpecialPage {
 	 * Handles case where user clicked a link to clear a pending review
 	 * This will not display the pending reviews page.
 	 *
+	 * @param Title $clearNotifyTitle
 	 * @return bool
 	 */
 	public function handleClearNotification( $clearNotifyTitle ) {
@@ -344,9 +345,14 @@ class SpecialPendingReviews extends SpecialPage {
 		}
 		$reviewCriticalityClass = 'pendingreviews-criticality-' . $reviewCriticality;
 
-		$classAndAttr = "class='pendingreviews-row $rowClass $reviewCriticalityClass pendingreviews-row-$rowCount' pendingreviews-row-count='$rowCount'";
+		$classAndAttr = "class='pendingreviews-row $rowClass " .
+			"$reviewCriticalityClass pendingreviews-row-$rowCount' " .
+			"pendingreviews-row-count='$rowCount'";
 
-		$html = "<tr $classAndAttr><td class='pendingreviews-page-title pendingreviews-top-cell'>$displayTitle</td><td class='pendingreviews-review-links pendingreviews-bottom-cell pendingreviews-top-cell'>$buttonOne $buttonTwo</td></tr>";
+		$html = "<tr $classAndAttr><td class='pendingreviews-page-title pendingreviews-top-cell'>" .
+			"$displayTitle</td>" .
+			"<td class='pendingreviews-review-links pendingreviews-bottom-cell pendingreviews-top-cell'>" .
+			"$buttonOne $buttonTwo</td></tr>";
 
 		$html .= "<tr $classAndAttr><td colspan='2' class='pendingreviews-bottom-cell'>$changes</td></tr>";
 
@@ -504,10 +510,10 @@ class SpecialPendingReviews extends SpecialPage {
 	 * Creates a button bringing user to the talk page of the user who deleted
 	 * the page, allowing them to ask questions about why the page was deleted.
 	 *
-	 * @param $deletionLog
+	 * @param array $deletionLog
 	 * @return string HTML for button
 	 */
-	public function getDeleterTalkButton( $deletionLog ) {
+	public function getDeleterTalkButton( array $deletionLog ) {
 		if ( count( $deletionLog ) == 0 ) {
 			return '';
 		}
@@ -535,9 +541,10 @@ class SpecialPendingReviews extends SpecialPage {
 	/**
 	 * Creates simple header stating how many pending reviews the user has.
 	 *
+	 * @param User $user
 	 * @return string HTML for header
 	 */
-	public function getPageHeader( $user ) {
+	public function getPageHeader( User $user ) {
 		$userWatch = new UserWatchesQuery();
 		$watchStats = $userWatch->getUserWatchStats( $user );
 		$numPendingReviews = $watchStats['num_pending'];
@@ -633,12 +640,12 @@ class SpecialPendingReviews extends SpecialPage {
 	 * @todo FIXME: documentation...why does this do what it does?
 	 * @todo FIXME: cleanup temporary code
 	 *
-	 * @param $log
-	 * @param $revisions
-	 * @param $title
+	 * @param array $log
+	 * @param array $revisions
+	 * @param Title $title
 	 * @return array
 	 */
-	protected function combineLogAndChanges( $log, $revisions, $title ) {
+	protected function combineLogAndChanges( array $log, array $revisions, Title $title ) {
 		// if ( $title->getNamespace() === NS_FILE ) {
 
 		// }
