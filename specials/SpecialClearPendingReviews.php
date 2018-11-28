@@ -156,7 +156,7 @@ class SpecialClearPendingReviews extends SpecialPage {
 		$output = $this->getOutput();
 		$this->setHeaders();
 
-		if ( isset( $_POST['clearpages'] ) ) {
+		if ( $request->wasPosted() && $request->getVal( 'clearpages' ) ) {
 			// Clears pending reviews
 			$results = $this->doSearchQuery( $data, true );
 
