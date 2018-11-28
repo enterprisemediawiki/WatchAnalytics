@@ -228,7 +228,7 @@ class PendingReview {
 		return $logDeletes;
 	}
 
-	public static function getMoveTarget( mixed $logParams ) {
+	public static function getMoveTarget( $logParams ) {
 		// FIXME: This was copied from LogEntry::getParameters() because
 		// I couldn't find a cleaner way to do it.
 		// $logParams the content of the column log_params in the logging table
