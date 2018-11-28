@@ -7,6 +7,8 @@ php:
 before_script:
   # ref: https://stackoverflow.com/questions/45213498/how-to-syntax-check-php-files-in-travis-ci
   - '! find . -type f -name "*.php" -exec php -d error_reporting=32767 -l {} \; 2>&1 >&- | grep "^"'
+  - composer install
 script:
+  - composer test
   - bash ./build/travis/run-tests.sh
 
