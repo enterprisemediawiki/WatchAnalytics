@@ -1,37 +1,4 @@
 <?php
-/**
- * MediaWiki Extension: WatchAnalytics
- * http://www.mediawiki.org/wiki/Extension:WatchAnalytics
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * This program is distributed WITHOUT ANY WARRANTY.
- */
-
-/**
- *
- * @file
- * @ingroup Extensions
- * @author James Montalvo
- * @licence MIT License
- */
-
-# Alert the user that this is not a valid entry point to MediaWiki if they try to access the special pages file directly.
-if ( !defined( 'MEDIAWIKI' ) ) {
-	echo <<<EOT
-To install this extension, put the following line in LocalSettings.php:
-require_once( "$IP/extensions/WatchAnalytics/WatchAnalytics.php" );
-EOT;
-	exit( 1 );
-}
 
 class PageScore {
 
@@ -51,23 +18,22 @@ class PageScore {
 	 */
 	public $cssColorClasses;
 
-	public function __construct ( Title $title ) {
-
+	public function __construct( Title $title ) {
 		$this->mTitle = $title;
-		$this->cssColorClasses = array(
+		$this->cssColorClasses = [
 			'excellent',
 			// 'good',
 			'okay',
 			// 'warning',
 			'danger',
-		);
+		];
 	}
 
-	static public function noPageScore () {
+	public static function noPageScore() {
 		self::$displayPageScore = false;
 	}
 
-	static public function pageScoreIsEnabled () {
+	public static function pageScoreIsEnabled() {
 		return self::$displayPageScore;
 	}
 
@@ -76,60 +42,53 @@ class PageScore {
 	 *
 	 * @return string
 	 */
-	public function getWatchQuality () {
+	public function getWatchQuality() {
 		$pwq = new PageWatchesQuery();
 		return round( $pwq->getPageWatchQuality( $this->mTitle ), 1 );
 	}
 
-	public function getReviewStatus () {
+	public function getReviewStatus() {
 		return $this->getNumReviews();
 	}
 
-	public function getNumReviews () {
-
-		$dbr = wfGetDB( DB_SLAVE );
-
+	public function getNumReviews() {
+		$dbr = wfGetDB( DB_REPLICA );
 
 		$pageData = $dbr->selectRow(
 			'watchlist',
 			'COUNT(*) AS num_reviews',
-			array(
+			[
 				'wl_notificationtimestamp IS NULL',
 				'wl_namespace' => $this->mTitle->getNamespace(),
 				'wl_title' => $this->mTitle->getDBkey()
-			),
+			],
 			__METHOD__
 		);
 
 		return $pageData->num_reviews;
-
 	}
 
-	public function getScoreColor ( $score, $configVariable ) {
-
+	public function getScoreColor( $score, $configVariable ) {
 		$scoreArr = $GLOBALS[ $configVariable ];
 
 		$scoreArrCount = count( $scoreArr );
-		for ( $i = 0; $i < $scoreArrCount; $i++ ) { //  ) as $index => $upperBound
+		for ( $i = 0; $i < $scoreArrCount; $i++ ) { // ) as $index => $upperBound
 			if ( $score > $scoreArr[ $i ] ) {
 				return $this->cssColorClasses[ $i ];
 			}
 		}
 		return $this->cssColorClasses[ count( $scoreArr ) ];
-
 	}
 
-
-	public function getPageScoreTemplate () {
-
+	public function getPageScoreTemplate() {
 		// simple explanation of what PageScores are
 		$pageScoresTooltip = wfMessage( 'watch-analytics-page-score-tooltip' )->text();
 
 		// @FIXME: Replace with special page showing page stats
 		// $pageScoresHelpPageLink = Title::makeTitle( NS_HELP, "Page Scores" )->getInternalURL();
-		$pageScoresHelpPageLink = SpecialPage::getTitleFor( 'PageStatistics' )->getInternalURL( array(
+		$pageScoresHelpPageLink = SpecialPage::getTitleFor( 'PageStatistics' )->getInternalURL( [
 			'page' => $this->mTitle->getPrefixedText()
-		) );
+		] );
 
 		// when MW 1.25 is released (very soon) replace this with a mustache template
 		$template =
@@ -139,23 +98,19 @@ class PageScore {
 			. "</a>";
 
 		return "<script type='text/template' id='ext-watchanalytics-pagescores-template'>$template</script>";
-
 	}
 
-	public function getBadge ( $label, $score, $color, $showLabel = false ) {
-
+	public function getBadge( $label, $score, $color, $showLabel = false ) {
 		// @todo FIXME: make the javascript apply a class to handle this, so this can just apply a class
 		if ( $showLabel ) {
 			$leftStyle = " style='display:inherit; border-radius: 4px 0 0 4px;'";
 			$rightStyle = " style='border-radius: 0 4px 4px 0;'";
-		}
-		else {
+		} else {
 			$leftStyle = "";
 			$rightStyle = "";
 		}
 
-		return
-			"<div class='ext-watchanalytics-pagescores-$color'>
+		return "<div class='ext-watchanalytics-pagescores-$color'>
 				<div class='ext-watchanalytics-pagescores-left'$leftStyle>
 					$label
 				</div>
@@ -163,10 +118,9 @@ class PageScore {
 					$score
 				</div>
 			</div>";
-
 	}
 
-	public function getScrutinyBadge ( $showLabel = false ) {
+	public function getScrutinyBadge( $showLabel = false ) {
 		$scrutinyScore = $this->getWatchQuality();
 		$scrutinyLabel = wfMessage( 'watch-analytics-page-score-scrutiny-label' )->text();
 		$scrutinyColor = $this->getScoreColor( $scrutinyScore, 'egWatchAnalyticsWatchQualityColors' );
@@ -174,7 +128,7 @@ class PageScore {
 		return $this->getBadge( $scrutinyLabel, $scrutinyScore, $scrutinyColor, $showLabel );
 	}
 
-	public function getReviewsBadge ( $showLabel = false ) {
+	public function getReviewsBadge( $showLabel = false ) {
 		$reviewsScore = $this->getReviewStatus();
 		$reviewsLabel = wfMessage( 'watch-analytics-page-score-reviews-label' )->text();
 		$reviewsColor = $this->getScoreColor( $reviewsScore, 'egWatchAnalyticsReviewStatusColors' );
