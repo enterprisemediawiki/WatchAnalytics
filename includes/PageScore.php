@@ -18,20 +18,8 @@ class PageScore {
 	 */
 	public $cssColorClasses;
 
-<<<<<<< HEAD
-	public function __construct ( Title $title ) {
-		$this->mTitle = $title;
-=======
 	public function __construct( Title $title ) {
 		$this->mTitle = $title;
-		$this->cssColorClasses = [
-			'excellent',
-			// 'good',
-			'okay',
-			// 'warning',
-			'danger',
-		];
->>>>>>> master
 	}
 
 	public static function noPageScore() {
@@ -77,7 +65,6 @@ class PageScore {
 		$scoreArr = $GLOBALS[ $configVariable ];
 		krsort( $scoreArr, SORT_NUMERIC );
 
-<<<<<<< HEAD
 		foreach ($scoreArr as $scoreThreshold => $style) {
 			if ( $score >= $scoreThreshold ) {
 				return $style;
@@ -86,20 +73,8 @@ class PageScore {
 		return 'danger';
 	}
 
-	public function getPageScoreTemplate () {
-
-=======
-		$scoreArrCount = count( $scoreArr );
-		for ( $i = 0; $i < $scoreArrCount; $i++ ) { // ) as $index => $upperBound
-			if ( $score > $scoreArr[ $i ] ) {
-				return $this->cssColorClasses[ $i ];
-			}
-		}
-		return $this->cssColorClasses[ count( $scoreArr ) ];
-	}
-
 	public function getPageScoreTemplate() {
->>>>>>> master
+
 		// simple explanation of what PageScores are
 		$pageScoresTooltip = wfMessage( 'watch-analytics-page-score-tooltip' )->text();
 
@@ -129,12 +104,8 @@ class PageScore {
 			$rightStyle = "";
 		}
 
-<<<<<<< HEAD
 		return
 			"<div class='ext-watchanalytics-criticality-$color'>
-=======
-		return "<div class='ext-watchanalytics-pagescores-$color'>
->>>>>>> master
 				<div class='ext-watchanalytics-pagescores-left'$leftStyle>
 					$label
 				</div>

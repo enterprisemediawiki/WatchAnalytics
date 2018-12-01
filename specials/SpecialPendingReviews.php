@@ -337,7 +337,6 @@ class SpecialPendingReviews extends SpecialPage {
 		// FIXME: wow this is ugly
 		$rowClass = ( $rowCount % 2 === 0 ) ? 'pendingreviews-even-row' : 'pendingreviews-odd-row';
 
-<<<<<<< HEAD
 		$scoreArr = $GLOBALS['egWatchAnalyticsReviewStatusColors'];
 		//making sure array is sorted from highest to lowest
 		krsort( $scoreArr, SORT_NUMERIC );
@@ -347,14 +346,6 @@ class SpecialPendingReviews extends SpecialPage {
 			} else {
 				$reviewCriticalityClass = 'ext-watchanalytics-criticality-danger';
 			}
-=======
-		if ( $item->numReviewers > $GLOBALS['egPendingReviewsOrangePagesThreshold'] ) {
-			$reviewCriticality = 'green'; // page is "green" because it has lots of reviewers
-		} elseif ( $item->numReviewers > $GLOBALS['egPendingReviewsRedPagesThreshold'] ) {
-			$reviewCriticality = 'orange';
-		} else {
-			$reviewCriticality = 'red'; // page is red because it has very few reviewers
->>>>>>> master
 		}
 
 		$classAndAttr = "class='pendingreviews-row $rowClass " .
@@ -620,9 +611,7 @@ class SpecialPendingReviews extends SpecialPage {
 	 *
 	 * @return string HTML for legend (table)
 	 */
-<<<<<<< HEAD
-	public function getPendingReviewsLegend () {
-
+	public function getPendingReviewsLegend() {
 		$scoreArr = $GLOBALS['egWatchAnalyticsReviewStatusColors'];
 		//making sure array is sorted from highest to lowest
 		krsort( $scoreArr, SORT_NUMERIC );
@@ -653,33 +642,6 @@ class SpecialPendingReviews extends SpecialPage {
 		$html .= '</table>';
 
 		return $html;
-
-=======
-	public function getPendingReviewsLegend() {
-		$redMaxReviewers = $GLOBALS['egPendingReviewsRedPagesThreshold'] - 1;
-		$orangeMaxReviewers = $GLOBALS['egPendingReviewsOrangePagesThreshold'] - 1;
-
-		$redReviewersMsg = $this->msg(
-			'pendingreviews-reviewer-criticality-red',
-			$redMaxReviewers
-		)->text();
-
-		$orangeReviewersMsg = $this->msg(
-			'pendingreviews-reviewer-criticality-orange',
-			$orangeMaxReviewers
-		)->text();
-
-		$greenReviewersMsg = $this->msg(
-			'pendingreviews-reviewer-criticality-green',
-			$orangeMaxReviewers
-		)->text();
-
-		return "<table class='pendingreviews-legend'>
-			<tr class='pendingreviews-criticality-red'><td>$redReviewersMsg</td></tr>
-			<tr class='pendingreviews-criticality-orange'><td>$orangeReviewersMsg</td></tr>
-			<tr class='pendingreviews-criticality-green'><td>$greenReviewersMsg</td></tr>
-		</table>";
->>>>>>> master
 	}
 
 	/**
