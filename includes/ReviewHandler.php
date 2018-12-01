@@ -1,37 +1,4 @@
 <?php
-/**
- * MediaWiki Extension: WatchAnalytics
- * http://www.mediawiki.org/wiki/Extension:WatchAnalytics
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * This program is distributed WITHOUT ANY WARRANTY.
- */
-
-/**
- *
- * @file
- * @ingroup Extensions
- * @author James Montalvo
- * @licence MIT License
- */
-
-# Alert the user that this is not a valid entry point to MediaWiki if they try to access the special pages file directly.
-if ( !defined( 'MEDIAWIKI' ) ) {
-	echo <<<EOT
-To install this extension, put the following line in LocalSettings.php:
-require_once( "$IP/extensions/WatchAnalytics/WatchAnalytics.php" );
-EOT;
-	exit( 1 );
-}
 
 class ReviewHandler {
 
@@ -63,12 +30,12 @@ class ReviewHandler {
 	 */
 	public $final = null;
 
-	public function __construct ( User $user, Title $title ) {
+	public function __construct( User $user, Title $title ) {
 		$this->user = $user;
 		$this->title = $title;
 	}
 
-	public static function setup ( User $user, Title $title ) {
+	public static function setup( User $user, Title $title ) {
 		if ( ! $title->isWatchable() ) {
 			self::$isReviewable = false;
 			return false;
@@ -82,40 +49,36 @@ class ReviewHandler {
 	 * Get the "watch status" of a user for a page, e.g. whether they're watching
 	 * and, if they're watching, whether they have reviewed the latest revision.
 	 *
+	 * @return int
 	 */
-	public function getReviewStatus () {
-
-		$dbr = wfGetDB( DB_SLAVE );
+	public function getReviewStatus() {
+		$dbr = wfGetDB( DB_REPLICA );
 
 		// FIXME: probably should use User->getNotificationTimestmap() or something
 		// but I'm on a plane and I don't know what is available to me without docs
 		$row = $dbr->selectRow(
 			'watchlist',
-			array( 'wl_notificationtimestamp' ),
-			array(
+			[ 'wl_notificationtimestamp' ],
+			[
 				'wl_user' => $this->user->getId(),
 				'wl_namespace' => $this->title->getNamespace(),
 				'wl_title' => $this->title->getDBkey(),
-			),
+			],
 			__METHOD__,
-			array()
+			[]
 		);
 
 		// user is not watching the page
 		if ( $row === false ) {
 			return -1;
-		}
-		else if ( $row->wl_notificationtimestamp === NULL ) {
+		} elseif ( $row->wl_notificationtimestamp === null ) {
 			return 0;
-		}
-		else {
+		} else {
 			return $row->wl_notificationtimestamp;
 		}
-
 	}
 
-	public static function pageIsBeingReviewed () {
-
+	public static function pageIsBeingReviewed() {
 		// never setup
 		if ( ! self::$isReviewable || self::$pageLoadHandler === null ) {
 			return false;
@@ -140,25 +103,23 @@ class ReviewHandler {
 		// or $newStatus is a timestamp greater than the original timestamp, meaning
 		// they have reviewed a more recent version of the page than they had originally
 		// if ( $newStatus < 1 || $newStatus > self::$pageLoadHandler->initial ) {
-		// 	self::$pageLoadHandler->final = $newStatus;
-		// 	return self::$pageLoadHandler;
+		// self::$pageLoadHandler->final = $newStatus;
+		// return self::$pageLoadHandler;
 		// }
 		// else {
-		// 	return false;
+		// return false;
 		// }
 
 		return true;
-
 	}
 
-	public function getTemplate () {
-
+	public function getTemplate() {
 		// $msg = wfMessage( 'watch-analytics-page-score-tooltip' )->text();
 
-		$unReviewLink = SpecialPage::getTitleFor( 'PageStatistics' )->getInternalURL( array(
+		$unReviewLink = SpecialPage::getTitleFor( 'PageStatistics' )->getInternalURL( [
 			'page' => $this->title->getPrefixedText(),
 			'unreview' => $this->initial
-		) );
+		] );
 
 		$linkText = wfMessage( 'watchanalytics-unreview-button' )->text();
 		$bannerText = wfMessage( 'watchanalytics-unreview-banner-text' )->parse();
@@ -171,27 +132,24 @@ class ReviewHandler {
 			</div>";
 
 		return "<script type='text/template' id='ext-watchanalytics-review-handler-template'>$template</script>";
-
 	}
 
-	public function resetNotificationTimestamp ( $ts ) {
-
+	public function resetNotificationTimestamp( $ts ) {
 		$dbw = wfGetDB( DB_MASTER );
 
 		return $dbw->update(
 			'watchlist',
-			array(
+			[
 				'wl_notificationtimestamp' => $ts,
-			),
-			array(
+			],
+			[
 				'wl_user' => $this->user->getId(),
 				'wl_namespace' => $this->title->getNamespace(),
 				'wl_title' => $this->title->getDBkey(),
-			),
+			],
 			__METHOD__,
 			null
 		);
-
 	}
 
 }
