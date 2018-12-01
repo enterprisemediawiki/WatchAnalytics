@@ -65,7 +65,7 @@ class PageScore {
 		$scoreArr = $GLOBALS[ $configVariable ];
 		krsort( $scoreArr, SORT_NUMERIC );
 
-		foreach ($scoreArr as $scoreThreshold => $style) {
+		foreach ( $scoreArr as $scoreThreshold => $style ) {
 			if ( $score >= $scoreThreshold ) {
 				return $style;
 			}
@@ -74,7 +74,6 @@ class PageScore {
 	}
 
 	public function getPageScoreTemplate() {
-
 		// simple explanation of what PageScores are
 		$pageScoresTooltip = wfMessage( 'watch-analytics-page-score-tooltip' )->text();
 
@@ -104,8 +103,7 @@ class PageScore {
 			$rightStyle = "";
 		}
 
-		return
-			"<div class='ext-watchanalytics-criticality-$color'>
+		return "<div class='ext-watchanalytics-criticality-$color'>
 				<div class='ext-watchanalytics-pagescores-left'$leftStyle>
 					$label
 				</div>
