@@ -24,14 +24,20 @@
 		"php": ">=5.6.0"
 	},
 	"require-dev": {
-		"mediawiki/mediawiki-codesniffer": "19.1.0 || 23.0.0"
+		"jakub-onderka/php-parallel-lint": "1.0.0",
+		"mediawiki/mediawiki-codesniffer": "19.1.0 || 23.0.0",
+		"jakub-onderka/php-console-highlighter": "0.3.2",
+		"mediawiki/minus-x": "0.3.1"
 	},
 	"scripts": {
 		"test": [
-			"phpcs -p -s"
+			"parallel-lint . --exclude vendor --exclude node_modules",
+			"phpcs -p -s",
+			"minus-x check ."
 		],
 		"fix": [
-			"phpcbf"
+			"phpcbf",
+			"minus-x fix ."
 		]
 	}
 }
