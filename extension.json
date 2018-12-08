@@ -214,7 +214,8 @@
 		"WatchAnalyticsWatchQualityColors": {
 			"50" : "plaid",
 			"5" : "excellent",
-			"1.5" : "okay"
+			"1.5" : "okay",
+			"_merge_strategy": "array_plus"
 		},
 		"WatchAnalyticsReviewStatusColors": {
 			"5" : "excellent",
