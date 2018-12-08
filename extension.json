@@ -219,7 +219,8 @@
 		},
 		"WatchAnalyticsReviewStatusColors": {
 			"5" : "excellent",
-			"3" : "okay"
+			"3" : "okay",
+			"_merge_strategy": "array_plus"
 		}
 	},
 	"manifest_version": 1
