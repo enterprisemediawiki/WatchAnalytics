@@ -113,6 +113,7 @@ class SpecialPendingReviews extends SpecialPage {
 		// functions causes the CSS to load later, which makes the page styles
 		// apply late. This looks bad.
 		$wgOut->addModuleStyles( [
+			'ext.watchanalytics.base',
 			'ext.watchanalytics.specials',
 			'ext.watchanalytics.pendingreviews.styles',
 		] );
@@ -336,14 +337,16 @@ class SpecialPendingReviews extends SpecialPage {
 		// FIXME: wow this is ugly
 		$rowClass = ( $rowCount % 2 === 0 ) ? 'pendingreviews-even-row' : 'pendingreviews-odd-row';
 
-		if ( $item->numReviewers > $GLOBALS['egPendingReviewsOrangePagesThreshold'] ) {
-			$reviewCriticality = 'green'; // page is "green" because it has lots of reviewers
-		} elseif ( $item->numReviewers > $GLOBALS['egPendingReviewsRedPagesThreshold'] ) {
-			$reviewCriticality = 'orange';
-		} else {
-			$reviewCriticality = 'red'; // page is red because it has very few reviewers
+		$scoreArr = $GLOBALS['egWatchAnalyticsReviewStatusColors'];
+		// making sure array is sorted from highest to lowest
+		krsort( $scoreArr, SORT_NUMERIC );
+		foreach ( $scoreArr as $scoreThreshold => $style ) {
+			if ( $item->numReviewers >= $scoreThreshold ) {
+				$reviewCriticalityClass = 'ext-watchanalytics-criticality-' . $style;
+			} else {
+				$reviewCriticalityClass = 'ext-watchanalytics-criticality-danger';
+			}
 		}
-		$reviewCriticalityClass = 'pendingreviews-criticality-' . $reviewCriticality;
 
 		$classAndAttr = "class='pendingreviews-row $rowClass " .
 			"$reviewCriticalityClass pendingreviews-row-$rowCount' " .
@@ -609,29 +612,36 @@ class SpecialPendingReviews extends SpecialPage {
 	 * @return string HTML for legend (table)
 	 */
 	public function getPendingReviewsLegend() {
-		$redMaxReviewers = $GLOBALS['egPendingReviewsRedPagesThreshold'] - 1;
-		$orangeMaxReviewers = $GLOBALS['egPendingReviewsOrangePagesThreshold'] - 1;
+		$scoreArr = $GLOBALS['egWatchAnalyticsReviewStatusColors'];
+		// making sure array is sorted from highest to lowest
+		krsort( $scoreArr, SORT_NUMERIC );
 
-		$redReviewersMsg = $this->msg(
-			'pendingreviews-reviewer-criticality-red',
-			$redMaxReviewers
-		)->text();
+		$html = "<table class='pendingreviews-legend'>";
+		foreach ( $scoreArr as $scoreThreshold => $style ) {
+			$msg = $this->msg(
+				"pendingreviews-reviewer-criticality-generic",
+				$scoreThreshold
+				)->text();
 
-		$orangeReviewersMsg = $this->msg(
-			'pendingreviews-reviewer-criticality-orange',
-			$orangeMaxReviewers
-		)->text();
+			$html .= "<tr class='ext-watchanalytics-criticality-$style'><td>$msg</td></tr>";
+		}
 
-		$greenReviewersMsg = $this->msg(
-			'pendingreviews-reviewer-criticality-green',
-			$orangeMaxReviewers
-		)->text();
+		// bottom threshold will always be "danger" class
+		// Get lowest value in array
+		end( $scoreArr );
+		$smallestThreshold = key( $scoreArr );
 
-		return "<table class='pendingreviews-legend'>
-			<tr class='pendingreviews-criticality-red'><td>$redReviewersMsg</td></tr>
-			<tr class='pendingreviews-criticality-orange'><td>$orangeReviewersMsg</td></tr>
-			<tr class='pendingreviews-criticality-green'><td>$greenReviewersMsg</td></tr>
-		</table>";
+		if ( $smallestThreshold == 1 ) {
+			$msg = $this->msg( "pendingreviews-reviewer-criticality-danger-zero" )->text();
+		} else {
+			$msg = $this->msg( "pendingreviews-reviewer-criticality-danger", $smallestThreshold - 1 )->text();
+		}
+
+		$html .= "<tr class='ext-watchanalytics-criticality-danger'><td>$msg</td></tr>";
+
+		$html .= '</table>';
+
+		return $html;
 	}
 
 	/**

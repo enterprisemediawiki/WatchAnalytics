@@ -20,13 +20,6 @@ class PageScore {
 
 	public function __construct( Title $title ) {
 		$this->mTitle = $title;
-		$this->cssColorClasses = [
-			'excellent',
-			// 'good',
-			'okay',
-			// 'warning',
-			'danger',
-		];
 	}
 
 	public static function noPageScore() {
@@ -70,14 +63,14 @@ class PageScore {
 
 	public function getScoreColor( $score, $configVariable ) {
 		$scoreArr = $GLOBALS[ $configVariable ];
+		krsort( $scoreArr, SORT_NUMERIC );
 
-		$scoreArrCount = count( $scoreArr );
-		for ( $i = 0; $i < $scoreArrCount; $i++ ) { // ) as $index => $upperBound
-			if ( $score > $scoreArr[ $i ] ) {
-				return $this->cssColorClasses[ $i ];
+		foreach ( $scoreArr as $scoreThreshold => $style ) {
+			if ( $score >= $scoreThreshold ) {
+				return $style;
 			}
 		}
-		return $this->cssColorClasses[ count( $scoreArr ) ];
+		return 'danger';
 	}
 
 	public function getPageScoreTemplate() {
@@ -110,7 +103,7 @@ class PageScore {
 			$rightStyle = "";
 		}
 
-		return "<div class='ext-watchanalytics-pagescores-$color'>
+		return "<div class='ext-watchanalytics-criticality-$color'>
 				<div class='ext-watchanalytics-pagescores-left'$leftStyle>
 					$label
 				</div>
