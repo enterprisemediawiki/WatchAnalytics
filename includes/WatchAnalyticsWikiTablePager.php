@@ -2,7 +2,7 @@
 
 class WatchAnalyticsWikiTablePager extends WatchAnalyticsTablePager {
 
-	protected $isSortable = array(
+	protected $isSortable = [
 		'tracking_timestamp' => true,
 
 		'num_pages' => true,
@@ -26,12 +26,12 @@ class WatchAnalyticsWikiTablePager extends WatchAnalyticsTablePager {
 		'content_num_one_watched' => true,
 		'content_num_unreviewed' => true,
 		'content_num_one_reviewed' => true,
-	);
+	];
 
 	public function __construct( $page, $conds ) {
 		$this->watchQuery = new WikiWatchesQuery();
 
-		parent::__construct( $page , $conds );
+		parent::__construct( $page, $conds );
 
 		global $wgRequest;
 
@@ -40,40 +40,36 @@ class WatchAnalyticsWikiTablePager extends WatchAnalyticsTablePager {
 			$this->mDefaultDirection = false;
 		}
 
-		$this->mExtraSortFields = array();
+		$this->mExtraSortFields = [];
 	}
 
 	public function getQueryInfo() {
 		return $this->watchQuery->getQueryInfo();
 	}
 
-	public function formatValue ( $fieldName , $value ) {
-
-		$timeDiffFields = array(
+	public function formatValue( $fieldName, $value ) {
+		$timeDiffFields = [
 			'max_pending_minutes',
 			'avg_pending_minutes',
 			'content_max_pending_minutes',
 			'content_avg_pending_minutes',
-		);
+		];
 
 		if ( in_array( $fieldName, $timeDiffFields ) ) {
-			return ( $value === NULL ) ? NULL : $this->watchQuery->createTimeStringFromMinutes( $value );
-		}
-		else if ( $fieldName === 'tracking_timestamp' ) {
+			return ( $value === null ) ? null : $this->watchQuery->createTimeStringFromMinutes( $value );
+		} elseif ( $fieldName === 'tracking_timestamp' ) {
 			$ts = new MWTimestamp( $value );
 			return $ts->format( 'Y-m-d' ) . '<br />' . $ts->format( 'H:i:s' );
-		}
-		else {
+		} else {
 			return $value;
 		}
-
 	}
 
 	public function getFieldNames() {
 		return $this->watchQuery->getFieldNames();
 	}
 
-	public function getDefaultSort () {
+	public function getDefaultSort() {
 		return 'tracking_timestamp';
 	}
 
@@ -84,7 +80,7 @@ class WatchAnalyticsWikiTablePager extends WatchAnalyticsTablePager {
 	 *
 	 * @return string empty string
 	 */
-	public function buildForm () {
+	public function buildForm() {
 		return '';
 	}
 }

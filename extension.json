@@ -1,6 +1,6 @@
 {
 	"name": "WatchAnalytics",
-	"version": "2.0.0",
+	"version": "2.0.1",
 	"author": [
 		"[https://www.mediawiki.org/wiki/User:Jamesmontalvo3 James Montalvo]"
 	],
@@ -211,8 +211,17 @@
 		"PendingReviewsNumberWatchSuggestions": 20,
 		"PendingReviewsShowWatchSuggestionsIfReviewsUnder": 5,
 		"WatchAnalyticsPageScoreNamespaces": [0, 1],
-		"WatchAnalyticsWatchQualityColors": [5, 1.5],
-		"WatchAnalyticsReviewStatusColors": [4, 2]
+		"WatchAnalyticsWatchQualityColors": {
+			"50" : "plaid",
+			"5" : "excellent",
+			"1.5" : "okay",
+			"_merge_strategy": "array_plus"
+		},
+		"WatchAnalyticsReviewStatusColors": {
+			"5" : "excellent",
+			"3" : "okay",
+			"_merge_strategy": "array_plus"
+		}
 	},
 	"manifest_version": 1
 }

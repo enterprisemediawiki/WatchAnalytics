@@ -2,7 +2,7 @@
 
 class WatchAnalyticsUserTablePager extends WatchAnalyticsTablePager {
 
-	protected $isSortable = array(
+	protected $isSortable = [
 		'user_name' => true,
 		'num_watches' => true,
 		'num_pending' => true,
@@ -10,9 +10,9 @@ class WatchAnalyticsUserTablePager extends WatchAnalyticsTablePager {
 		'max_pending_minutes' => true,
 		'avg_pending_minutes' => true,
 		'engagement_score' => true,
-	);
+	];
 
-	public function __construct( $page, $conds, $filters = array() ) {
+	public function __construct( $page, $conds, $filters = [] ) {
 		$this->watchQuery = new UserWatchesQuery();
 		parent::__construct( $page, $conds, $filters );
 	}
@@ -21,8 +21,7 @@ class WatchAnalyticsUserTablePager extends WatchAnalyticsTablePager {
 		return $this->watchQuery->getQueryInfo();
 	}
 
-	public function formatValue ( $fieldName , $value ) {
-
+	public function formatValue( $fieldName, $value ) {
 		if ( $fieldName === 'user_name' ) {
 
 			$user_name = $value;
@@ -39,32 +38,29 @@ class WatchAnalyticsUserTablePager extends WatchAnalyticsTablePager {
 			*/
 
 			$url = Title::newFromText( 'Special:PendingReviews' )->getLocalUrl(
-				array( 'user' => $user_name )
+				[ 'user' => $user_name ]
 			);
 			$msg = wfMessage( 'watchanalytics-view-user-pendingreviews' );
 
 			$name .= ' (' . Xml::element(
 				'a',
-				array( 'href' => $url ),
+				[ 'href' => $url ],
 				$msg
 			) . ')';
 
 			return $name;
-		}
-		else if ( $fieldName === 'max_pending_minutes' || $fieldName === 'avg_pending_minutes' ) {
-			return ( $value === NULL ) ? NULL : $this->watchQuery->createTimeStringFromMinutes( $value );
-		}
-		else {
+		} elseif ( $fieldName === 'max_pending_minutes' || $fieldName === 'avg_pending_minutes' ) {
+			return ( $value === null ) ? null : $this->watchQuery->createTimeStringFromMinutes( $value );
+		} else {
 			return $value;
 		}
-
 	}
 
 	public function getFieldNames() {
 		return $this->watchQuery->getFieldNames();
 	}
 
-	public function getDefaultSort () {
+	public function getDefaultSort() {
 		return 'num_pending';
 	}
 

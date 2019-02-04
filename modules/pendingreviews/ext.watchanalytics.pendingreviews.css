@@ -37,7 +37,6 @@ table.pendingreviews-list td.pendingreviews-top-cell {
 }
 
 tr.pendingreviews-row td:first-child {
-	border-left: solid #ddd 5px;
 	padding-left: 5px;
 }
 /*tr.pendingreviews-row-hover td:first-child {
@@ -48,16 +47,6 @@ tr.pendingreviews-row-hover td.pendingreviews-bottom-cell {
 }
 tr.pendingreviews-row-hover td {
 	background-color: #f9f9f9;
-}
-
-tr.pendingreviews-criticality-red td:first-child {
-	border-left: solid #d33 5px;
-}
-tr.pendingreviews-criticality-orange td:first-child {
-	border-left: solid #fc3 5px;
-}
-tr.pendingreviews-criticality-green td:first-child {
-	border-left: solid #00af89 5px;
 }
 
 .pendingreviews-legend {
@@ -115,16 +104,6 @@ td.pendingreviews-review-links a:hover {
 .pendingreviews-green-button:hover {
 	background-color: #14866d;
 	border-color: #00af89;
-}
-
-.pendingreviews-light-blue-button {
-	background-color: #eaf3ff;
-	border-color: #36c;
-}
-
-.pendingreviews-light-blue-button:hover {
-	background-color: #36c;
-	border-color: #36c;
 }
 
 .pendingreviews-orange-button {
@@ -189,5 +168,3 @@ a.pendingreviews-nav-link-inactive {
 a.pendingreviews-nav-link-inactive:visited {
 	color: #c8ccd1;
 }
-
-

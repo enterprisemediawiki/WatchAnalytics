@@ -29,12 +29,12 @@
 // Allow people to have different layouts.
 if ( ! isset( $IP ) ) {
 	$IP = __DIR__ . '/../../../';
-	if ( getenv("MW_INSTALL_PATH") ) {
-		$IP = getenv("MW_INSTALL_PATH");
+	if ( getenv( "MW_INSTALL_PATH" ) ) {
+		$IP = getenv( "MW_INSTALL_PATH" );
 	}
 }
 
-require_once( "$IP/maintenance/Maintenance.php" );
+require_once "$IP/maintenance/Maintenance.php";
 
 class WatchAnalyticsForgivePendingReviews extends Maintenance {
 
@@ -63,33 +63,8 @@ class WatchAnalyticsForgivePendingReviews extends Maintenance {
 			'reviewedby',
 			'Limit forgiveness to pages which have been reviewed by at least the specified number of people (default ' . $this->forgiveBefore . ')',
 			false, true );
-
 	}
 
-	// $query =
-		// "SELECT
-			// u.user_name AS user_name,
-			// p.page_title AS title,
-			// w.wl_notificationtimestamp AS pending_since
-		// FROM watchlist AS w
-		// LEFT JOIN page AS p ON
-			// w.wl_title = p.page_title
-			// AND w.wl_namespace = p.page_namespace
-		// LEFT JOIN user AS u ON
-			// u.user_id = w.wl_user
-		// WHERE
-			// w.wl_notificationtimestamp IS NOT NULL
-			// AND w.wl_notificationtimestamp < $forgiveBefore
-			// AND (
-				// SELECT COUNT(*)
-				// FROM watchlist AS w2
-				// WHERE
-					// w.wl_namespace = w2.wl_namespace
-					// AND w.wl_title = w2.wl_title
-					// AND w2.wl_notificationtimestamp IS NULL
-			// ) >= $reviewedBy
-			// $usernames
-		// ORDER BY w.wl_notificationtimestamp DESC;";
 	public function execute() {
 		$dbw = wfGetDB( DB_MASTER );
 
@@ -102,11 +77,9 @@ class WatchAnalyticsForgivePendingReviews extends Maintenance {
 
 			$namesForDB = $dbw->makeList( $namesArray );
 			$usernames = "AND u.user_name IN ($namesForDB)";
-		}
-		else {
+		} else {
 			$usernames = '';
 		}
-
 
 		$forgiveBefore = $this->getOption( 'forgivebefore', $this->forgiveBefore );
 		$reviewedBy = $this->getOption( 'reviewedby', $this->reviewedBy );
@@ -144,4 +117,4 @@ class WatchAnalyticsForgivePendingReviews extends Maintenance {
 }
 
 $maintClass = "WatchAnalyticsForgivePendingReviews";
-require_once( DO_MAINTENANCE );
+require_once RUN_MAINTENANCE_IF_MAIN;

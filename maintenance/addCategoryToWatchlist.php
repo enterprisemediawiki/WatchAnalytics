@@ -30,21 +30,15 @@
 // Allow people to have different layouts.
 if ( ! isset( $IP ) ) {
 	$IP = __DIR__ . '/../../../';
-	if ( getenv("MW_INSTALL_PATH") ) {
-		$IP = getenv("MW_INSTALL_PATH");
+	if ( getenv( "MW_INSTALL_PATH" ) ) {
+		$IP = getenv( "MW_INSTALL_PATH" );
 	}
 }
 
-require_once( "$IP/maintenance/Maintenance.php" );
+require_once "$IP/maintenance/Maintenance.php";
 
 class WatchAnalyticsAddCategoryToWatchlist extends Maintenance {
 
-	/**
-	 * Add description
-	 *
-	 * @param string $varName add description
-	 * @return null
-	 */
 	public function __construct() {
 		parent::__construct();
 
@@ -62,18 +56,11 @@ class WatchAnalyticsAddCategoryToWatchlist extends Maintenance {
 			true, true );
 
 		// $this->addOption(
-		// 	'dry-run',
-		// 	"List whether a page will be added to a user's watchlist, but do not perform action",
-		// 	false, true );
-
+		// 'dry-run',
+		// "List whether a page will be added to a user's watchlist, but do not perform action",
+		// false, true );
 	}
 
-	/**
-	 * Add description
-	 *
-	 * @param string $varName add description
-	 * @return null
-	 */
 	public function execute() {
 		$dbw = wfGetDB( DB_MASTER );
 
@@ -83,12 +70,11 @@ class WatchAnalyticsAddCategoryToWatchlist extends Maintenance {
 			foreach ( $namesArray as $i => $u ) {
 				$namesArray[$i] = trim( $u );
 			}
-		}
-		else {
+		} else {
 			die( 'You must supply at least one username' );
 		}
 
-		$users = array();
+		$users = [];
 		foreach ( $namesArray as $username ) {
 			$users[] = User::newFromName( $username );
 		}
@@ -99,8 +85,7 @@ class WatchAnalyticsAddCategoryToWatchlist extends Maintenance {
 			foreach ( $catsArray as $i => $c ) {
 				$catsArray[$i] = trim( $c );
 			}
-		}
-		else {
+		} else {
 			die( 'You must supply at least one category' );
 		}
 
@@ -124,8 +109,7 @@ class WatchAnalyticsAddCategoryToWatchlist extends Maintenance {
 
 					if ( $watchedItem->isWatched() ) {
 						$this->output( "already watching\n" );
-					}
-					else {
+					} else {
 						$watchedItem->addWatch();
 						$this->output( "added to watchlist\n" );
 					}
@@ -142,4 +126,4 @@ class WatchAnalyticsAddCategoryToWatchlist extends Maintenance {
 }
 
 $maintClass = "WatchAnalyticsAddCategoryToWatchlist";
-require_once( DO_MAINTENANCE );
+require_once RUN_MAINTENANCE_IF_MAIN;
