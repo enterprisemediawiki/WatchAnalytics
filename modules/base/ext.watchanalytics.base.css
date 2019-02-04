@@ -13,3 +13,65 @@
 .watch-analytics-watchers-needed-link {
 	font-weight: bold;
 }
+
+.ext-watchanalytics-criticality-danger > div {
+	background-color: #d33;
+	border-color: #d33;
+	color: #fff;
+}
+
+tr.ext-watchanalytics-criticality-danger td:first-child {
+	border-left: solid #d33 5px;
+}
+
+.ext-watchanalytics-criticality-plaid > div {
+	background:
+		repeating-linear-gradient(
+			-45deg,
+			transparent 0%,
+			transparent 20%,
+			#d33 0,
+			#d33 50%
+		),
+		repeating-linear-gradient(
+			45deg,
+			transparent 0,
+			transparent 20%,
+			#00af89 0,
+			#00af89 50%
+		),
+		repeating-linear-gradient(
+			transparent 0%,
+			transparent 20%,
+			#fc3 0,
+			#fc3 50%
+		), white;
+	background-blend-mode: multiply;
+	background-size: 10px 10px;
+	color: #000;
+	text-shadow:
+		-1px -1px 0 #fff,
+		1px -1px 0 #fff,
+		-1px 1px 0 #fff,
+		1px 1px 0 #fff;
+}
+
+.ext-watchanalytics-criticality-okay > div {
+	background-color: #fc3;
+	border-color: #fc3;
+	color: #fff;
+}
+
+tr.ext-watchanalytics-criticality-okay td:first-child {
+	border-left: solid #fc3 5px;
+}
+
+.ext-watchanalytics-criticality-excellent > div {
+	background-color: #00af89;
+	border-color: #00af89;
+	color: #fff;
+}
+
+tr.ext-watchanalytics-criticality-excellent td:first-child {
+	border-left: solid #00af89 5px;
+}

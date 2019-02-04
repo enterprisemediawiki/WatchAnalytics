@@ -1,16 +1,36 @@
 {
-    "@metadata": {
-        "authors": [
-            "James Montalvo"
-        ]
-    },
-    "watchanalytics-desc": "Encouraging good distribution of watchers",
+		"@metadata": {
+				"authors": [
+						"James Montalvo"
+				]
+		},
+	"watchanalytics-desc": "Encouraging good distribution of watchers",
 	"watchanalytics-personal-url": "Pending reviews ($1)",
 	"watchanalytics-personal-url-old": "{{PLURAL:$1|1 review|$1 reviews}} (oldest: {{PLURAL:$2|1 day|$2 days}})",
 	"watchanalytics-view": "View:",
 	"pendingreviews": "Pending reviews",
 	"watchanalytics": "Watch analytics",
 	"pagestatistics": "Page statistics",
+	"clearpendingreviews": "Clear pending reviews",
+	"clearpendingreview-category": "Select page category:",
+	"clearpendingreview-start-time": "Start time:",
+	"clearpendingreview-end-time": "End time:",
+	"clearpendingreview-page-title": "Page title like:",
+	"clearpendingreview-preview": "Preview pages",
+	"clearpendingreview-clear": "Clear reviews",
+	"clearpendingreviews-legend": "Search criteria",
+	"clearpendingreviews-date-invalid": "Not a valid date",
+	"clearpendingreviews-date-order-invalid": "Start date must be before end date",
+	"clearpendingreviews-missing-date-category":"Must input either category or title.",
+	"clearpendingreviews-category-invalid": "Category does not exist.",
+	"clearpendingreviews-success": "Successfully cleared pending reviews from $1 pages.",
+	"clearpendingreviews-success-return": "Return to: ",
+	"clearpendingreviews-pages-cleared": "The following pages will be cleared:",
+	"clearpendingreviews-people-impacted": "The following people will be impacted:",
+	"action-clearreviews": "clear pending reviews",
+	"clearform-submit": "Clear Pages",
+	"clearform-section1": "Select time period:",
+	"clearform-section2": "Select category and/or title:",
 	"pendingreviews-user-page": "Pending reviews for User:$1",
 	"watchanalytics-pages-specialpage": "Page watch statistics",
 	"watchanalytics-users-specialpage": "User watch statistics",
@@ -58,16 +78,17 @@
 	"watchanalytics-pendingreviews-diff-revisions": "Display {{PLURAL:$1|1 change|$1 changes}} since last visit",
 	"watchanalytics-pendingreviews-users-first-view": "New page - view latest",
 	"watchanalytics-pendingreviews-history-link": "view page history",
+	"watchanalytics-pendingreviews-prev-revisions": "< Previous",
+	"watchanalytics-pendingreviews-next-revisions": "Next >",
 	"pendingreviews-timediff-days": "Changed {{PLURAL:$1|1 day|$1 days}} ago",
 	"pendingreviews-timediff-hours": "Changed {{PLURAL:$1|1 hour|$1 hours}} ago",
 	"pendingreviews-timediff-minutes": "Changed {{PLURAL:$1|1 minute|$1 minutes}} ago",
 	"pendingreviews-timediff-just-now": "Changed just now",
 	"pendingreviews-no-revisions": "No page content changes",
 	"pendingreviews-num-reviews": "You have $1 pending {{PLURAL:$1|review|reviews}}.",
-	"pendingreviews-num-shown": "Showing the {{PLURAL:$1|most important review|$1 most important reviews}}.",
-	"pendingreviews-reviewer-criticality-red": "Pages reviewed by {{PLURAL:$1|1 person|$1 people}} or fewer",
-	"pendingreviews-reviewer-criticality-orange": "Pages reviewed by {{PLURAL:$1|1 person|$1 people}} or fewer",
-	"pendingreviews-reviewer-criticality-green": "Pages reviewed by more than {{PLURAL:$1|1 person|$1 people}}",
+	"pendingreviews-reviewer-criticality-danger": "Pages reviewed by 0 - {{PLURAL:$1|1 person|$1 people}}",
+	"pendingreviews-reviewer-criticality-danger-zero": "Pages reviewed by 0 people",
+	"pendingreviews-reviewer-criticality-generic": "Pages reviewed by $1 or more people",
 
 	"watch-analytics-page-score-tooltip": "Scores indicate how well this page is being reviewed",
 	"watch-analytics-page-score-scrutiny-label": "Scrutiny",
@@ -77,8 +98,8 @@
 	"watchanalytics-pagestats-editors-list-title": "Page editors",
 	"watchanalytics-pagestats-editors-list-item": "$1 - {{PLURAL:$2|1 revision|$2 revisions}}",
 	"watchanalytics-pagestats-watchers-title": "Page watchers",
-	"watchanalytics-pagestats-watchers-list-item-reviewed": "$1 - <span style='color:green;'>reviewed latest</span>",
-	"watchanalytics-pagestats-watchers-list-item-unreviewed": "$1 - <span style='color:red;'>review pending</span>",
+	"watchanalytics-pagestats-watchers-list-item-reviewed": "$1 - <span style='color:#00af89'>reviewed latest</span>",
+	"watchanalytics-pagestats-watchers-list-item-unreviewed": "$1 - <span style='color:#d33;'>review pending</span>",
 	"watchanalytics-pagestats-chart-header": "Number of reviewers over time",
 
 	"watchanalytics-unreview-button": "Defer review",
@@ -112,10 +133,11 @@
 	"pendingreviews-log-upload-new":       "[[$1]] uploaded the initial version of the file",
 	"pendingreviews-log-upload-overwrite": "[[$1]] uploaded a new version of the file",
 	"pendingreviews-log-unknown-change":   "[[$1]] made an unknown change",
-
+	"log-name-pendingreviews": "Pending Reviews",
+	"log-description-pendingreviews": "Tracks actions taken using tools from the Watch Analytics extension related to Pending Reviews.",
+	"logentry-pendingreviews-clearreivews": "$1 {{GENDER:$2|cleared $4 pending reviews}} with criteria -category$5 -title like$6 using $3",
 	"pendingreviews-watch-suggestion-title": "This wiki needs your help watching pages",
 	"pendingreviews-watch-suggestion-description": "Few (if any) people are watching the pages below. They are related to other pages in your watchlist, and it'd be real swell if you could help by watching some of them.",
 	"pendingreviews-watch-suggestion-watchlink": "Watch"
 
 }
-

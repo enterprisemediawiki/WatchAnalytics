@@ -1,6 +1,6 @@
 {
 	"name": "WatchAnalytics",
-	"version": "1.0.0",
+	"version": "2.0.1",
 	"author": [
 		"[https://www.mediawiki.org/wiki/User:Jamesmontalvo3 James Montalvo]"
 	],
@@ -9,7 +9,8 @@
 	"type": "specialpage",
 	"GroupPermissions": {
 		"sysop": {
-			"viewpagescore": true
+			"viewpagescore": true,
+			"clearreviews": true
 		},
 		"user": {
 			"pendingreviewslink": true
@@ -17,12 +18,14 @@
 	},
 	"AvailableRights": [
 		"viewpagescore",
-		"pendingreviewslink"
+		"pendingreviewslink",
+		"clearreviews"
 	],
 	"SpecialPages": {
 		"WatchAnalytics": "SpecialWatchAnalytics",
 		"PendingReviews": "SpecialPendingReviews",
-		"PageStatistics": "SpecialPageStatistics"
+		"PageStatistics": "SpecialPageStatistics",
+		"ClearPendingReviews": "SpecialClearPendingReviews"
 	},
 	"MessagesDirs": {
 		"WatchAnalytics": [
@@ -55,7 +58,8 @@
 		"WatchStateRecorder": "includes/WatchStateRecorder.php",
 		"SpecialWatchAnalytics": "specials/SpecialWatchAnalytics.php",
 		"SpecialPendingReviews": "specials/SpecialPendingReviews.php",
-		"SpecialPageStatistics": "specials/SpecialPageStatistics.php"
+		"SpecialPageStatistics": "specials/SpecialPageStatistics.php",
+		"SpecialClearPendingReviews": "specials/SpecialClearPendingReviews.php"
 	},
 	"ResourceModules": {
 		"ext.watchanalytics.base": {
@@ -88,6 +92,13 @@
 		"ext.watchanalytics.pendingreviews.scripts": {
 			"position": "bottom",
 			"scripts": "pendingreviews/ext.watchanalytics.pendingreviews.js",
+			"dependencies": [
+				"mediawiki.Title"
+			]
+		},
+		"ext.watchanalytics.clearpendingreviews.scripts": {
+			"position": "bottom",
+			"scripts": "clearpendingreviews/ext.watchanalytics.clearpendingreviews.js",
 			"dependencies": [
 				"mediawiki.Title"
 			]
@@ -182,6 +193,16 @@
 			"WatchAnalyticsUpdaterHooks::onParserTestTables"
 		]
 	},
+	"LogTypes": [ "pendingreviews" ],
+	"LogNames": {
+			"pendingreviews": "pendingreviews"
+	},
+	"LogHeaders": {
+			"pendingreviews": "pendingreviews-header"
+	},
+	"LogActionsHandlers": {
+			"pendingreviews/*": "LogFormatter"
+	},
 	"config": {
 		"_prefix": "eg",
 		"WatchAnalyticsPageCounter": false,
@@ -191,8 +212,17 @@
 		"PendingReviewsNumberWatchSuggestions": 20,
 		"PendingReviewsShowWatchSuggestionsIfReviewsUnder": 5,
 		"WatchAnalyticsPageScoreNamespaces": [0, 1],
-		"WatchAnalyticsWatchQualityColors": [5, 1.5],
-		"WatchAnalyticsReviewStatusColors": [4, 2]
+		"WatchAnalyticsWatchQualityColors": {
+			"50" : "plaid",
+			"5" : "excellent",
+			"1.5" : "okay",
+			"_merge_strategy": "array_plus"
+		},
+		"WatchAnalyticsReviewStatusColors": {
+			"5" : "excellent",
+			"3" : "okay",
+			"_merge_strategy": "array_plus"
+		}
 	},
 	"manifest_version": 1
 }

@@ -1,89 +1,53 @@
 <?php
-/**
- * MediaWiki Extension: WatchAnalytics
- * http://www.mediawiki.org/wiki/Extension:WatchAnalytics
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * This program is distributed WITHOUT ANY WARRANTY.
- */
-
-/**
- *
- * @file
- * @ingroup Extensions
- * @author James Montalvo
- * @licence MIT License
- */
-
-# Alert the user that this is not a valid entry point to MediaWiki if they try to access the special pages file directly.
-if ( !defined( 'MEDIAWIKI' ) ) {
-	echo <<<EOT
-To install this extension, put the following line in LocalSettings.php:
-require_once( "$IP/extensions/WatchAnalytics/WatchAnalytics.php" );
-EOT;
-	exit( 1 );
-}
 
 class WatchAnalyticsParserFunctions {
 
-	static public function setup ( &$parser ) {
-
+	public static function setup( &$parser ) {
 		$parser->setFunctionHook(
 			'underwatched_categories',
-			array(
+			[
 				'WatchAnalyticsParserFunctions', // class to call function from
 				'renderUnderwatchedCategories' // function to call within that class
-			),
+			],
 			SFH_OBJECT_ARGS
 		);
 
 		// pages needing watchers
 		$parser->setFunctionHook(
 			'watchers_needed',
-			array(
+			[
 				'WatchAnalyticsParserFunctions',
 				'renderWatchersNeeded'
-			),
+			],
 			SFH_OBJECT_ARGS
 		);
 
-
 		return true;
-
 	}
 
-	static public function processArgs( $frame, $args, $defaults ) {
-		$new_args = array();
+	public static function processArgs( $frame, $args, $defaults ) {
+		$new_args = [];
 		$num_args = count( $args );
 		$num_defaults = count( $defaults );
 		$count = ( $num_args > $num_defaults ) ? $num_args : $num_defaults;
 
 		for ( $i = 0; $i < $count; $i++ ) {
-			if ( isset( $args[$i] ) )
+			if ( isset( $args[$i] ) ) {
 				$new_args[$i] = trim( $frame->expand( $args[$i] ) );
-			else
+			} else {
 				$new_args[$i] = $defaults[$i];
+			}
 		}
 		return $new_args;
 	}
 
-	static public function renderUnderwatchedCategories ( &$parser, $frame, $args ) {
-
+	public static function renderUnderwatchedCategories( &$parser, $frame, $args ) {
 		// @TODO: currently these do nothing. The namespace arg needs to be text
 		// provided by the user, so this method needs to convert "Main" to zero, etc
 		// $args = self::processArgs( $frame, $args, array(0) );
 		// $namespace  = $args[0];
 
-		$dbr = wfGetDB( DB_SLAVE );
+		$dbr = wfGetDB( DB_REPLICA );
 
 		$query = "
 			SELECT * FROM (
@@ -111,15 +75,14 @@ class WatchAnalyticsParserFunctions {
 		$output = "{| class=\"wikitable sortable\"\n";
 		$output .= "! Category !! Number of Under-watched pages\n";
 
-		$categories = array();
+		$categories = [];
 		while ( $row = $dbr->fetchObject( $result ) ) {
-			$pageCategories = explode( ';' , $row->categories );
+			$pageCategories = explode( ';', $row->categories );
 
 			foreach ( $pageCategories as $cat ) {
-				if ( isset ( $categories[ $cat ] ) ) {
+				if ( isset( $categories[ $cat ] ) ) {
 					$categories[ $cat ]++;
-				}
-				else {
+				} else {
 					$categories[ $cat ] = 1;
 				}
 			}
@@ -131,8 +94,7 @@ class WatchAnalyticsParserFunctions {
 
 			if ( $cat === '' ) {
 				$catLink = "''Uncategorized''";
-			}
-			else {
+			} else {
 				$catTitle = Category::newFromName( $cat )->getTitle();
 				$catLink = "[[:$catTitle|" . $catTitle->getText() . "]]";
 			}
@@ -146,12 +108,12 @@ class WatchAnalyticsParserFunctions {
 		return $output;
 	}
 
-	static public function renderWatchersNeeded ( &$parser, $frame, $args ) {
+	public static function renderWatchersNeeded( &$parser, $frame, $args ) {
 		global $wgUser;
 
 		$wgUserId = $wgUser->getId();
 
-		$args = self::processArgs( $frame, $args, array( 0, 60, 3, 10 ) );
+		$args = self::processArgs( $frame, $args, [ 0, 60, 3, 10 ] );
 		$namespace   = intval( $args[0] );
 		$numDays     = intval( $args[1] );
 		$maxWatchers = intval( $args[2] );
@@ -159,7 +121,7 @@ class WatchAnalyticsParserFunctions {
 
 		$rangeTimestamp = date( 'YmdHis', time() - ( $numDays * 24 * 60 * 60 ) );
 
-		$dbr = wfGetDB( DB_SLAVE );
+		$dbr = wfGetDB( DB_REPLICA );
 
 		if ( class_exists( 'Wiretap' ) && false ) {
 			$query =
@@ -193,8 +155,7 @@ class WatchAnalyticsParserFunctions {
 				ORDER BY
 					unique_hits DESC
 				LIMIT 20";
-		}
-		else {
+		} else {
 			$query =
 				"SELECT page_title, page_namespace FROM (
 					SELECT
@@ -234,22 +195,21 @@ class WatchAnalyticsParserFunctions {
 			// $output .= "* [[$title]] - '''[$watchURL watch]'''\n";
 			$output .= Xml::tags(
 				'li',
-				array(),
+				[],
 				self::makeWatchLink( $row->page_namespace, $row->page_title )
 			);
 
 		}
 
-		$output = Xml::tags( 'ul', array(), $output );
+		$output = Xml::tags( 'ul', [], $output );
 
-		return array(
+		return [
 			0 => $output,
 			'isHTML' => true,
-		);
-
+		];
 	}
 
-	static protected function makeWatchLink ( $ns, $titleText ) {
+	protected static function makeWatchLink( $ns, $titleText ) {
 		global $wgContLang, $wgUser;
 
 		$context = RequestContext::getMain();
@@ -261,7 +221,7 @@ class WatchAnalyticsParserFunctions {
 		// Perhaps the parser function should offer an option as to whether or
 		// not to display invalid pages?
 		if ( !$nt ) {
-			return Html::element( 'span', array( 'class' => 'mw-invalidtitle' ),
+			return Html::element( 'span', [ 'class' => 'mw-invalidtitle' ],
 				Linker::getInvalidTitleDescription( $context, $ns, $titleText ) );
 		}
 
@@ -272,8 +232,8 @@ class WatchAnalyticsParserFunctions {
 		$wlink = Linker::linkKnown(
 			$nt,
 			$context->msg( 'watch' )->escaped(),
-			array( 'class' => 'mw-watch-link watch-analytics-watchers-needed-link' ),
-			array( 'action' => 'watch', 'token' => $token )
+			[ 'class' => 'mw-watch-link watch-analytics-watchers-needed-link' ],
+			[ 'action' => 'watch', 'token' => $token ]
 		);
 
 		return $context->getLanguage()->specialList( $plink, $wlink );

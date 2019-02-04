@@ -3,13 +3,6 @@
 class SpecialPageStatistics extends SpecialPage {
 
 	public $mMode;
-	// protected $header_links = array(
-	// 	'watchanalytics-pages-specialpage' => '',
-	// 	'watchanalytics-users-specialpage' => 'users',
-	// 	'watchanalytics-wikihistory-specialpage'  => 'wikihistory',
-	// 	'watchanalytics-watch-forcegraph-specialpage' => 'forcegraph',
-	// );
-
 
 	public function __construct() {
 		parent::__construct(
@@ -32,13 +25,13 @@ class SpecialPageStatistics extends SpecialPage {
 		// @todo: probably don't need filters, but may want to show stats just
 		// from a certain group of users
 		// $filters = array(
-		// 	'groupfilter'    => $wgRequest->getVal( 'groupfilter', '' ),
-		// 	'categoryfilter' => $wgRequest->getVal( 'categoryfilter', '' ),
+		// 'groupfilter'    => $wgRequest->getVal( 'groupfilter', '' ),
+		// 'categoryfilter' => $wgRequest->getVal( 'categoryfilter', '' ),
 		// );
 		// foreach( $filters as &$filter ) {
-		// 	if ( $filter === '' ) {
-		// 		$filter = false;
-		// 	}
+		// if ( $filter === '' ) {
+		// $filter = false;
+		// }
 		// }
 
 		// @todo: delete if multiple views not needed (thus, not requiring header call here)
@@ -48,28 +41,23 @@ class SpecialPageStatistics extends SpecialPage {
 			if ( $unReviewTimestamp ) {
 				$rh = new ReviewHandler( $wgUser, $this->mTitle );
 				$rh->resetNotificationTimestamp( $unReviewTimestamp );
-				$wgOut->addModuleStyles( array( 'ext.watchanalytics.reviewhandler.styles' ) );
+				$wgOut->addModuleStyles( [ 'ext.watchanalytics.reviewhandler.styles' ] );
 				$wgOut->addHTML( $this->unReviewMessage() );
 			}
 
-
 			$wgOut->addHTML( $this->getPageHeader() );
 			$this->renderPageStats();
-		}
-		else if ( $requestedPage ) {
+		} elseif ( $requestedPage ) {
 			// @todo FIXME: internationalize
 			$wgOut->addHTML( "<p>\"$requestedPage\" is either not a page or is not watchable</p>" );
-		}
-		else {
+		} else {
 			$wgOut->addHTML( "<p>No page requested</p>" );
 		}
-
 	}
 
 	public function getPageHeader() {
 		global $wgOut;
-		$wgOut->addModuleStyles( array( 'ext.watchanalytics.pagescores.styles' ) );
-
+		$wgOut->addModuleStyles( [ 'ext.watchanalytics.pagescores.styles' ] );
 
 		$pageScore = new PageScore( $this->mTitle );
 		// $out->addScript( $pageScore->getPageScoreTemplate() );
@@ -105,28 +93,25 @@ class SpecialPageStatistics extends SpecialPage {
 				<td>The number of people who have reviewed this page.</td>
 			</tr>
 			</table>";
-
 	}
 
-	public function renderPageStats () {
-
+	public function renderPageStats() {
 		global $wgOut;
 
 		// @todo FIXME: internationalization
 		$wgOut->setPageTitle( 'Page Statistics: ' . $this->mTitle->getPrefixedText() );
 
-		$dbr = wfGetDB( DB_SLAVE );
+		$dbr = wfGetDB( DB_REPLICA );
 		$html = '';
 		// Load the module for the D3.js force directed graph
 		// $wgOut->addModules( 'ext.watchanalytics.forcegraph.scripts' );
 		// Load the styles for the D3.js force directed graph
 		// $wgOut->addModuleStyles( 'ext.watchanalytics.forcegraph.styles' );
 
-
 		// SELECT
-		// 	rev.rev_user,
-		// 	rev.rev_user_text,
-		// 	COUNT( * ) AS num_revisions
+		// rev.rev_user,
+		// rev.rev_user_text,
+		// COUNT( * ) AS num_revisions
 		// FROM revision AS rev
 		// LEFT JOIN page AS p ON p.page_id = rev.rev_page
 		// WHERE p.page_title = "US_EVA_29_(US_EVA_IDA1_Cables)" AND p.page_namespace = 0
@@ -134,38 +119,36 @@ class SpecialPageStatistics extends SpecialPage {
 		// ORDER BY num_revisions DESC
 
 		#
-		#	Page editors query
+		# Page editors query
 		#
 		$res = $dbr->select(
-			array(
+			[
 				'rev' => 'revision',
 				'p' => 'page',
-			),
-			array(
+			],
+			[
 				'rev.rev_user',
 				'rev.rev_user_text',
 				'COUNT( * ) AS num_revisions',
-			),
-			array(
+			],
+			[
 				'p.page_title' => $this->mTitle->getDBkey(),
 				'p.page_namespace' => $this->mTitle->getNamespace(),
-			),
+			],
 			__METHOD__,
-			array(
+			[
 				'GROUP BY' => 'rev.rev_user',
 				'ORDER BY' => 'num_revisions DESC',
-			),
-			array(
-				'p' => array(
+			],
+			[
+				'p' => [
 					'LEFT JOIN', 'p.page_id = rev.rev_page'
-				),
-			)
+				],
+			]
 		);
 
-
-
 		#
-		#	Page editors
+		# Page editors
 		#
 		$html .= Xml::element( 'h2', null, wfMessage( 'watchanalytics-pagestats-editors-list-title' )->text() );
 		$html .= Xml::openElement( "ul" );
@@ -185,37 +168,34 @@ class SpecialPageStatistics extends SpecialPage {
 		}
 		$html .= Xml::closeElement( "ul" );
 
-
 		#
-		#	Watchers query
+		# Watchers query
 		#
 		$res = $dbr->select(
-			array(
+			[
 				'w' => 'watchlist',
 				'u' => 'user',
-			),
-			array(
+			],
+			[
 				'wl_user',
 				'u.user_name',
 				'wl_notificationtimestamp',
-			),
-			array(
+			],
+			[
 				'wl_title' => $this->mTitle->getDBkey(),
 				'wl_namespace' => $this->mTitle->getNamespace(),
-			),
+			],
 			__METHOD__,
 			null, // no limits, order by, etc
-			array(
-				'u' => array(
+			[
+				'u' => [
 					'LEFT JOIN', 'u.user_id = w.wl_user'
-				),
-			)
+				],
+			]
 		);
 
-
-
 		#
-		#	Page watchers
+		# Page watchers
 		#
 		$html .= Xml::element( 'h2', null, wfMessage( 'watchanalytics-pagestats-watchers-title' )->text() );
 		$html .= Xml::openElement( "ul" );
@@ -225,8 +205,7 @@ class SpecialPageStatistics extends SpecialPage {
 
 			if ( is_null( $row->wl_notificationtimestamp ) ) {
 				$watcherMsg = 'watchanalytics-pagestats-watchers-list-item-reviewed';
-			}
-			else {
+			} else {
 				$watcherMsg = 'watchanalytics-pagestats-watchers-list-item-unreviewed';
 			}
 
@@ -241,29 +220,20 @@ class SpecialPageStatistics extends SpecialPage {
 		}
 		$html .= Xml::closeElement( "ul" );
 
-
-
 		$wgOut->addHTML( $html );
 
 		$this->pageChart();
-
 	}
 
-	public function unReviewMessage () {
-
+	public function unReviewMessage() {
 		// FIXME: Original self: this shouldn't use the same CSS ID.
-		//        Newer self: Why not?
-		return
-			"<div id='watch-analytics-review-handler'><p>" .
+		// Newer self: Why not?
+		return "<div id='watch-analytics-review-handler'><p>" .
 				wfMessage( 'watchanalytics-unreview-complete' )->parse() .
 			"</p></div>";
-
 	}
 
-
-
-	public function pageChart () {
-
+	public function pageChart() {
 		global $wgOut;
 		$wgOut->addModules( 'ext.watchanalytics.charts' );
 
@@ -273,26 +243,26 @@ class SpecialPageStatistics extends SpecialPage {
 		// $dateRangeStart = new MWTimestamp( date( 'YmdHis', strtotime( '2 weeks ago' ) ) );
 		// $dateRangeStart = $dateRangeStart->format('YmdHis');
 
-		$dbr = wfGetDB( DB_SLAVE );
+		$dbr = wfGetDB( DB_REPLICA );
 		$res = $dbr->select(
-			array( 'wtp' => 'watch_tracking_page' ),
-			array(
+			[ 'wtp' => 'watch_tracking_page' ],
+			[
 				"DATE_FORMAT( wtp.tracking_timestamp, '%Y-%m-%d %H:%i:%s' ) AS timestamp",
 				"wtp.num_reviewed AS num_reviewed",
-			),
-			array(
+			],
+			[
 				'page_id' => $this->mTitle->getArticleID(),
 				// 'tracking_timestamp > ' . $dateRangeStart
-			),
+			],
 			__METHOD__,
-			array(
+			[
 				"ORDER BY" => "wtp.tracking_timestamp DESC",
 				"LIMIT" => "200", // MOST RECENT 100 changes
-			),
+			],
 			null // join conditions
 		);
 
-		$data = array();
+		$data = [];
 		while ( $row = $dbr->fetchObject( $res ) ) {
 			$data[ $row->timestamp ] = $row->num_reviewed;
 		}
@@ -302,7 +272,5 @@ class SpecialPageStatistics extends SpecialPage {
 
 		$html .= "<script type='text/template-json' id='ext-watchanalytics-page-stats-data'>" . json_encode( $data ) . "</script>";
 		$wgOut->addHTML( $html );
-
 	}
 }
-
