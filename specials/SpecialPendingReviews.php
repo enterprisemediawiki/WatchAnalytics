@@ -362,16 +362,13 @@ class SpecialPendingReviews extends SpecialPage {
 
 		$buttonOne = '';
 
-		$historyButton = $this->getHistoryButton( $item );
+		$historyButton = $this->getApproveButton( $item );
 
 		$approvedRevID = ApprovedRevs::getApprovedRevID( $item->title );
-		$newRevID = RevisionStore::getRevisionByTitle( $item->title	);
 
 		$displayTitle = '<strong>' .
 			'<span style="color:#00b050;">★</span> ' .
 			$item->title->getFullText() .
-			$approvedRevID .
-			$newRevID .
 			'</strong>';
 
 		return $this->getRowHTML( $item, $rowCount, $displayTitle, $buttonOne, $historyButton, $changes );
@@ -458,6 +455,41 @@ class SpecialPendingReviews extends SpecialPage {
 				$this->msg( 'watchanalytics-pendingreviews-users-first-view' )->text()
 			);
 
+		}
+
+		return $diffLink;
+	}
+
+	/**
+	 * Creates a button bringing user to the diff page.
+	 *
+	 * @param PendingReview $item
+	 * @return string HTML for button
+	 */
+	public function getApproveButton( $item ) {
+		if ( count( $item->newRevisions ) > 0 ) {
+
+			// returns essentially the negative-oneth revision...the one before
+			// the wl_notificationtimestamp revision...or null/false if none exists?
+			$mostRecentReviewed = Revision::newFromRow( $item->newRevisions[0] )->getPrevious();
+		} else {
+			$mostRecentReviewed = false; // no previous revision, the user has not reviewed the first!
+		}
+
+		if ( $mostRecentReviewed ) {
+
+			$diffURL = $item->title->getLocalURL( [
+				'diff' => '',
+				'oldid' => ApprovedRevs::getApprovedRevID( $item->title )
+			] );
+
+			$diffLink = Xml::element( 'a',
+				[ 'href' => $diffURL, 'class' => 'pendingreviews-green-button', 'target' => "_blank" ],
+				wfMessage(
+					'watchanalytics-pendingreviews-diff-revisions',
+					count( $item->newRevisions )
+				)->text()
+			);
 		}
 
 		return $diffLink;
