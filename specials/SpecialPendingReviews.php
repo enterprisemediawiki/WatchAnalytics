@@ -155,6 +155,26 @@ class SpecialPendingReviews extends SpecialPage {
 		}
 		$html .= '</table>';
 
+		$useApprovedRevs = class_exists( 'ApprovedRevs' );
+		if ( $useApprovedRevs ) {
+			$html .= '<h2>Pages needing your approval:</h2>';
+			$html .= '<table class="pendingreviews-list">';
+			$rowCount = 0;
+
+			// loop through pending reviews
+			foreach ( $this->pendingReviewList as $item ) {
+
+				// if ApprovedRevs installed...
+				if ( $useApprovedRevs && is_a( $item, 'PendingApproval' ) ) {
+					$html .= $this->getApprovedRevsChangeRow( $item, $rowCount );
+				}
+
+				$rowCount++;
+			}
+			$html .= '</table>';
+
+		}
+
 		global $egPendingReviewsShowWatchSuggestionsIfReviewsUnder; // FIXME: crazy long name...
 		if ( $rowCount < $egPendingReviewsShowWatchSuggestionsIfReviewsUnder ) {
 			$watchSuggest = new WatchSuggest( $this->mUser );
