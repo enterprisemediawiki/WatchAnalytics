@@ -147,7 +147,7 @@ class SpecialPendingReviews extends SpecialPage {
 			}
 
 			// page has been deleted (or moved w/o a redirect)
-			} else {
+			else {
 				$html .= $this->getDeletedPageRow( $item, $rowCount );
 			}
 
