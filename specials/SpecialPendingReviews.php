@@ -467,30 +467,18 @@ class SpecialPendingReviews extends SpecialPage {
 	 * @return string HTML for button
 	 */
 	public function getApproveButton( $item ) {
-		if ( count( $item->newRevisions ) > 0 ) {
+		$diffURL = $item->title->getLocalURL( [
+			'diff' => '',
+			'oldid' => ApprovedRevs::getApprovedRevID( $item->title )
+		] );
 
-			// returns essentially the negative-oneth revision...the one before
-			// the wl_notificationtimestamp revision...or null/false if none exists?
-			$mostRecentReviewed = Revision::newFromRow( $item->newRevisions[0] )->getPrevious();
-		} else {
-			$mostRecentReviewed = false; // no previous revision, the user has not reviewed the first!
-		}
-
-		if ( $mostRecentReviewed ) {
-
-			$diffURL = $item->title->getLocalURL( [
-				'diff' => '',
-				'oldid' => ApprovedRevs::getApprovedRevID( $item->title )
-			] );
-
-			$diffLink = Xml::element( 'a',
-				[ 'href' => $diffURL, 'class' => 'pendingreviews-green-button', 'target' => "_blank" ],
-				wfMessage(
-					'watchanalytics-pendingreviews-diff-revisions',
-					count( $item->newRevisions )
-				)->text()
-			);
-		}
+		$diffLink = Xml::element( 'a',
+			[ 'href' => $diffURL, 'class' => 'pendingreviews-green-button', 'target' => "_blank" ],
+			wfMessage(
+				'watchanalytics-pendingreviews-diff-revisions',
+				count( $item->newRevisions )
+			)->text()
+		);
 
 		return $diffLink;
 	}
