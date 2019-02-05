@@ -130,15 +130,8 @@ class SpecialPendingReviews extends SpecialPage {
 		$html .= '<table class="pendingreviews-list">';
 		$rowCount = 0;
 
-		$useApprovedRevs = class_exists( 'ApprovedRevs' );
-
 		// loop through pending reviews
 		foreach ( $this->pendingReviewList as $item ) {
-
-			// if ApprovedRevs installed...
-			if ( $useApprovedRevs && is_a( $item, 'PendingApproval' ) ) {
-				$html .= $this->getApprovedRevsChangeRow( $item, $rowCount );
-			}
 
 			// if the title exists, then the page exists (and hence it has not
 			// been deleted)
