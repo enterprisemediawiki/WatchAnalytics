@@ -365,7 +365,8 @@ class SpecialPendingReviews extends SpecialPage {
 		$historyButton = $this->getHistoryButton( $item );
 
 		$approvedRevID = ApprovedRevs::getApprovedRevID( $item->title );
-		$newRevID = Revision::getRevisionByTitle( $item->title );
+		$revision = new Revision;
+		$newRevID = $revision->getRevisionByTitle( $item->title );
 
 		$displayTitle = '<strong>' .
 			'<span style="color:#00b050;">★</span> ' .
