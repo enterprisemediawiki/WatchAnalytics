@@ -135,7 +135,7 @@ class SpecialPendingReviews extends SpecialPage {
 
 			// if the title exists, then the page exists (and hence it has not
 			// been deleted)
-			else if ( $item->title ) {
+			if ( $item->title ) {
 				$html .= $this->getStandardChangeRow( $item, $rowCount );
 			}
 
