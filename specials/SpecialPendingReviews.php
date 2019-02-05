@@ -144,14 +144,13 @@ class SpecialPendingReviews extends SpecialPage {
 			// been deleted)
 			else if ( $item->title ) {
 				$html .= $this->getStandardChangeRow( $item, $rowCount );
-				$rowCount++;
 			}
 
 			// page has been deleted (or moved w/o a redirect)
 			else {
 				$html .= $this->getDeletedPageRow( $item, $rowCount );
-				$rowCount++;
 			}
+			$rowCount++;
 
 		}
 		$html .= '</table>';
@@ -159,7 +158,6 @@ class SpecialPendingReviews extends SpecialPage {
 		if ( $useApprovedRevs ) {
 			$html .= '<h2>Pages needing your approval:</h2>';
 			$html .= '<table class="pendingreviews-list">';
-			$rowCount = 0;
 
 			// loop through pending reviews
 			foreach ( $this->pendingReviewList as $item ) {
@@ -368,10 +366,7 @@ class SpecialPendingReviews extends SpecialPage {
 
 		$displayTitle = '<strong>' .
 			'<span style="color:#00b050;">★</span> ' .
-			wfMessage(
-				'pendingreviews-pending-approvedrev-title',
-				$item->title->getFullText()
-			)->parse() .
+			$item->title->getFullText() .
 			'</strong>';
 
 		return $this->getRowHTML( $item, $rowCount, $displayTitle, $buttonOne, $historyButton, $changes );
