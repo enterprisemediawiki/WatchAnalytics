@@ -156,7 +156,7 @@ class SpecialPendingReviews extends SpecialPage {
 		$html .= '</table>';
 
 		if ( $useApprovedRevs ) {
-			$html .= wfMessage( 'pendingreviews-approve-revs-title' )->parse();
+			$html .= '<h3>' . wfMessage( 'pendingreviews-approve-revs-title' )->parse() . '</h3>';
 			$html .= '<table class="pendingreviews-list">';
 
 			// loop through pending reviews
