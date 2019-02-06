@@ -138,6 +138,7 @@
 	"log-description-pendingreviews": "Tracks actions taken using tools from the Watch Analytics extension related to Pending Reviews.",
 	"logentry-pendingreviews-clearreivews": "$1 {{GENDER:$2|cleared $4 pending reviews}} with criteria -category$5 -title like$6 using $3",
 	"pendingreviews-watch-suggestion-title": "This wiki needs your help watching pages",
+	"pendingreviews-approve-revs-title": "Pages needing your approval",
 	"pendingreviews-watch-suggestion-description": "Few (if any) people are watching the pages below. They are related to other pages in your watchlist, and it'd be real swell if you could help by watching some of them.",
 	"pendingreviews-watch-suggestion-watchlink": "Watch"
 

@@ -156,7 +156,7 @@ class SpecialPendingReviews extends SpecialPage {
 		$html .= '</table>';
 
 		if ( $useApprovedRevs ) {
-			$html .= '<h2>Pages needing your approval:</h2>';
+			$html .= wfMessage( 'pendingreviews-approve-revs-title' )->parse();
 			$html .= '<table class="pendingreviews-list">';
 
 			// loop through pending reviews
@@ -420,7 +420,7 @@ class SpecialPendingReviews extends SpecialPage {
 		$rowClass = ( $rowCount % 2 === 0 ) ? 'pendingreviews-even-row' : 'pendingreviews-odd-row';
 
 		$classAndAttr = "class='pendingreviews-row $rowClass " .
-			"pendingreviews-row-$rowCount' " .
+			"ext-watchanalytics-approvable-page pendingreviews-row-$rowCount' " .
 			"pendingreviews-row-count='$rowCount'";
 
 		$html = "<tr $classAndAttr><td class='pendingreviews-page-title pendingreviews-top-cell'>" .

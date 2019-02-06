@@ -75,3 +75,7 @@ tr.ext-watchanalytics-criticality-okay td:first-child {
 tr.ext-watchanalytics-criticality-excellent td:first-child {
 	border-left: solid #00af89 5px;
 }
+
+tr.ext-watchanalytics-approvable-page td:first-child {
+	border-left: solid #00B050 5px;
+}
