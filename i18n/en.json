@@ -76,6 +76,7 @@
 	"watchanalytics-pause-visualization": "Pause visualization",
 	"watchanalytics-unpause-visualization": "Unpause visualization",
 	"watchanalytics-pendingreviews-diff-revisions": "Display {{PLURAL:$1|1 change|$1 changes}} since last visit",
+	"watchanalytics-review-and-approve": "Review/Approve changes",
 	"watchanalytics-pendingreviews-users-first-view": "New page - view latest",
 	"watchanalytics-pendingreviews-history-link": "view page history",
 	"watchanalytics-pendingreviews-prev-revisions": "< Previous",

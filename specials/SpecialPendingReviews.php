@@ -304,7 +304,7 @@ class SpecialPendingReviews extends SpecialPage {
 
 		$displayTitle = '<strong>' . $item->title->getFullText() . '</strong>';
 
-		return $this->getRowHTML( $item, $rowCount, $displayTitle, $reviewButton, $historyButton, $changes );
+		return $this->getReviewRowHTML( $item, $rowCount, $displayTitle, $reviewButton, $historyButton, $changes );
 	}
 
 	/**
@@ -346,7 +346,7 @@ class SpecialPendingReviews extends SpecialPage {
 			. wfMessage( $displayMessage, $title->getFullText() )->parse()
 			. '</strong>';
 
-		return $this->getRowHTML( $item, $rowCount, $displayTitle, $acceptDeletionButton, $talkToDeleterButton, $changes );
+		return $this->getReviewRowHTML( $item, $rowCount, $displayTitle, $acceptDeletionButton, $talkToDeleterButton, $changes );
 	}
 
 	/**
@@ -371,7 +371,7 @@ class SpecialPendingReviews extends SpecialPage {
 			$item->title->getFullText() .
 			'</strong>';
 
-		return $this->getRowHTML( $item, $rowCount, $displayTitle, $buttonOne, $historyButton, $changes );
+		return $this->getApproveRowHTML( $item, $rowCount, $displayTitle, $buttonOne, $historyButton, $changes );
 
 	}
 
@@ -386,7 +386,7 @@ class SpecialPendingReviews extends SpecialPage {
 	 * @param string $changes
 	 * @return string HTML for pending review of a given page
 	 */
-	public function getRowHTML( PendingReview $item, $rowCount, $displayTitle, $buttonOne, $buttonTwo, $changes ) {
+	public function getReviewRowHTML( PendingReview $item, $rowCount, $displayTitle, $buttonOne, $buttonTwo, $changes ) {
 		// FIXME: wow this is ugly
 		$rowClass = ( $rowCount % 2 === 0 ) ? 'pendingreviews-even-row' : 'pendingreviews-odd-row';
 
@@ -403,6 +403,24 @@ class SpecialPendingReviews extends SpecialPage {
 
 		$classAndAttr = "class='pendingreviews-row $rowClass " .
 			"$reviewCriticalityClass pendingreviews-row-$rowCount' " .
+			"pendingreviews-row-count='$rowCount'";
+
+		$html = "<tr $classAndAttr><td class='pendingreviews-page-title pendingreviews-top-cell'>" .
+			"$displayTitle</td>" .
+			"<td class='pendingreviews-review-links pendingreviews-bottom-cell pendingreviews-top-cell'>" .
+			"$buttonOne $buttonTwo</td></tr>";
+
+		$html .= "<tr $classAndAttr><td colspan='2' class='pendingreviews-bottom-cell'>$changes</td></tr>";
+
+		return $html;
+	}
+
+	public function getApproveRowHTML( PendingReview $item, $rowCount, $displayTitle, $buttonOne, $buttonTwo, $changes ) {
+		// FIXME: wow this is ugly
+		$rowClass = ( $rowCount % 2 === 0 ) ? 'pendingreviews-even-row' : 'pendingreviews-odd-row';
+
+		$classAndAttr = "class='pendingreviews-row $rowClass " .
+			"pendingreviews-row-$rowCount' " .
 			"pendingreviews-row-count='$rowCount'";
 
 		$html = "<tr $classAndAttr><td class='pendingreviews-page-title pendingreviews-top-cell'>" .
@@ -461,7 +479,7 @@ class SpecialPendingReviews extends SpecialPage {
 	}
 
 	/**
-	 * Creates a button bringing user to the diff page.
+	 * Creates a button bringing user to view diff since last approved version
 	 *
 	 * @param PendingReview $item
 	 * @return string HTML for button
@@ -475,8 +493,7 @@ class SpecialPendingReviews extends SpecialPage {
 		$diffLink = Xml::element( 'a',
 			[ 'href' => $diffURL, 'class' => 'pendingreviews-green-button', 'target' => "_blank" ],
 			wfMessage(
-				'watchanalytics-pendingreviews-diff-revisions',
-				count( $item->newRevisions )
+				'watchanalytics-review-and-approve'
 			)->text()
 		);
 
