@@ -81,11 +81,6 @@ class PendingApproval extends PendingReview {
 			// $page with keys id, rev_id, latest_id
 			$title = Title::newFromID( $page['id'] );
 
-			// Remove this if Yaron merges https://gerrit.wikimedia.org/r/c/mediawiki/extensions/ApprovedRevs/+/470620
-			if ( is_bool( ApprovedRevs::$mUserCanApprove ) ) {
-				unset( ApprovedRevs::$mUserCanApprove );
-			}
-
 			if ( ApprovedRevs::userCanApprove( $user, $title ) ) {
 
 				// FIXME: May want to get these in there so PendingReviews can

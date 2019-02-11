@@ -78,7 +78,7 @@
 	"watchanalytics-pause-visualization": "Pause visualization",
 	"watchanalytics-unpause-visualization": "Unpause visualization",
 	"watchanalytics-pendingreviews-diff-revisions": "Display {{PLURAL:$1|1 change|$1 changes}} since last visit",
-	"watchanalytics-review-and-approve": "Review/Approve changes",
+	"watchanalytics-view-and-approve": "View/Approve changes",
 	"watchanalytics-pendingreviews-users-first-view": "New page - view latest",
 	"watchanalytics-pendingreviews-history-link": "view page history",
 	"watchanalytics-pendingreviews-prev-revisions": "< Previous",
@@ -89,6 +89,7 @@
 	"pendingreviews-timediff-just-now": "Changed just now",
 	"pendingreviews-no-revisions": "No page content changes",
 	"pendingreviews-num-reviews": "You have $1 pending {{PLURAL:$1|review|reviews}}",
+	"pendingreviews-num-reviews-complete": "Congrats! You completed your reviews." ,
 	"pendingreviews-num-approvals": "/$1 pending {{PLURAL:$1|approval|approvals}}.",
 	"pendingreviews-reviewer-criticality-danger": "Pages reviewed by 0 - {{PLURAL:$1|1 person|$1 people}}",
 	"pendingreviews-reviewer-criticality-danger-zero": "Pages reviewed by 0 people",
@@ -141,7 +142,7 @@
 	"log-description-pendingreviews": "Tracks actions taken using tools from the Watch Analytics extension related to Pending Reviews.",
 	"logentry-pendingreviews-clearreivews": "$1 {{GENDER:$2|cleared $4 pending reviews}} with criteria -category$5 -title like$6 using $3",
 	"pendingreviews-watch-suggestion-title": "This wiki needs your help watching pages",
-	"pendingreviews-approve-revs-title": "Pages needing your approval",
+	"pendingreviews-approve-revs-title": "{{PLURAL:$1|Page|Pages}} needing your approval ($1)",
 	"pendingreviews-watch-suggestion-description": "Few (if any) people are watching the pages below. They are related to other pages in your watchlist, and it'd be real swell if you could help by watching some of them.",
 	"pendingreviews-watch-suggestion-watchlink": "Watch"
 

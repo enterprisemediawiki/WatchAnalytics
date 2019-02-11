@@ -155,20 +155,25 @@ class SpecialPendingReviews extends SpecialPage {
 		$approvedRowCount = 0;
 
 		if ( $useApprovedRevs ) {
-			$html .= '<h3>' . wfMessage( 'pendingreviews-approve-revs-title' )->parse() . '</h3>';
-			$html .= '<table class="pendingreviews-list">';
+			$numApprovedRevs = count( PendingApproval::getUserPendingApprovals( $this->mUser ) );
 
-			// loop through pending reviews
-			foreach ( $this->pendingReviewList as $item ) {
+			if ( $numApprovedRevs != 0 ) {
+				$html .= '<h3>' . wfMessage( 'pendingreviews-approve-revs-title', $numApprovedRevs )->parse() . '</h3>';
+				$html .= '<table class="pendingreviews-list">';
 
-				// if ApprovedRevs installed...
-				if ( $useApprovedRevs && is_a( $item, 'PendingApproval' ) ) {
-					$html .= $this->getApprovedRevsChangeRow( $item, $approvedRowCount );
+				// loop through pending reviews
+				foreach ( $this->pendingReviewList as $item ) {
+
+					// if ApprovedRevs installed...
+					if ( $useApprovedRevs && is_a( $item, 'PendingApproval' ) ) {
+						$html .= $this->getApprovedRevsChangeRow( $item, $approvedRowCount );
+					}
+
+					$approvedRowCount++;
 				}
+				$html .= '</table>';
 
-				$approvedRowCount++;
 			}
-			$html .= '</table>';
 
 		}
 
@@ -492,7 +497,7 @@ class SpecialPendingReviews extends SpecialPage {
 		$diffLink = Xml::element( 'a',
 			[ 'href' => $diffURL, 'class' => 'pendingreviews-green-button', 'target' => "_blank" ],
 			wfMessage(
-				'watchanalytics-review-and-approve'
+				'watchanalytics-view-and-approve'
 			)->text()
 		);
 
@@ -650,16 +655,6 @@ class SpecialPendingReviews extends SpecialPage {
 			$html .= $this->getPendingReviewsLegend();
 		}
 
-		// message like "You have X pending reviews"
-		$html .= '<p>' . wfMessage( 'pendingreviews-num-reviews', $numPendingReviews, $this->reviewLimit )->text();
-		if ( $useApprovedRevs ) {
-			$numPendingApprovals = count( PendingApproval::getUserPendingApprovals( $user ) );
-			$html .= wfMessage( 'pendingreviews-num-approvals', $numPendingApprovals, $this->reviewLimit )->text();
-		}
-
-		// close out header
-		$html .= '</p>';
-
 		$nextReviewSet = $this->reviewOffset + $this->reviewLimit;
 		$prevReviewSet = max( [ 0, $this->reviewOffset - $this->reviewLimit ] );
 		$currentURL = $this->getPageTitle()->getLocalUrl();
@@ -698,6 +693,13 @@ class SpecialPendingReviews extends SpecialPage {
 			],
 			wfMessage( 'watchanalytics-pendingreviews-next-revisions' )->text()
 		);
+
+		if ( $numPendingReviews != 0 ) {
+			// message like "You have X pending reviews"
+			$html .= '<h3>' . wfMessage( 'pendingreviews-num-reviews', $numPendingReviews, $this->reviewLimit )->text() . '</h3>';
+		} else {
+			$html .= ' <br /> <big>' . wfMessage( 'pendingreviews-num-reviews-complete' )->text() . '</big>';
+		}
 
 		return $html;
 	}
