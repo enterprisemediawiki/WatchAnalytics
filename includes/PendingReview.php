@@ -75,7 +75,7 @@ class PendingReview {
 
 			$revResults = $dbr->select(
 				[ 'r' => 'revision' ],
-				Revision::selectFields(),
+				Revision::getQueryInfo()['fields'],
 				"r.rev_page=$pageID AND r.rev_timestamp>=$notificationTimestamp",
 				__METHOD__,
 				[ 'ORDER BY' => 'rev_timestamp ASC' ],
