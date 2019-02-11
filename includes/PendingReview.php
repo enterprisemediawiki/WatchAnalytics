@@ -57,23 +57,21 @@ class PendingReview {
 			$pageID = $title->getArticleID();
 			$namespace = $title->getNamespace();
 			$titleDBkey = $title->getDBkey();
-		}
-		 else {
+		} else {
 			$pageID = $row['page_id'];
 			$namespace = $row['namespace'];
 			$titleDBkey = $row['title'];
 
 			if ( $pageID ) {
 				$title = Title::newFromID( $pageID );
-			}
-			else {
+			} else {
 				$title = false;
 			}
 		}
 
 		if ( $pageID && $title->exists() ) {
 
-			$dbr = wfGetDB( DB_SLAVE );
+			$dbr = wfGetDB( DB_REPLICA );
 
 			$revResults = $dbr->select(
 				[ 'r' => 'revision' ],
@@ -106,8 +104,7 @@ class PendingReview {
 			$deletedTitle = false;
 			$deletionLog = false;
 
-		}
-		 else {
+		} else {
 			$deletedNS = $namespace;
 			$deletedTitle = $titleDBkey;
 			$deletionLog = $this->getDeletionLog( $deletedTitle, $deletedNS, $notificationTimestamp );

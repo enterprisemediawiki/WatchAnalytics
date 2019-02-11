@@ -143,9 +143,9 @@ class SpecialPendingReviews extends SpecialPage {
 			}
 
 			// page has been deleted (or moved w/o a redirect)
-			 elseif ( !( $useApprovedRevs && is_a( $item, 'PendingApproval' ) ) ) {
-				 $html .= $this->getDeletedPageRow( $item, $rowCount );
-			 }
+ elseif ( !( $useApprovedRevs && is_a( $item, 'PendingApproval' ) ) ) {
+					$html .= $this->getDeletedPageRow( $item, $rowCount );
+	}
 
 			 $rowCount++;
 		}
@@ -640,7 +640,7 @@ class SpecialPendingReviews extends SpecialPage {
 	 * Creates simple header stating how many pending reviews the user has.
 	 *
 	 * @param User $user
-	 * @param boolean $useApprovedRevs
+	 * @param bool $useApprovedRevs
 	 * @return string HTML for header
 	 */
 	public function getPageHeader( User $user, $useApprovedRevs ) {

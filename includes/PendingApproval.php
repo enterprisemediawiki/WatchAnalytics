@@ -21,7 +21,7 @@
  * @file
  * @ingroup Extensions
  * @author James Montalvo
- * @licence MIT License
+ * @license MIT
  */
 
 # Alert the user that this is not a valid entry point to MediaWiki if they try to access the special pages file directly.
@@ -35,7 +35,6 @@ EOT;
 
 class PendingApproval extends PendingReview {
 	public function __construct( $row, Title $title ) {
-
 		$this->title = $title;
 
 		$this->notificationTimestamp = $row['notificationtimestamp'];
