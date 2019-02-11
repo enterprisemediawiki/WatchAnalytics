@@ -34,7 +34,6 @@ EOT;
 }
 
 class PendingApproval extends PendingReview {
-
 	public function __construct( $row, Title $title ) {
 
 		$this->title = $title;
@@ -52,17 +51,14 @@ class PendingApproval extends PendingReview {
 		// no list of revisions for now
 		$this->log = [];
 		$this->newRevisions = [];
-
 	}
-
 
 	/**
 	 * Get an array of pages user can approve that require approvals
 	 * @param User $user
 	 * @return Array
 	 */
-	static public function getUserPendingApprovals ( User $user ) {
-
+	public static function getUserPendingApprovals( User $user ) {
 		$dbr = wfGetDB( DB_REPLICA );
 
 		$queryInfo = ApprovedRevs::getQueryInfoPageApprovals( 'notlatest' );
@@ -85,8 +81,8 @@ class PendingApproval extends PendingReview {
 
 				// FIXME: May want to get these in there so PendingReviews can
 				// show the list of revs in the approval.
-				//     'approved_rev_id' => $page['rev_id']
-				//     'latest_rev_id' => $page['latest_id']
+				// 'approved_rev_id' => $page['rev_id']
+				// 'latest_rev_id' => $page['latest_id']
 				$pagesUserCanApprove[] = new self(
 					[
 						'notificationtimestamp' => null,
@@ -100,7 +96,6 @@ class PendingApproval extends PendingReview {
 		}
 
 		return $pagesUserCanApprove;
-
 	}
 
 }

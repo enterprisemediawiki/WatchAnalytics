@@ -48,7 +48,6 @@ class PendingReview {
 	public $log;
 
 	public function __construct( $row, Title $title = null ) {
-
 		$notificationTimestamp = $row['notificationtimestamp'];
 
 		$this->notificationTimestamp = $notificationTimestamp;
@@ -59,7 +58,7 @@ class PendingReview {
 			$namespace = $title->getNamespace();
 			$titleDBkey = $title->getDBkey();
 		}
-		else {
+		 else {
 			$pageID = $row['page_id'];
 			$namespace = $row['namespace'];
 			$titleDBkey = $row['title'];
@@ -77,7 +76,7 @@ class PendingReview {
 			$dbr = wfGetDB( DB_SLAVE );
 
 			$revResults = $dbr->select(
-				array( 'r' => 'revision' ),
+				[ 'r' => 'revision' ],
 				Revision::selectFields(),
 				"r.rev_page=$pageID AND r.rev_timestamp>=$notificationTimestamp",
 				__METHOD__,
@@ -90,8 +89,8 @@ class PendingReview {
 			}
 
 			$logResults = $dbr->select(
-				array( 'l' => 'logging' ),
-				array( '*' ),
+				[ 'l' => 'logging' ],
+				[ '*' ],
 				"l.log_page=$pageID AND l.log_timestamp>=$notificationTimestamp
 					AND l.log_type NOT IN ('interwiki','newusers','patrol','rights','upload')",
 				__METHOD__,
@@ -108,7 +107,7 @@ class PendingReview {
 			$deletionLog = false;
 
 		}
-		else {
+		 else {
 			$deletedNS = $namespace;
 			$deletedTitle = $titleDBkey;
 			$deletionLog = $this->getDeletionLog( $deletedTitle, $deletedNS, $notificationTimestamp );
@@ -116,14 +115,12 @@ class PendingReview {
 			$revsPending = false;
 		}
 
-
 		$this->title = $title;
 		$this->newRevisions = $revsPending;
 		$this->deletedTitle = $deletedTitle;
 		$this->deletedNS = $deletedNS;
 		$this->deletionLog = $deletionLog;
 		$this->log = $logPending;
-
 	}
 
 	public static function getPendingReviewsList( User $user, $limit, $offset ) {
@@ -257,7 +254,6 @@ class PendingReview {
 			return $moveLogParams[0];
 		}
 	}
-
 
 	/**
 	 * Clears a pending reviews of a particular page for a particular user.

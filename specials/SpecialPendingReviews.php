@@ -125,7 +125,7 @@ class SpecialPendingReviews extends SpecialPage {
 
 		$this->pendingReviewList = PendingReview::getPendingReviewsList( $this->mUser, $this->reviewLimit, $this->reviewOffset );
 
-		//Check that Approved Revs is installed
+		// Check that Approved Revs is installed
 		$useApprovedRevs = class_exists( 'ApprovedRevs' );
 
 		$html = $this->getPageHeader( $wgUser, $useApprovedRevs );
@@ -143,15 +143,15 @@ class SpecialPendingReviews extends SpecialPage {
 			}
 
 			// page has been deleted (or moved w/o a redirect)
-			else if ( !( $useApprovedRevs && is_a( $item, 'PendingApproval' ) ) ) {
-				$html .= $this->getDeletedPageRow( $item, $rowCount );
-			}
-			$rowCount++;
+			 elseif ( !( $useApprovedRevs && is_a( $item, 'PendingApproval' ) ) ) {
+				 $html .= $this->getDeletedPageRow( $item, $rowCount );
+			 }
 
+			 $rowCount++;
 		}
 		$html .= '</table>';
 
-		//seperate out row counts between approval table and pending reviews
+		// how many pending approval rows there are
 		$approvedRowCount = 0;
 
 		if ( $useApprovedRevs ) {
@@ -357,11 +357,10 @@ class SpecialPendingReviews extends SpecialPage {
 	 * Generates row for a pending ApprovedRevs revision.
 	 *
 	 * @param PendingReview $item
-	 * @param int $rowCount used to determine if the row is odd or even
+	 * @param int $approvedRowCount used to determine if the row is odd or even
 	 * @return string HTML for row
 	 */
-	public function getApprovedRevsChangeRow ( PendingReview $item, $approvedRowCount ) {
-
+	public function getApprovedRevsChangeRow( PendingReview $item, $approvedRowCount ) {
 		$changes = '<ul><li>' . wfMessage( 'pendingreviews-pending-approvedrev' )->parse() . '</li></ul>';
 
 		$buttonOne = '';
@@ -376,7 +375,6 @@ class SpecialPendingReviews extends SpecialPage {
 			'</strong>';
 
 		return $this->getApproveRowHTML( $item, $approvedRowCount, $displayTitle, $buttonOne, $historyButton, $changes );
-
 	}
 
 	/**
@@ -642,6 +640,7 @@ class SpecialPendingReviews extends SpecialPage {
 	 * Creates simple header stating how many pending reviews the user has.
 	 *
 	 * @param User $user
+	 * @param boolean $useApprovedRevs
 	 * @return string HTML for header
 	 */
 	public function getPageHeader( User $user, $useApprovedRevs ) {

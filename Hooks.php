@@ -28,10 +28,10 @@ class WatchAnalyticsHooks {
 		$maxPendingDays = $watchStats['max_pending_days'];
 
 		// Get user's pending approvals
-		//Check that Approved Revs is installed
+		// Check that Approved Revs is installed
 		$numPendingApprovals = 0;
 		if ( class_exists( 'ApprovedRevs' ) ) {
-			$numPendingApprovals =  count( PendingApproval::getUserPendingApprovals( $user ) );
+			$numPendingApprovals = count( PendingApproval::getUserPendingApprovals( $user ) );
 		}
 
 		// Determine CSS class of Watchlist/PendingReviews link
@@ -46,7 +46,7 @@ class WatchAnalyticsHooks {
 			$personal_urls['watchlist']['class'][] = 'mw-watchanalytics-watchlist-pending-old';
 			if ( $numPendingApprovals != 0 ) {
 				$text = wfMessage( 'watchanalytics-personal-url-approvals-old' )->params( $numPending, $maxPendingDays, $numPendingApprovals )->text();
-			} else{
+			} else {
 				$text = wfMessage( 'watchanalytics-personal-url-old' )->params( $numPending, $maxPendingDays )->text();
 			}
 		} else {
