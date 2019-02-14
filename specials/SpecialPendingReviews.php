@@ -149,7 +149,7 @@ class SpecialPendingReviews extends SpecialPage {
 				$html .= $this->getDeletedPageRow( $item, $rowCount );
 				$rowCount++;
 			}
-			
+
 		}
 		$html .= '</table>';
 
