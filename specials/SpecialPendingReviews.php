@@ -138,16 +138,18 @@ class SpecialPendingReviews extends SpecialPage {
 
 			if ( $useApprovedRevs && is_a( $item, 'PendingApproval' ) ) {
 				// don't add approvals here
+				continue;
 			} elseif ( $item->title ) {
 				// if the title exists, then the page exists (and hence it has not
 				// been deleted)
 				$html .= $this->getStandardChangeRow( $item, $rowCount );
+				$rowCount++;
 			} else {
 				// page has been deleted (or moved w/o a redirect)
 				$html .= $this->getDeletedPageRow( $item, $rowCount );
+				$rowCount++;
 			}
-
-			$rowCount++;
+			
 		}
 		$html .= '</table>';
 
