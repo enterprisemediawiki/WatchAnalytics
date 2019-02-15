@@ -27,6 +27,13 @@ class WatchAnalyticsHooks {
 		$numPending = $watchStats['num_pending'];
 		$maxPendingDays = $watchStats['max_pending_days'];
 
+		// Get user's pending approvals
+		// Check that Approved Revs is installed
+		$numPendingApprovals = 0;
+		if ( class_exists( 'ApprovedRevs' ) ) {
+			$numPendingApprovals = count( PendingApproval::getUserPendingApprovals( $user ) );
+		}
+
 		// Determine CSS class of Watchlist/PendingReviews link
 		$personal_urls['watchlist']['class'] = [ 'mw-watchanalytics-watchlist-badge' ];
 		if ( $numPending != 0 ) {
@@ -37,10 +44,19 @@ class WatchAnalyticsHooks {
 		global $egPendingReviewsEmphasizeDays;
 		if ( $maxPendingDays > $egPendingReviewsEmphasizeDays ) {
 			$personal_urls['watchlist']['class'][] = 'mw-watchanalytics-watchlist-pending-old';
-			$text = wfMessage( 'watchanalytics-personal-url-old' )->params( $numPending, $maxPendingDays )->text();
+			if ( $numPendingApprovals != 0 ) {
+				$text = wfMessage( 'watchanalytics-personal-url-approvals-old' )->params( $numPending, $maxPendingDays, $numPendingApprovals )->text();
+			} else {
+				$text = wfMessage( 'watchanalytics-personal-url-old' )->params( $numPending, $maxPendingDays )->text();
+			}
 		} else {
-			// when $sk (third arg) available, replace wfMessage with $sk->msg()
-			$text = wfMessage( 'watchanalytics-personal-url' )->params( $numPending )->text();
+			if ( $numPendingApprovals != 0 ) {
+				$text = wfMessage( 'watchanalytics-personal-url-approvals' )->params( $numPending, $numPendingApprovals )->text();
+			} else {
+				// when $sk (third arg) available, replace wfMessage with $sk->msg()
+				$text = wfMessage( 'watchanalytics-personal-url' )->params( $numPending )->text();
+			}
+
 		}
 		$personal_urls['watchlist']['text'] = $text;
 

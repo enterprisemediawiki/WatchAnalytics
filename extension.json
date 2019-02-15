@@ -41,6 +41,7 @@
 		"WatchAnalyticsUser": "WatchAnalyticsUser.php",
 		"WatchAnalyticsUpdaterHooks": "schema/WatchAnalyticsUpdaterHooks.php",
 		"PendingReview": "includes/PendingReview.php",
+		"PendingApproval": "includes/PendingApproval.php",
 		"WatchSuggest": "includes/WatchSuggest.php",
 		"ReviewHandler": "includes/ReviewHandler.php",
 		"PageScore": "includes/PageScore.php",
