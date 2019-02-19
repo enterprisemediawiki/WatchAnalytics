@@ -91,7 +91,7 @@ class SpecialPendingReviews extends SpecialPage {
 	 * @return bool
 	 */
 	public function execute( $parser = null ) {
-		global $wgOut, $wgUser;
+		global $wgOut;
 
 		$this->setHeaders();
 
@@ -660,7 +660,7 @@ class SpecialPendingReviews extends SpecialPage {
 		$prevReviewSet = max( [ 0, $this->reviewOffset - $this->reviewLimit ] );
 		$currentURL = $this->getPageTitle()->getLocalUrl();
 
-		$viewingUser = '&user='.$this->mUser;
+		$viewingUser = '&user=' . $this->mUser;
 
 		$linkClass = "pendingreviews-nav-link";
 		if ( $this->reviewOffset == 0 ) {
