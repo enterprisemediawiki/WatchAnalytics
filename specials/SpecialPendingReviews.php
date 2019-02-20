@@ -91,7 +91,7 @@ class SpecialPendingReviews extends SpecialPage {
 	 * @return bool
 	 */
 	public function execute( $parser = null ) {
-		global $wgOut, $wgUser;
+		global $wgOut;
 
 		$this->setHeaders();
 
@@ -128,7 +128,7 @@ class SpecialPendingReviews extends SpecialPage {
 		// Check that Approved Revs is installed
 		$useApprovedRevs = class_exists( 'ApprovedRevs' );
 
-		$html = $this->getPageHeader( $wgUser, $useApprovedRevs );
+		$html = $this->getPageHeader( $this->mUser, $useApprovedRevs );
 
 		$html .= '<table class="pendingreviews-list">';
 		$rowCount = 0;
@@ -660,10 +660,7 @@ class SpecialPendingReviews extends SpecialPage {
 		$prevReviewSet = max( [ 0, $this->reviewOffset - $this->reviewLimit ] );
 		$currentURL = $this->getPageTitle()->getLocalUrl();
 
-		$viewingUser = '';
-		// if ( $this->mUser ) {
-		// $viewingUser = '&user='.$this->mUser;
-		// }
+		$viewingUser = '&user=' . $this->mUser;
 
 		$linkClass = "pendingreviews-nav-link";
 		if ( $this->reviewOffset == 0 ) {
@@ -695,12 +692,21 @@ class SpecialPendingReviews extends SpecialPage {
 			wfMessage( 'watchanalytics-pendingreviews-next-revisions' )->text()
 		);
 
-		if ( $numPendingReviews != 0 ) {
-			// message like "You have X pending reviews"
-			$html .= '<h3>' . wfMessage( 'pendingreviews-num-reviews', $numPendingReviews, $this->reviewLimit )->text() . '</h3>';
+		$html .= '<h3>';
+
+		if ( !( $this->getRequest()->getVal( 'user' ) ) ) {
+			if ( $numPendingReviews != 0 ) {
+				// message like "You have X pending reviews"
+				$html .= wfMessage( 'pendingreviews-num-reviews', $numPendingReviews )->text();
+			} else {
+				// message like "Congrats you finished your reviews!"
+				$html .= wfMessage( 'pendingreviews-num-reviews-complete' )->text();
+			}
 		} else {
-			$html .= ' <br /> <big>' . wfMessage( 'pendingreviews-num-reviews-complete' )->text() . '</big>';
+			$html .= wfMessage( 'pendingreviews-num-other-user-reviews', $user, $numPendingReviews )->text();
 		}
+
+		$html .= '</h3>';
 
 		return $html;
 	}
