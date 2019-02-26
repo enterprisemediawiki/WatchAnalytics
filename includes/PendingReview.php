@@ -1,5 +1,9 @@
 <?php
 
+use MediaWiki\MediaWikiServices;
+use MediaWiki\Revision\RevisionRecord;
+use MediaWiki\Revision\RevisionStore;
+
 class PendingReview {
 
 	/**
@@ -73,12 +77,27 @@ class PendingReview {
 
 			$dbr = wfGetDB( DB_REPLICA );
 
+			$revisionStore = MediaWikiServices::getInstance()->getRevisionStore();
+
 			$revResults = $dbr->select(
-				[ 'r' => 'revision' ],
-				Revision::getQueryInfo()['fields'],
+				[ 'r' => 'revision', 'c' => 'comment' ],
+				array(
+					'rev_id' => 'r.rev_id',
+					'rev_page' => 'r.rev_page',
+					'r.rev_timestamp',
+					'r.rev_minor_edit',
+					'r.rev_deleted',
+					'r.rev_len',
+					'r.rev_parent_id',
+					'r.rev_sha1',
+					'rev_comment_text' => 'c.comment_text',
+					'rev_comment_data' => 'c.comment_data',
+					'rev_comment_cid' => 'c.comment_id'
+				 ),
+				//$revisionStore->getQueryInfo(['page'])['fields'],
 				"r.rev_page=$pageID AND r.rev_timestamp>=$notificationTimestamp",
 				__METHOD__,
-				[ 'ORDER BY' => 'rev_timestamp ASC' ],
+				[ 'ORDER BY' => 'r.rev_timestamp ASC' ],
 				null
 			);
 			$revsPending = [];

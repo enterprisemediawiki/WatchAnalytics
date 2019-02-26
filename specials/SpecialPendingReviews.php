@@ -30,6 +30,11 @@
  * @ingroup SpecialPage
  */
 
+
+use MediaWiki\MediaWikiServices;
+use MediaWiki\Revision\RevisionRecord;
+use MediaWiki\Revision\RevisionStore;
+
 class SpecialPendingReviews extends SpecialPage {
 
 	public $mMode;
@@ -863,13 +868,15 @@ class SpecialPendingReviews extends SpecialPage {
 	 * @return string HTML
 	 */
 	public function getPendingReviewChangesList( $combinedList ) {
+		$revisionStore = MediaWikiServices::getInstance()->getRevisionStore();
 		$changes = [];
 		foreach ( $combinedList as $change ) {
 			if ( isset( $change->log_timestamp ) ) {
 				$changeTs = $change->log_timestamp;
 				$changeText = $this->getLogChangeMessage( $change );
 			} else {
-				$rev = Revision::newFromRow( $change );
+				$rev = $revisionStore->newRevisionFromRow( $change );
+				//$rev = Revision::newFromRow( $change );
 				$changeTs = $change->rev_timestamp;
 				$userPage = Title::makeTitle( NS_USER, $change->rev_user_text )->getFullText();
 
