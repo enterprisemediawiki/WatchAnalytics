@@ -875,8 +875,7 @@ class SpecialPendingReviews extends SpecialPage {
 				$changeTs = $change->log_timestamp;
 				$changeText = $this->getLogChangeMessage( $change );
 			} else {
-				$rev = $revisionStore->newRevisionFromRow( $change );
-				//$rev = Revision::newFromRow( $change );
+				$rev = Revision::newFromRow( $change );
 				$changeTs = $change->rev_timestamp;
 				$userPage = Title::makeTitle( NS_USER, $change->rev_user_text )->getFullText();
 

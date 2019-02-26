@@ -79,26 +79,15 @@ class PendingReview {
 
 			$revisionStore = MediaWikiServices::getInstance()->getRevisionStore();
 
+			$revQueryInfo = $revisionStore->getQueryInfo();
+
 			$revResults = $dbr->select(
-				[ 'r' => 'revision', 'c' => 'comment' ],
-				array(
-					'rev_id' => 'r.rev_id',
-					'rev_page' => 'r.rev_page',
-					'r.rev_timestamp',
-					'r.rev_minor_edit',
-					'r.rev_deleted',
-					'r.rev_len',
-					'r.rev_parent_id',
-					'r.rev_sha1',
-					'rev_comment_text' => 'c.comment_text',
-					'rev_comment_data' => 'c.comment_data',
-					'rev_comment_cid' => 'c.comment_id'
-				 ),
-				//$revisionStore->getQueryInfo(['page'])['fields'],
-				"r.rev_page=$pageID AND r.rev_timestamp>=$notificationTimestamp",
+				$revQueryInfo['tables'],
+				$revQueryInfo['fields'],
+				"rev_page=$pageID AND rev_timestamp>=$notificationTimestamp",
 				__METHOD__,
-				[ 'ORDER BY' => 'r.rev_timestamp ASC' ],
-				null
+				[ 'ORDER BY' => 'rev_timestamp ASC' ],
+				$revQueryInfo['joins']
 			);
 			$revsPending = [];
 			while ( $rev = $revResults->fetchObject() ) {
