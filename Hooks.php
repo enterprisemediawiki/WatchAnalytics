@@ -71,7 +71,7 @@ class WatchAnalyticsHooks {
 	 *
 	 * 1) Determine if user should see shaky pending reviews link
 	 * 2) Insert page scores on applicable pages
-	 * 3) REMOVED FOR MW 1.27: If a page review has occured on this page view, display an unreview
+	 * 3) REMOVED FOR MW 1.27: If a page review has occurred on this page view, display an unreview
 	 *    option and record that the review happened.
 	 *
 	 * Also supports parameter: Skin $skin.
