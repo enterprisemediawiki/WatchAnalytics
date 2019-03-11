@@ -265,7 +265,6 @@ class WatchStateRecorder {
 	 * Record relevant info in watch_tracking_page and watch_tracking_user
 	 * after a change to a page (e.g. an edit, a move, etc)
 	 *
-	 * @param $wikipage
 	 * @return bool
 	 */
 	public static function recordPageChange( $wikipage ) {
