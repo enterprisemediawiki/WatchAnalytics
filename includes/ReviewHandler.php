@@ -126,9 +126,9 @@ class ReviewHandler {
 				'id' => 'watch-analytics-unreview',
 				'class' => 'watch-analytics-unreview',
 				'pending-title' => $this->title->getPrefixedText(),
-				'title' => wfMessage( 'watchanalytics-review-button' )->text(),
+				'title' => wfMessage( 'watchanalytics-unreview-button' )->text(),
 			),
-			wfMessage( 'watchanalytics-review-button' )->text()
+			wfMessage( 'watchanalytics-unreview-button' )->text()
 		);
 
 		$linkText = wfMessage( 'watchanalytics-unreview-button' )->text();
