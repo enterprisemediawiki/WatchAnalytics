@@ -197,12 +197,6 @@ class PendingReview {
 		return $pending;
 	}
 
-	/**
-	 * Get details of single pending review for a given page
-	 * @var User $user
-	 * @var Title $title
-	 * @return array Details on specific pendingReview for given page.
-	 */
 	public static function getPendingReview( User $user, Title $title ) {
 		$tables = [
 			'w' => 'watchlist',
@@ -265,7 +259,6 @@ class PendingReview {
 
 	public function getDeletionLog( $title, $ns, $notificationTimestamp ) {
 		$dbr = wfGetDB( DB_REPLICA );
-
 		$title = $dbr->addQuotes( $title );
 
 		// pages are deleted when (a) they are explicitly deleted or (b) they
