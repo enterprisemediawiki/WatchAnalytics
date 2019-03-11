@@ -161,6 +161,11 @@ class ReviewHandler {
 
 		$diff = new DifferenceEngine( null , $old = $lastSeenId , $new = 0);
 
+		$template =
+			"<div id='watch-analytics-review-handler'>
+				$reviewLink
+				<p>$bannerText</p>";
+
 		$template .= "<div id='diff-box'>";
 		$template .= $diff->showDiffStyle();
 		$template .= $diff->getDiff('<b>Last seen</b>', '<b>Current</b>');
