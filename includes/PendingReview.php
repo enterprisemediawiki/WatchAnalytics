@@ -191,6 +191,72 @@ class PendingReview {
 		return $pending;
 	}
 
+	//Get details of single pending review for a given page
+	public static function getPendingReview( User $user, Title $title ) {
+		$tables = [
+			'w' => 'watchlist',
+			'p' => 'page',
+			'log' => 'logging',
+		];
+
+		$fields = [
+			'p.page_id AS page_id',
+			'log.log_action AS log_action',
+			'w.wl_namespace AS namespace',
+			'w.wl_title AS title',
+			'w.wl_notificationtimestamp AS notificationtimestamp',
+			'(SELECT COUNT(*) FROM watchlist AS subwatch
+				WHERE
+				subwatch.wl_namespace = w.wl_namespace
+				AND subwatch.wl_title = w.wl_title
+				AND subwatch.wl_notificationtimestamp IS NULL
+			) AS num_reviewed',
+		];
+
+		//FIXME something wrong with how conditions are set
+		$conds = [ 'w.wl_user' => $user->getId() , 'p.page_id' => $title->getArticleID() , 'w.wl_notificationtimestamp IS NOT NULL' ];
+
+		$options = [];
+
+		$join_conds = [
+			'p' => [
+				'LEFT JOIN', 'p.page_namespace=w.wl_namespace AND p.page_title=w.wl_title'
+			],
+			'log' => [
+				'LEFT JOIN',
+				'log.log_namespace = w.wl_namespace '
+				. ' AND log.log_title = w.wl_title'
+				. ' AND p.page_namespace IS NULL'
+				. ' AND p.page_title IS NULL'
+				. ' AND log.log_action IN ("delete","move")'
+			],
+		];
+
+		$dbr = wfGetDB( DB_REPLICA );
+
+		$watchResult = $dbr->select(
+			$tables,
+			$fields,
+			$conds,
+			__METHOD__,
+			$options,
+			$join_conds
+		);
+
+		$pending = [];
+
+		while ( $row = $dbr->fetchRow( $watchResult ) ) {
+
+			$pending[] = new self( $row );
+
+		}
+		// echo "<pre>";
+		// var_dump($pending);
+		// echo "<pre>";
+
+		return $pending;
+	}
+
 	public function getDeletionLog( $title, $ns, $notificationTimestamp ) {
 		$dbr = wfGetDB( DB_REPLICA );
 
