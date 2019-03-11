@@ -39,7 +39,7 @@ class SpecialPageStatistics extends SpecialPage {
 
 			$unReviewTimestamp = $wgRequest->getVal( 'unreview' );
 			if ( $unReviewTimestamp ) {
-				$rh = new ReviewHandler( $wgUser, $this->mTitle );
+				$rh = new ReviewHandler( $wgUser, $this->mTitle, $wgRequest);
 				$rh->resetNotificationTimestamp( $unReviewTimestamp );
 				$wgOut->addModuleStyles( [ 'ext.watchanalytics.reviewhandler.styles' ] );
 				$wgOut->addHTML( $this->unReviewMessage() );

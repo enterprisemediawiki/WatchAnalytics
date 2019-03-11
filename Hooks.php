@@ -259,8 +259,10 @@ class WatchAnalyticsHooks {
 	 * @return bool
 	 */
 	public static function onPageViewUpdates( WikiPage $wikiPage, User $user ) {
+		global $wgRequest;
 		$title = $wikiPage->getTitle();
-		$reviewHandler = ReviewHandler::setup( $user, $title );
+		$isDiff = $wgRequest->getText( 'oldid' );
+		$reviewHandler = ReviewHandler::setup( $user, $title, $isDiff );
 
 		if ( $reviewHandler::pageIsBeingReviewed() ) {
 

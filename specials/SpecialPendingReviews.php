@@ -443,7 +443,7 @@ class SpecialPendingReviews extends SpecialPage {
 	 * @param PendingReview $item
 	 * @return string HTML for button
 	 */
-	public function getReviewButton( $item ) {
+	public function ( $item ) {
 		if ( count( $item->newRevisions ) > 0 ) {
 
 			// returns essentially the negative-oneth revision...the one before

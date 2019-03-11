@@ -206,6 +206,7 @@
 	"config": {
 		"_prefix": "eg",
 		"WatchAnalyticsPageCounter": false,
+		"WatchAnalyticsShowUnreviewDiff": true,
 		"PendingReviewsEmphasizeDays": 7,
 		"PendingReviewsRedPagesThreshold": 2,
 		"PendingReviewsOrangePagesThreshold": 4,

@@ -30,17 +30,18 @@ class ReviewHandler {
 	 */
 	public $final = null;
 
-	public function __construct( User $user, Title $title ) {
+	public function __construct( User $user, Title $title, $isDiff ) {
 		$this->user = $user;
 		$this->title = $title;
+		$this->isDiff = $isDiff;
 	}
 
-	public static function setup( User $user, Title $title ) {
+	public static function setup( User $user, Title $title, $isDiff ) {
 		if ( ! $title->isWatchable() ) {
 			self::$isReviewable = false;
 			return false;
 		}
-		self::$pageLoadHandler = new self ( $user, $title );
+		self::$pageLoadHandler = new self ( $user, $title, $isDiff );
 		self::$pageLoadHandler->initial = self::$pageLoadHandler->getReviewStatus();
 		return self::$pageLoadHandler;
 	}
@@ -131,7 +132,6 @@ class ReviewHandler {
 			wfMessage( 'watchanalytics-unreview-button' )->text()
 		);
 
-		$linkText = wfMessage( 'watchanalytics-unreview-button' )->text();
 		$bannerText = wfMessage( 'watchanalytics-unreview-banner-text' )->parse();
 
 		$this->pendingReview = PendingReview::getPendingReview( $this->user, $this->title );
@@ -166,10 +166,18 @@ class ReviewHandler {
 				$unReviewLink
 				<p>$bannerText</p>";
 
-		$template .= "<div id='diff-box'>";
-		$template .= $diff->showDiffStyle();
-		$template .= $diff->getDiff('<b>Last seen</b>', '<b>Current</b>');
-		$template .= "</div></div>";
+		global $egWatchAnalyticsShowUnreviewDiff;
+		if ( $egWatchAnalyticsShowUnreviewDiff ) {
+			//Don't show diff on in header while viewing diff page
+			if ( !($this->isDiff) ) {
+				$template .= "<div id='diff-box'>";
+				$template .= $diff->showDiffStyle();
+				$template .= $diff->getDiff('<b>Last seen</b>', '<b>Current</b>');
+				$template .= "</div>";
+			}
+		}
+
+		$template .= "</div>";
 
 		return "<script type='text/template' id='ext-watchanalytics-review-handler-template'>$template</script>";
 	}
