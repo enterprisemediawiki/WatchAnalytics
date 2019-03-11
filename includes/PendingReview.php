@@ -252,8 +252,8 @@ class PendingReview {
 		while ( $row = $dbr->fetchRow( $watchResult ) ) {
 
 			$pending[] = new self( $row );
+
 		}
-		
 		return $pending;
 	}
 
