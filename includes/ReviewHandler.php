@@ -116,20 +116,55 @@ class ReviewHandler {
 	public function getTemplate() {
 		// $msg = wfMessage( 'watch-analytics-page-score-tooltip' )->text();
 
-		$unReviewLink = SpecialPage::getTitleFor( 'PageStatistics' )->getInternalURL( [
-			'page' => $this->title->getPrefixedText(),
-			'unreview' => $this->initial
-		] );
+		$unReviewLink = Xml::element(
+			'a',
+			array(
+				'href' => SpecialPage::getTitleFor( 'PageStatistics' )->getInternalURL( [
+					'page' => $this->title->getPrefixedText(),
+					'unreview' => $this->initial
+				] ),
+				'id' => 'watch-analytics-unreview',
+				'class' => 'watch-analytics-unreview',
+				'pending-title' => $this->title->getPrefixedText(),
+				'title' => wfMessage( 'watchanalytics-review-button' )->text(),
+			),
+			wfMessage( 'watchanalytics-review-button' )->text()
+		);
 
 		$linkText = wfMessage( 'watchanalytics-unreview-button' )->text();
 		$bannerText = wfMessage( 'watchanalytics-unreview-banner-text' )->parse();
 
-		// when MW 1.25 is released (very soon) replace this with a mustache template
-		$template =
-			"<div id='watch-analytics-review-handler'>
-				<a id='watch-analytics-unreview' href='$unReviewLink'>$linkText</a>
-				<p>$bannerText</p>
-			</div>";
+		$this->pendingReview = PendingReview::getPendingReview( $this->user, $this->title );
+
+		foreach( $this->pendingReview as $item ) {
+			if ( count( $item->newRevisions ) > 0 ) {
+
+				// returns essentially the negative-oneth revision...the one before
+				// the wl_notificationtimestamp revision...or null/false if none exists?
+				$mostRecentReviewed = Revision::newFromRow( $item->newRevisions[0] )->getPrevious();
+			} else {
+				$mostRecentReviewed = false; // no previous revision, the user has not reviewed the first!
+			}
+
+			if ( $mostRecentReviewed ) {
+
+				$lastSeenId = $mostRecentReviewed->getId();
+
+			} else {
+
+				$latest = Revision::newFromTitle( $item->title );
+				$lastSeenId = $latest->getId();
+
+			}
+
+		}
+
+		$diff = new DifferenceEngine( null , $old = $lastSeenId , $new = 0);
+
+		$template .= "<div id='diff-box'>";
+		$template .= $diff->showDiffStyle();
+		$template .= $diff->getDiff('<b>Last seen</b>', '<b>Current</b>');
+		$template .= "</div></div>";
 
 		return "<script type='text/template' id='ext-watchanalytics-review-handler-template'>$template</script>";
 	}
