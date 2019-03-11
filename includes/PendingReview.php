@@ -199,6 +199,9 @@ class PendingReview {
 
 	/**
 	 * Get details of single pending review for a given page
+	 * @var User $user
+	 * @var Title $title
+	 * @return array Details on specific pendingReview for given page.
 	 */
 	public static function getPendingReview( User $user, Title $title ) {
 		$tables = [
@@ -255,7 +258,6 @@ class PendingReview {
 		while ( $row = $dbr->fetchRow( $watchResult ) ) {
 
 			$pending[] = new self( $row );
-
 		}
 		
 		return $pending;
