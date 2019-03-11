@@ -1,5 +1,9 @@
 <?php
 
+use MediaWiki\MediaWikiServices;
+use MediaWiki\Revision\RevisionRecord;
+use MediaWiki\Revision\RevisionStore;
+
 class PendingReview {
 
 	/**
@@ -73,13 +77,17 @@ class PendingReview {
 
 			$dbr = wfGetDB( DB_REPLICA );
 
+			$revisionStore = MediaWikiServices::getInstance()->getRevisionStore();
+
+			$revQueryInfo = $revisionStore->getQueryInfo();
+
 			$revResults = $dbr->select(
-				[ 'r' => 'revision' ],
-				Revision::getQueryInfo()['fields'],
-				"r.rev_page=$pageID AND r.rev_timestamp>=$notificationTimestamp",
+				$revQueryInfo['tables'],
+				$revQueryInfo['fields'],
+				"rev_page=$pageID AND rev_timestamp>=$notificationTimestamp",
 				__METHOD__,
 				[ 'ORDER BY' => 'rev_timestamp ASC' ],
-				null
+				$revQueryInfo['joins']
 			);
 			$revsPending = [];
 			while ( $rev = $revResults->fetchObject() ) {
@@ -265,26 +273,28 @@ class PendingReview {
 		// pages are deleted when (a) they are explicitly deleted or (b) they
 		// are moved without leaving a redirect behind.
 		$logResults = $dbr->select(
-			[ 'l' => 'logging' ],
+			[ 'l' => 'logging', 'c' => 'comment' ],
 			[
-				'log_id',
-				'log_type',
-				'log_action',
-				'log_timestamp',
-				'log_user',
-				'log_user_text',
-				'log_namespace',
-				'log_title',
-				'log_page',
-				'log_comment',
-				'log_params',
-				'log_deleted',
+				'l.log_id',
+				'l.log_type',
+				'l.log_action',
+				'l.log_timestamp',
+				'l.log_user',
+				'l.log_user_text',
+				'l.log_namespace',
+				'l.log_title',
+				'l.log_page',
+				'l.log_comment_id',
+				'l.log_params',
+				'l.log_deleted',
+				'c.comment_id',
+				'c.comment_text AS log_comment'
 			],
 			"l.log_title=$title AND l.log_namespace=$ns AND l.log_timestamp>=$notificationTimestamp
 				AND l.log_type IN ('delete','move')",
 			__METHOD__,
-			[ 'ORDER BY' => 'log_timestamp ASC' ],
-			null
+			[ 'ORDER BY' => 'l.log_timestamp ASC' ],
+			[ 'c' => [ 'INNER JOIN', [ 'l.log_comment_id=c.comment_id'] ] ]
 		);
 		$logDeletes = [];
 		while ( $log = $logResults->fetchObject() ) {
