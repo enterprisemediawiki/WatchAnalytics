@@ -163,7 +163,7 @@ class ReviewHandler {
 
 		$template =
 			"<div id='watch-analytics-review-handler'>
-				$reviewLink
+				$unReviewLink
 				<p>$bannerText</p>";
 
 		$template .= "<div id='diff-box'>";
