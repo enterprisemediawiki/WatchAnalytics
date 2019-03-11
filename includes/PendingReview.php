@@ -197,7 +197,9 @@ class PendingReview {
 		return $pending;
 	}
 
-	// Get details of single pending review for a given page
+	/**
+	 * Get details of single pending review for a given page
+	 */
 	public static function getPendingReview( User $user, Title $title ) {
 		$tables = [
 			'w' => 'watchlist',
@@ -255,10 +257,7 @@ class PendingReview {
 			$pending[] = new self( $row );
 
 		}
-		// echo "<pre>";
-		// var_dump($pending);
-		// echo "<pre>";
-
+		
 		return $pending;
 	}
 
@@ -291,10 +290,10 @@ class PendingReview {
 				AND l.log_type IN ('delete','move')",
 			__METHOD__,
 			[ 'ORDER BY' => 'l.log_timestamp ASC' ],
-			[ 'c' => [ 'INNER JOIN', [ 'l.log_comment_id=c.comment_id'] ] ]
+			[ 'c' => [ 'INNER JOIN', [ 'l.log_comment_id=c.comment_id' ] ] ]
 		);
 		$logDeletes = [];
-		while ( $log = $logResults->fetchObject( ) ) {
+		while ( $log = $logResults->fetchObject() ) {
 			$logDeletes[] = $log;
 		}
 
