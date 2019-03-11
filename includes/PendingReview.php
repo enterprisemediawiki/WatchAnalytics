@@ -1,8 +1,6 @@
 <?php
 
 use MediaWiki\MediaWikiServices;
-use MediaWiki\Revision\RevisionRecord;
-use MediaWiki\Revision\RevisionStore;
 
 class PendingReview {
 
@@ -199,7 +197,7 @@ class PendingReview {
 		return $pending;
 	}
 
-	//Get details of single pending review for a given page
+	// Get details of single pending review for a given page
 	public static function getPendingReview( User $user, Title $title ) {
 		$tables = [
 			'w' => 'watchlist',
@@ -221,7 +219,6 @@ class PendingReview {
 			) AS num_reviewed',
 		];
 
-		//FIXME something wrong with how conditions are set
 		$conds = [ 'w.wl_user' => $user->getId() , 'p.page_id' => $title->getArticleID() , 'w.wl_notificationtimestamp IS NOT NULL' ];
 
 		$options = [];
@@ -297,7 +294,7 @@ class PendingReview {
 			[ 'c' => [ 'INNER JOIN', [ 'l.log_comment_id=c.comment_id'] ] ]
 		);
 		$logDeletes = [];
-		while ( $log = $logResults->fetchObject() ) {
+		while ( $log = $logResults->fetchObject( ) ) {
 			$logDeletes[] = $log;
 		}
 
