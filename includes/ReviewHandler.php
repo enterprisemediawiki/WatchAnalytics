@@ -119,7 +119,7 @@ class ReviewHandler {
 
 		$unReviewLink = Xml::element(
 			'a',
-			array(
+			[
 				'href' => SpecialPage::getTitleFor( 'PageStatistics' )->getInternalURL( [
 					'page' => $this->title->getPrefixedText(),
 					'unreview' => $this->initial
@@ -128,7 +128,7 @@ class ReviewHandler {
 				'class' => 'watch-analytics-unreview',
 				'pending-title' => $this->title->getPrefixedText(),
 				'title' => wfMessage( 'watchanalytics-unreview-button' )->text(),
-			),
+			],
 			wfMessage( 'watchanalytics-unreview-button' )->text()
 		);
 
@@ -136,7 +136,7 @@ class ReviewHandler {
 
 		$this->pendingReview = PendingReview::getPendingReview( $this->user, $this->title );
 
-		foreach( $this->pendingReview as $item ) {
+		foreach ( $this->pendingReview as $item ) {
 			if ( count( $item->newRevisions ) > 0 ) {
 
 				// returns essentially the negative-oneth revision...the one before
@@ -159,7 +159,7 @@ class ReviewHandler {
 
 		}
 
-		$diff = new DifferenceEngine( null , $old = $lastSeenId , $new = 0);
+		$diff = new DifferenceEngine( null, $old = $lastSeenId, $new = 0 );
 
 		$template =
 			"<div id='watch-analytics-review-handler'>
@@ -168,11 +168,11 @@ class ReviewHandler {
 
 		global $egWatchAnalyticsShowUnreviewDiff;
 		if ( $egWatchAnalyticsShowUnreviewDiff ) {
-			//Don't show diff on in header while viewing diff page
-			if ( !($this->isDiff) ) {
+			// Don't show diff on in header while viewing diff page
+			if ( !( $this->isDiff ) ) {
 				$template .= "<div id='diff-box'>";
 				$template .= $diff->showDiffStyle();
-				$template .= $diff->getDiff('<b>Last seen</b>', '<b>Current</b>');
+				$template .= $diff->getDiff( '<b>Last seen</b>', '<b>Current</b>' );
 				$template .= "</div>";
 			}
 		}
