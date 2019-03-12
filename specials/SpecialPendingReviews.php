@@ -300,6 +300,33 @@ class SpecialPendingReviews extends SpecialPage {
 		$combinedList = $this->combineLogAndChanges( $item->log, $item->newRevisions, $item->title );
 		$changes = $this->getPendingReviewChangesList( $combinedList );
 
+
+
+		if ( count( $item->newRevisions ) ) {
+			$previousViewedChange = Revision::newFromRow( $item->newRevisions[0] )->getPrevious();
+			if ( $previousViewedChange ) {
+				$prevId = $previousViewedChange->getId();
+				$context = new DerivativeContext( RequestContext::getMain() );
+				$context->setTitle( $item->title );
+				$diff = new DifferenceEngine( $context, $prevId, 0 );
+				$diff->showDiffStyle();
+				$theDiff = $diff->getDiff( '<b>Last seen</b>', '<b>Current</b>' );
+
+				$numChars = strlen( $theDiff );
+				$numRows = substr_count( $theDiff, '<tr' );
+
+				// FIXME: make these global vars
+				if ( $numRows < 15 && $numChars < 3500 ) {
+					$changes .= $theDiff;
+				}
+				// $changes .= " chars: $numChars, rows: $numRows ";
+
+				// FIXME: Make this a real thing!
+				$acceptChangesButton = '';
+			}
+		}
+
+
 		if ( $item->title->isRedirect() ) {
 			$reviewButton = $this->getAcceptRedirectButton( $item );
 		} else {
