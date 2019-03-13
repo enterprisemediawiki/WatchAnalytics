@@ -206,10 +206,10 @@ class SpecialPendingReviews extends SpecialPage {
 				$clearNotifyTitle->getFullText(),
 				Xml::tags( 'a',
 					[
-						'href' => $this->getTitle()->getLocalUrl(),
+						'href' => $this->getPageTitle()->getLocalUrl(),
 						'style' => 'font-weight:bold;',
 					],
-					$this->getTitle()
+					$this->getPageTitle()
 				)
 			)->text()
 		);
@@ -297,9 +297,11 @@ class SpecialPendingReviews extends SpecialPage {
 	 * @return string HTML for row
 	 */
 	public function getStandardChangeRow( PendingReview $item, $rowCount ) {
+		global $egPendingReviewMaxDiffRows, $egPendingReviewMaxDiffChar;
+
 		$combinedList = $this->combineLogAndChanges( $item->log, $item->newRevisions, $item->title );
 		$changes = $this->getPendingReviewChangesList( $combinedList );
-
+		$acceptChangesButton = null;
 
 
 		if ( count( $item->newRevisions ) ) {
@@ -315,14 +317,13 @@ class SpecialPendingReviews extends SpecialPage {
 				$numChars = strlen( $theDiff );
 				$numRows = substr_count( $theDiff, '<tr' );
 
-				// FIXME: make these global vars
-				if ( $numRows < 15 && $numChars < 3500 ) {
+				if ( $numRows < $egPendingReviewMaxDiffRows && $numChars < $egPendingReviewMaxDiffChar ) {
+					$changes .= "<div class='pending-review-diff'>";
 					$changes .= $theDiff;
+					$changes .= '</div>';
+					$acceptChangesButton = $this->getAcceptChangeButton( $item );
 				}
-				// $changes .= " chars: $numChars, rows: $numRows ";
 
-				// FIXME: Make this a real thing!
-				$acceptChangesButton = '';
 			}
 		}
 
@@ -337,7 +338,7 @@ class SpecialPendingReviews extends SpecialPage {
 
 		$displayTitle = '<strong>' . $item->title->getFullText() . '</strong>';
 
-		return $this->getReviewRowHTML( $item, $rowCount, $displayTitle, $reviewButton, $historyButton, $changes );
+		return $this->getReviewRowHTML( $item, $rowCount, $displayTitle, $reviewButton, $historyButton, $changes, $acceptChangesButton );
 	}
 
 	/**
@@ -379,7 +380,7 @@ class SpecialPendingReviews extends SpecialPage {
 			. wfMessage( $displayMessage, $title->getFullText() )->parse()
 			. '</strong>';
 
-		return $this->getReviewRowHTML( $item, $rowCount, $displayTitle, $acceptDeletionButton, $talkToDeleterButton, $changes );
+		return $this->getReviewRowHTML( $item, $rowCount, $displayTitle, $acceptDeletionButton, $talkToDeleterButton, $changes, null );
 	}
 
 	/**
@@ -417,7 +418,7 @@ class SpecialPendingReviews extends SpecialPage {
 	 * @param string $changes
 	 * @return string HTML for pending review of a given page
 	 */
-	public function getReviewRowHTML( PendingReview $item, $rowCount, $displayTitle, $buttonOne, $buttonTwo, $changes ) {
+	public function getReviewRowHTML( PendingReview $item, $rowCount, $displayTitle, $buttonOne, $buttonTwo, $changes, $acceptButton ) {
 		// FIXME: wow this is ugly
 		$rowClass = ( $rowCount % 2 === 0 ) ? 'pendingreviews-even-row' : 'pendingreviews-odd-row';
 
@@ -439,7 +440,7 @@ class SpecialPendingReviews extends SpecialPage {
 		$html = "<tr $classAndAttr><td class='pendingreviews-page-title pendingreviews-top-cell'>" .
 			"$displayTitle</td>" .
 			"<td class='pendingreviews-review-links pendingreviews-bottom-cell pendingreviews-top-cell'>" .
-			"$buttonOne $buttonTwo</td></tr>";
+			"$acceptButton $buttonOne $buttonTwo</td></tr>";
 
 		$html .= "<tr $classAndAttr><td colspan='2' class='pendingreviews-bottom-cell'>$changes</td></tr>";
 
@@ -570,7 +571,7 @@ class SpecialPendingReviews extends SpecialPage {
 	public function getClearNotificationButton( $titleText, $namespace, $buttonMsg, $buttonClass ) {
 		return Xml::element( 'a',
 			[
-				'href' => $this->getTitle()->getLocalURL( [
+				'href' => $this->getPageTitle()->getLocalURL( [
 					'clearNotificationTitle' => $titleText,
 					'clearNotificationNS' => $namespace,
 				] ),
@@ -630,6 +631,25 @@ class SpecialPendingReviews extends SpecialPage {
 		return $this->getClearNotificationButton(
 			$titleText, $namespace, 'pendingreviews-accept-redirect',
 			'pendingreviews-orange-button pendingreviews-accept-deletion'
+		);
+	}
+
+	/**
+	 * Creates a button which marks page as reviews. Displayed when diff is
+	 * small enough to display in Special:PendingReviews.
+	 *
+	 * @param string $titleText
+	 * @param string|int $namespace
+	 *
+	 * @return string HTML for button
+	 */
+	public function getAcceptChangeButton( $item ) {
+		$titleText = $item->title->getDBkey();
+		$namespace = $item->title->getNamespace();
+
+		return $this->getClearNotificationButton(
+			$titleText, $namespace, 'pendingreviews-accept-change',
+			'pendingreviews-green-button pendingreviews-accept-change'
 		);
 	}
 
@@ -755,7 +775,7 @@ class SpecialPendingReviews extends SpecialPage {
 				$scoreThreshold
 				)->text();
 
-			$html .= "<tr class='ext-watchanalytics-criticality-$style'><td>$msg</td></tr>";
+			$html .= "<tr><td class='ext-watchanalytics-criticality-$style'>$msg</td></tr>";
 		}
 
 		// bottom threshold will always be "danger" class
@@ -769,7 +789,7 @@ class SpecialPendingReviews extends SpecialPage {
 			$msg = $this->msg( "pendingreviews-reviewer-criticality-danger", $smallestThreshold - 1 )->text();
 		}
 
-		$html .= "<tr class='ext-watchanalytics-criticality-danger'><td>$msg</td></tr>";
+		$html .= "<tr><td class='ext-watchanalytics-criticality-danger'>$msg</td></tr>";
 
 		$html .= '</table>';
 
