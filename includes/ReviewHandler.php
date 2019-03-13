@@ -120,12 +120,10 @@ class ReviewHandler {
 		$unReviewLink = Xml::element(
 			'a',
 			[
-				'href' => SpecialPage::getTitleFor( 'PageStatistics' )->getInternalURL( [
-					'page' => $this->title->getPrefixedText(),
-					'unreview' => $this->initial
-				] ),
+				'href' => null,
 				'id' => 'watch-analytics-unreview',
 				'class' => 'watch-analytics-unreview',
+				'timestamp' => $this->initial,
 				'pending-title' => $this->title->getPrefixedText(),
 				'title' => wfMessage( 'watchanalytics-unreview-button' )->text(),
 			],
