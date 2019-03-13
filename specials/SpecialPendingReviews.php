@@ -303,7 +303,6 @@ class SpecialPendingReviews extends SpecialPage {
 		$changes = $this->getPendingReviewChangesList( $combinedList );
 		$acceptChangesButton = null;
 
-
 		if ( count( $item->newRevisions ) ) {
 			$previousViewedChange = Revision::newFromRow( $item->newRevisions[0] )->getPrevious();
 			if ( $previousViewedChange ) {
@@ -327,7 +326,6 @@ class SpecialPendingReviews extends SpecialPage {
 			}
 		}
 
-
 		if ( $item->title->isRedirect() ) {
 			$reviewButton = $this->getAcceptRedirectButton( $item );
 		} else {
@@ -338,7 +336,7 @@ class SpecialPendingReviews extends SpecialPage {
 
 		$displayTitle = '<strong>' . $item->title->getFullText() . '</strong>';
 
-		return $this->getReviewRowHTML( $item, $rowCount, $displayTitle, $reviewButton, $historyButton, $changes, $acceptChangesButton );
+		return $this->getReviewRowHTML( $item, $rowCount, $displayTitle, $reviewButton, $historyButton, $acceptChangesButton, $changes );
 	}
 
 	/**
@@ -380,7 +378,7 @@ class SpecialPendingReviews extends SpecialPage {
 			. wfMessage( $displayMessage, $title->getFullText() )->parse()
 			. '</strong>';
 
-		return $this->getReviewRowHTML( $item, $rowCount, $displayTitle, $acceptDeletionButton, $talkToDeleterButton, $changes, null );
+		return $this->getReviewRowHTML( $item, $rowCount, $displayTitle, $acceptDeletionButton, $talkToDeleterButton, null, $changes );
 	}
 
 	/**
@@ -415,10 +413,11 @@ class SpecialPendingReviews extends SpecialPage {
 	 * @param string $displayTitle
 	 * @param string $buttonOne
 	 * @param string $buttonTwo
+	 * @param string $acceptButton
 	 * @param string $changes
 	 * @return string HTML for pending review of a given page
 	 */
-	public function getReviewRowHTML( PendingReview $item, $rowCount, $displayTitle, $buttonOne, $buttonTwo, $changes, $acceptButton ) {
+	public function getReviewRowHTML( PendingReview $item, $rowCount, $displayTitle, $buttonOne, $buttonTwo, $acceptButton, $changes ) {
 		// FIXME: wow this is ugly
 		$rowClass = ( $rowCount % 2 === 0 ) ? 'pendingreviews-even-row' : 'pendingreviews-odd-row';
 
@@ -638,8 +637,7 @@ class SpecialPendingReviews extends SpecialPage {
 	 * Creates a button which marks page as reviews. Displayed when diff is
 	 * small enough to display in Special:PendingReviews.
 	 *
-	 * @param string $titleText
-	 * @param string|int $namespace
+	 * @param PendingReview $item
 	 *
 	 * @return string HTML for button
 	 */
