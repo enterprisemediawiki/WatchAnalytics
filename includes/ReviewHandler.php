@@ -157,7 +157,7 @@ class ReviewHandler {
 
 		}
 
-		$diff = new DifferenceEngine( null, $old = $lastSeenId, $new = 0 );
+		$diff = new DifferenceEngine( null, $lastSeenId, 0 );
 
 		$template =
 			"<div id='watch-analytics-review-handler'>

@@ -30,7 +30,7 @@
 				$( button ).closest( '.pendingreviews-row' ).next()
 			);
 
-			rowLines.fadeOut( 500, function() {
+			rowLines.fadeOut( 300, function() {
 				rowLines.remove();
 			});
 
@@ -53,7 +53,7 @@
 				$( button ).closest( '.pendingreviews-row' ).next()
 			);
 
-			rowLines.fadeOut( 500, function() {
+			rowLines.fadeOut( 300, function() {
 				rowLines.remove();
 			});
 
