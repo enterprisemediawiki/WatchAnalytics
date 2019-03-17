@@ -153,9 +153,6 @@ class SpecialPendingReviews extends SpecialPage {
 		}
 		$html .= '</table>';
 
-		// how many pending approval rows there are
-		$approvedRowCount = 0;
-
 		if ( $useApprovedRevs ) {
 			$numApprovedRevs = count( PendingApproval::getUserPendingApprovals( $this->mUser ) );
 
@@ -168,10 +165,10 @@ class SpecialPendingReviews extends SpecialPage {
 
 					// if ApprovedRevs installed...
 					if ( $useApprovedRevs && is_a( $item, 'PendingApproval' ) ) {
-						$html .= $this->getApprovedRevsChangeRow( $item, $approvedRowCount );
+						$html .= $this->getApprovedRevsChangeRow( $item, $rowCount );
 					}
 
-					$approvedRowCount++;
+					$rowCount++;
 				}
 				$html .= '</table>';
 
@@ -385,10 +382,10 @@ class SpecialPendingReviews extends SpecialPage {
 	 * Generates row for a pending ApprovedRevs revision.
 	 *
 	 * @param PendingReview $item
-	 * @param int $approvedRowCount used to determine if the row is odd or even
+	 * @param int $rowCount used to determine if the row is odd or even
 	 * @return string HTML for row
 	 */
-	public function getApprovedRevsChangeRow( PendingReview $item, $approvedRowCount ) {
+	public function getApprovedRevsChangeRow( PendingReview $item, $rowCount ) {
 		$changes = '<ul><li>' . wfMessage( 'pendingreviews-pending-approvedrev' )->parse() . '</li></ul>';
 
 		$buttonOne = '';
@@ -402,7 +399,7 @@ class SpecialPendingReviews extends SpecialPage {
 			$item->title->getFullText() .
 			'</strong>';
 
-		return $this->getApproveRowHTML( $item, $approvedRowCount, $displayTitle, $buttonOne, $historyButton, $changes );
+		return $this->getApproveRowHTML( $item, $rowCount, $displayTitle, $buttonOne, $historyButton, $changes );
 	}
 
 	/**
@@ -446,13 +443,13 @@ class SpecialPendingReviews extends SpecialPage {
 		return $html;
 	}
 
-	public function getApproveRowHTML( PendingReview $item, $approvedRowCount, $displayTitle, $buttonOne, $buttonTwo, $changes ) {
+	public function getApproveRowHTML( PendingReview $item, $rowCount, $displayTitle, $buttonOne, $buttonTwo, $changes ) {
 		// FIXME: wow this is ugly
-		$rowClass = ( $approvedRowCount % 2 === 0 ) ? 'pendingreviews-even-row' : 'pendingreviews-odd-row';
+		$rowClass = ( $rowCount % 2 === 0 ) ? 'pendingreviews-even-row' : 'pendingreviews-odd-row';
 
 		$classAndAttr = "class='pendingreviews-row $rowClass " .
-			"ext-watchanalytics-approvable-page pendingreviews-row-$approvedRowCount' " .
-			"pendingreviews-row-count='$approvedRowCount'";
+			"ext-watchanalytics-approvable-page pendingreviews-row-$rowCount' " .
+			"pendingreviews-row-count='$rowCount'";
 
 		$html = "<tr $classAndAttr><td class='pendingreviews-page-title pendingreviews-top-cell'>" .
 			"$displayTitle</td>" .

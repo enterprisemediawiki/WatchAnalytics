@@ -36,6 +36,16 @@
 	border-color: #d58512;
 }
 
+#watch-analytics-unreview.pendingreviews-green-button.pendingreviews-accept-change {
+	background-color: #00af89;
+  border-color: #00af89;
+}
+
+#watch-analytics-unreview.pendingreviews-green-button.pendingreviews-accept-change:hover {
+	background-color: #14866d;
+  border-color: #00af89;
+}
+
 #diff-box {
   padding: 8px 20px;
 	background-color: #fff;

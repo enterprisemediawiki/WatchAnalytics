@@ -32,6 +32,17 @@
 
 		});
 
+		$('#watch-analytics-unreview.pendingreviews-green-button.pendingreviews-accept-change').click( function( event ) {
+			event.preventDefault();
+			var button = this;
+			var rowLines = $('#watch-analytics-review-handler' );
+
+			rowLines.fadeOut( 700, function() {
+				rowLines.remove();
+			});
+
+		});
+
 	});
 
 } )( jQuery, mediaWiki );

@@ -117,6 +117,16 @@ class ReviewHandler {
 	public function getTemplate() {
 		// $msg = wfMessage( 'watch-analytics-page-score-tooltip' )->text();
 
+		$reviewLink = Xml::element(
+			'a',
+			[
+				'href' => null,
+				'id' => 'watch-analytics-unreview',
+				'class' => 'pendingreviews-green-button pendingreviews-accept-change',
+			],
+			wfMessage( 'watchanalytics-accept-change-close-banner' )->text()
+		);
+
 		$unReviewLink = Xml::element(
 			'a',
 			[
@@ -161,7 +171,7 @@ class ReviewHandler {
 
 		$template =
 			"<div id='watch-analytics-review-handler'>
-				$unReviewLink
+				$unReviewLink $reviewLink
 				<p>$bannerText</p>";
 
 		global $egWatchAnalyticsShowUnreviewDiff;
