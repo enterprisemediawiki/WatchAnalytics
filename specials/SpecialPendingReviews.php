@@ -153,9 +153,6 @@ class SpecialPendingReviews extends SpecialPage {
 		}
 		$html .= '</table>';
 
-		// how many pending approval rows there are
-		$approvedRowCount = 0;
-
 		if ( $useApprovedRevs ) {
 			$numApprovedRevs = count( PendingApproval::getUserPendingApprovals( $this->mUser ) );
 
@@ -168,10 +165,10 @@ class SpecialPendingReviews extends SpecialPage {
 
 					// if ApprovedRevs installed...
 					if ( $useApprovedRevs && is_a( $item, 'PendingApproval' ) ) {
-						$html .= $this->getApprovedRevsChangeRow( $item, $approvedRowCount );
+						$html .= $this->getApprovedRevsChangeRow( $item, $rowCount );
 					}
 
-					$approvedRowCount++;
+					$rowCount++;
 				}
 				$html .= '</table>';
 
@@ -206,10 +203,10 @@ class SpecialPendingReviews extends SpecialPage {
 				$clearNotifyTitle->getFullText(),
 				Xml::tags( 'a',
 					[
-						'href' => $this->getTitle()->getLocalUrl(),
+						'href' => $this->getPageTitle()->getLocalUrl(),
 						'style' => 'font-weight:bold;',
 					],
-					$this->getTitle()
+					$this->getPageTitle()
 				)
 			)->text()
 		);
@@ -297,8 +294,34 @@ class SpecialPendingReviews extends SpecialPage {
 	 * @return string HTML for row
 	 */
 	public function getStandardChangeRow( PendingReview $item, $rowCount ) {
+		global $egPendingReviewMaxDiffRows, $egPendingReviewMaxDiffChar;
+
 		$combinedList = $this->combineLogAndChanges( $item->log, $item->newRevisions, $item->title );
 		$changes = $this->getPendingReviewChangesList( $combinedList );
+		$acceptChangesButton = null;
+
+		if ( count( $item->newRevisions ) ) {
+			$previousViewedChange = Revision::newFromRow( $item->newRevisions[0] )->getPrevious();
+			if ( $previousViewedChange ) {
+				$prevId = $previousViewedChange->getId();
+				$context = new DerivativeContext( RequestContext::getMain() );
+				$context->setTitle( $item->title );
+				$diff = new DifferenceEngine( $context, $prevId, 0 );
+				$diff->showDiffStyle();
+				$theDiff = $diff->getDiff( '<b>Last seen</b>', '<b>Current</b>' );
+
+				$numChars = strlen( $theDiff );
+				$numRows = substr_count( $theDiff, '<tr' );
+
+				if ( $numRows < $egPendingReviewMaxDiffRows && $numChars < $egPendingReviewMaxDiffChar ) {
+					$changes .= "<div class='pending-review-diff'>";
+					$changes .= $theDiff;
+					$changes .= '</div>';
+					$acceptChangesButton = $this->getAcceptChangeButton( $item );
+				}
+
+			}
+		}
 
 		if ( $item->title->isRedirect() ) {
 			$reviewButton = $this->getAcceptRedirectButton( $item );
@@ -310,7 +333,7 @@ class SpecialPendingReviews extends SpecialPage {
 
 		$displayTitle = '<strong>' . $item->title->getFullText() . '</strong>';
 
-		return $this->getReviewRowHTML( $item, $rowCount, $displayTitle, $reviewButton, $historyButton, $changes );
+		return $this->getReviewRowHTML( $item, $rowCount, $displayTitle, $reviewButton, $historyButton, $acceptChangesButton, $changes );
 	}
 
 	/**
@@ -352,17 +375,17 @@ class SpecialPendingReviews extends SpecialPage {
 			. wfMessage( $displayMessage, $title->getFullText() )->parse()
 			. '</strong>';
 
-		return $this->getReviewRowHTML( $item, $rowCount, $displayTitle, $acceptDeletionButton, $talkToDeleterButton, $changes );
+		return $this->getReviewRowHTML( $item, $rowCount, $displayTitle, $acceptDeletionButton, $talkToDeleterButton, null, $changes );
 	}
 
 	/**
 	 * Generates row for a pending ApprovedRevs revision.
 	 *
 	 * @param PendingReview $item
-	 * @param int $approvedRowCount used to determine if the row is odd or even
+	 * @param int $rowCount used to determine if the row is odd or even
 	 * @return string HTML for row
 	 */
-	public function getApprovedRevsChangeRow( PendingReview $item, $approvedRowCount ) {
+	public function getApprovedRevsChangeRow( PendingReview $item, $rowCount ) {
 		$changes = '<ul><li>' . wfMessage( 'pendingreviews-pending-approvedrev' )->parse() . '</li></ul>';
 
 		$buttonOne = '';
@@ -376,7 +399,7 @@ class SpecialPendingReviews extends SpecialPage {
 			$item->title->getFullText() .
 			'</strong>';
 
-		return $this->getApproveRowHTML( $item, $approvedRowCount, $displayTitle, $buttonOne, $historyButton, $changes );
+		return $this->getApproveRowHTML( $item, $rowCount, $displayTitle, $buttonOne, $historyButton, $changes );
 	}
 
 	/**
@@ -387,10 +410,11 @@ class SpecialPendingReviews extends SpecialPage {
 	 * @param string $displayTitle
 	 * @param string $buttonOne
 	 * @param string $buttonTwo
+	 * @param string $acceptButton
 	 * @param string $changes
 	 * @return string HTML for pending review of a given page
 	 */
-	public function getReviewRowHTML( PendingReview $item, $rowCount, $displayTitle, $buttonOne, $buttonTwo, $changes ) {
+	public function getReviewRowHTML( PendingReview $item, $rowCount, $displayTitle, $buttonOne, $buttonTwo, $acceptButton, $changes ) {
 		// FIXME: wow this is ugly
 		$rowClass = ( $rowCount % 2 === 0 ) ? 'pendingreviews-even-row' : 'pendingreviews-odd-row';
 
@@ -412,20 +436,20 @@ class SpecialPendingReviews extends SpecialPage {
 		$html = "<tr $classAndAttr><td class='pendingreviews-page-title pendingreviews-top-cell'>" .
 			"$displayTitle</td>" .
 			"<td class='pendingreviews-review-links pendingreviews-bottom-cell pendingreviews-top-cell'>" .
-			"$buttonOne $buttonTwo</td></tr>";
+			"$acceptButton $buttonOne $buttonTwo</td></tr>";
 
 		$html .= "<tr $classAndAttr><td colspan='2' class='pendingreviews-bottom-cell'>$changes</td></tr>";
 
 		return $html;
 	}
 
-	public function getApproveRowHTML( PendingReview $item, $approvedRowCount, $displayTitle, $buttonOne, $buttonTwo, $changes ) {
+	public function getApproveRowHTML( PendingReview $item, $rowCount, $displayTitle, $buttonOne, $buttonTwo, $changes ) {
 		// FIXME: wow this is ugly
-		$rowClass = ( $approvedRowCount % 2 === 0 ) ? 'pendingreviews-even-row' : 'pendingreviews-odd-row';
+		$rowClass = ( $rowCount % 2 === 0 ) ? 'pendingreviews-even-row' : 'pendingreviews-odd-row';
 
 		$classAndAttr = "class='pendingreviews-row $rowClass " .
-			"ext-watchanalytics-approvable-page pendingreviews-row-$approvedRowCount' " .
-			"pendingreviews-row-count='$approvedRowCount'";
+			"ext-watchanalytics-approvable-page pendingreviews-row-$rowCount' " .
+			"pendingreviews-row-count='$rowCount'";
 
 		$html = "<tr $classAndAttr><td class='pendingreviews-page-title pendingreviews-top-cell'>" .
 			"$displayTitle</td>" .
@@ -543,7 +567,7 @@ class SpecialPendingReviews extends SpecialPage {
 	public function getClearNotificationButton( $titleText, $namespace, $buttonMsg, $buttonClass ) {
 		return Xml::element( 'a',
 			[
-				'href' => $this->getTitle()->getLocalURL( [
+				'href' => $this->getPageTitle()->getLocalURL( [
 					'clearNotificationTitle' => $titleText,
 					'clearNotificationNS' => $namespace,
 				] ),
@@ -603,6 +627,24 @@ class SpecialPendingReviews extends SpecialPage {
 		return $this->getClearNotificationButton(
 			$titleText, $namespace, 'pendingreviews-accept-redirect',
 			'pendingreviews-orange-button pendingreviews-accept-deletion'
+		);
+	}
+
+	/**
+	 * Creates a button which marks page as reviews. Displayed when diff is
+	 * small enough to display in Special:PendingReviews.
+	 *
+	 * @param PendingReview $item
+	 *
+	 * @return string HTML for button
+	 */
+	public function getAcceptChangeButton( $item ) {
+		$titleText = $item->title->getDBkey();
+		$namespace = $item->title->getNamespace();
+
+		return $this->getClearNotificationButton(
+			$titleText, $namespace, 'pendingreviews-accept-change',
+			'pendingreviews-green-button pendingreviews-accept-change'
 		);
 	}
 
@@ -728,7 +770,7 @@ class SpecialPendingReviews extends SpecialPage {
 				$scoreThreshold
 				)->text();
 
-			$html .= "<tr class='ext-watchanalytics-criticality-$style'><td>$msg</td></tr>";
+			$html .= "<tr><td class='ext-watchanalytics-criticality-$style'>$msg</td></tr>";
 		}
 
 		// bottom threshold will always be "danger" class
@@ -742,7 +784,7 @@ class SpecialPendingReviews extends SpecialPage {
 			$msg = $this->msg( "pendingreviews-reviewer-criticality-danger", $smallestThreshold - 1 )->text();
 		}
 
-		$html .= "<tr class='ext-watchanalytics-criticality-danger'><td>$msg</td></tr>";
+		$html .= "<tr><td class='ext-watchanalytics-criticality-danger'>$msg</td></tr>";
 
 		$html .= '</table>';
 

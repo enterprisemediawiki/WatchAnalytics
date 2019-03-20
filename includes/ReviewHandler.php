@@ -30,17 +30,18 @@ class ReviewHandler {
 	 */
 	public $final = null;
 
-	public function __construct( User $user, Title $title ) {
+	public function __construct( User $user, Title $title, $isDiff ) {
 		$this->user = $user;
 		$this->title = $title;
+		$this->isDiff = $isDiff;
 	}
 
-	public static function setup( User $user, Title $title ) {
+	public static function setup( User $user, Title $title, $isDiff ) {
 		if ( ! $title->isWatchable() ) {
 			self::$isReviewable = false;
 			return false;
 		}
-		self::$pageLoadHandler = new self ( $user, $title );
+		self::$pageLoadHandler = new self ( $user, $title, $isDiff );
 		self::$pageLoadHandler->initial = self::$pageLoadHandler->getReviewStatus();
 		return self::$pageLoadHandler;
 	}
@@ -116,20 +117,75 @@ class ReviewHandler {
 	public function getTemplate() {
 		// $msg = wfMessage( 'watch-analytics-page-score-tooltip' )->text();
 
-		$unReviewLink = SpecialPage::getTitleFor( 'PageStatistics' )->getInternalURL( [
-			'page' => $this->title->getPrefixedText(),
-			'unreview' => $this->initial
-		] );
+		$reviewLink = Xml::element(
+			'a',
+			[
+				'href' => null,
+				'id' => 'watch-analytics-unreview',
+				'class' => 'pendingreviews-green-button pendingreviews-accept-change',
+			],
+			wfMessage( 'watchanalytics-accept-change-close-banner' )->text()
+		);
 
-		$linkText = wfMessage( 'watchanalytics-unreview-button' )->text();
+		$unReviewLink = Xml::element(
+			'a',
+			[
+				'href' => null,
+				'id' => 'watch-analytics-unreview',
+				'class' => 'watch-analytics-unreview',
+				'timestamp' => $this->initial,
+				'pending-title' => $this->title->getPrefixedText(),
+				'title' => wfMessage( 'watchanalytics-unreview-button' )->text(),
+			],
+			wfMessage( 'watchanalytics-unreview-button' )->text()
+		);
+
 		$bannerText = wfMessage( 'watchanalytics-unreview-banner-text' )->parse();
 
-		// when MW 1.25 is released (very soon) replace this with a mustache template
+		$this->pendingReview = PendingReview::getPendingReview( $this->user, $this->title );
+
+		foreach ( $this->pendingReview as $item ) {
+			if ( count( $item->newRevisions ) > 0 ) {
+
+				// returns essentially the negative-oneth revision...the one before
+				// the wl_notificationtimestamp revision...or null/false if none exists?
+				$mostRecentReviewed = Revision::newFromRow( $item->newRevisions[0] )->getPrevious();
+			} else {
+				$mostRecentReviewed = false; // no previous revision, the user has not reviewed the first!
+			}
+
+			if ( $mostRecentReviewed ) {
+
+				$lastSeenId = $mostRecentReviewed->getId();
+
+			} else {
+
+				$latest = Revision::newFromTitle( $item->title );
+				$lastSeenId = $latest->getId();
+
+			}
+
+		}
+
+		$diff = new DifferenceEngine( null, $lastSeenId, 0 );
+
 		$template =
 			"<div id='watch-analytics-review-handler'>
-				<a id='watch-analytics-unreview' href='$unReviewLink'>$linkText</a>
-				<p>$bannerText</p>
-			</div>";
+				$unReviewLink $reviewLink
+				<p>$bannerText</p>";
+
+		global $egWatchAnalyticsShowUnreviewDiff;
+		if ( $egWatchAnalyticsShowUnreviewDiff ) {
+			// Don't show diff on in header while viewing diff page
+			if ( !( $this->isDiff ) ) {
+				$template .= "<div id='diff-box'>";
+				$template .= $diff->showDiffStyle();
+				$template .= $diff->getDiff( '<b>Last seen</b>', '<b>Current</b>' );
+				$template .= "</div>";
+			}
+		}
+
+		$template .= "</div>";
 
 		return "<script type='text/template' id='ext-watchanalytics-review-handler-template'>$template</script>";
 	}
