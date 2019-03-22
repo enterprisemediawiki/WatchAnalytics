@@ -91,7 +91,7 @@ class SpecialPendingReviews extends SpecialPage {
 	 * @return bool
 	 */
 	public function execute( $parser = null ) {
-		global $wgOut, $wgUser;
+		global $wgOut;
 
 		$this->setHeaders();
 
@@ -125,26 +125,56 @@ class SpecialPendingReviews extends SpecialPage {
 
 		$this->pendingReviewList = PendingReview::getPendingReviewsList( $this->mUser, $this->reviewLimit, $this->reviewOffset );
 
-		$html = $this->getPageHeader( $wgUser );
+		// Check that Approved Revs is installed
+		$useApprovedRevs = class_exists( 'ApprovedRevs' );
+
+		$html = $this->getPageHeader( $this->mUser, $useApprovedRevs );
 
 		$html .= '<table class="pendingreviews-list">';
 		$rowCount = 0;
 
 		// loop through pending reviews
 		foreach ( $this->pendingReviewList as $item ) {
-			// if the title exists, then the page exists (and hence it has not
-			// been deleted)
-			if ( $item->title ) {
-				$html .= $this->getStandardChangeRow( $item, $rowCount );
 
-			// page has been deleted (or moved w/o a redirect)
+			if ( $useApprovedRevs && is_a( $item, 'PendingApproval' ) ) {
+				// don't add approvals here
+				continue;
+			} elseif ( $item->title ) {
+				// if the title exists, then the page exists (and hence it has not
+				// been deleted)
+				$html .= $this->getStandardChangeRow( $item, $rowCount );
+				$rowCount++;
 			} else {
+				// page has been deleted (or moved w/o a redirect)
 				$html .= $this->getDeletedPageRow( $item, $rowCount );
+				$rowCount++;
 			}
 
-			$rowCount++;
 		}
 		$html .= '</table>';
+
+		if ( $useApprovedRevs ) {
+			$numApprovedRevs = count( PendingApproval::getUserPendingApprovals( $this->mUser ) );
+
+			if ( $numApprovedRevs != 0 ) {
+				$html .= '<h3>' . wfMessage( 'pendingreviews-approve-revs-title', $numApprovedRevs )->parse() . '</h3>';
+				$html .= '<table class="pendingreviews-list">';
+
+				// loop through pending reviews
+				foreach ( $this->pendingReviewList as $item ) {
+
+					// if ApprovedRevs installed...
+					if ( $useApprovedRevs && is_a( $item, 'PendingApproval' ) ) {
+						$html .= $this->getApprovedRevsChangeRow( $item, $rowCount );
+					}
+
+					$rowCount++;
+				}
+				$html .= '</table>';
+
+			}
+
+		}
 
 		global $egPendingReviewsShowWatchSuggestionsIfReviewsUnder; // FIXME: crazy long name...
 		if ( $rowCount < $egPendingReviewsShowWatchSuggestionsIfReviewsUnder ) {
@@ -173,10 +203,10 @@ class SpecialPendingReviews extends SpecialPage {
 				$clearNotifyTitle->getFullText(),
 				Xml::tags( 'a',
 					[
-						'href' => $this->getTitle()->getLocalUrl(),
+						'href' => $this->getPageTitle()->getLocalUrl(),
 						'style' => 'font-weight:bold;',
 					],
-					$this->getTitle()
+					$this->getPageTitle()
 				)
 			)->text()
 		);
@@ -264,8 +294,34 @@ class SpecialPendingReviews extends SpecialPage {
 	 * @return string HTML for row
 	 */
 	public function getStandardChangeRow( PendingReview $item, $rowCount ) {
+		global $egPendingReviewMaxDiffRows, $egPendingReviewMaxDiffChar;
+
 		$combinedList = $this->combineLogAndChanges( $item->log, $item->newRevisions, $item->title );
 		$changes = $this->getPendingReviewChangesList( $combinedList );
+		$acceptChangesButton = null;
+
+		if ( count( $item->newRevisions ) ) {
+			$previousViewedChange = Revision::newFromRow( $item->newRevisions[0] )->getPrevious();
+			if ( $previousViewedChange ) {
+				$prevId = $previousViewedChange->getId();
+				$context = new DerivativeContext( RequestContext::getMain() );
+				$context->setTitle( $item->title );
+				$diff = new DifferenceEngine( $context, $prevId, 0 );
+				$diff->showDiffStyle();
+				$theDiff = $diff->getDiff( '<b>Last seen</b>', '<b>Current</b>' );
+
+				$numChars = strlen( $theDiff );
+				$numRows = substr_count( $theDiff, '<tr' );
+
+				if ( $numRows < $egPendingReviewMaxDiffRows && $numChars < $egPendingReviewMaxDiffChar ) {
+					$changes .= "<div class='pending-review-diff'>";
+					$changes .= $theDiff;
+					$changes .= '</div>';
+					$acceptChangesButton = $this->getAcceptChangeButton( $item );
+				}
+
+			}
+		}
 
 		if ( $item->title->isRedirect() ) {
 			$reviewButton = $this->getAcceptRedirectButton( $item );
@@ -277,7 +333,7 @@ class SpecialPendingReviews extends SpecialPage {
 
 		$displayTitle = '<strong>' . $item->title->getFullText() . '</strong>';
 
-		return $this->getRowHTML( $item, $rowCount, $displayTitle, $reviewButton, $historyButton, $changes );
+		return $this->getReviewRowHTML( $item, $rowCount, $displayTitle, $reviewButton, $historyButton, $acceptChangesButton, $changes );
 	}
 
 	/**
@@ -319,7 +375,31 @@ class SpecialPendingReviews extends SpecialPage {
 			. wfMessage( $displayMessage, $title->getFullText() )->parse()
 			. '</strong>';
 
-		return $this->getRowHTML( $item, $rowCount, $displayTitle, $acceptDeletionButton, $talkToDeleterButton, $changes );
+		return $this->getReviewRowHTML( $item, $rowCount, $displayTitle, $acceptDeletionButton, $talkToDeleterButton, null, $changes );
+	}
+
+	/**
+	 * Generates row for a pending ApprovedRevs revision.
+	 *
+	 * @param PendingReview $item
+	 * @param int $rowCount used to determine if the row is odd or even
+	 * @return string HTML for row
+	 */
+	public function getApprovedRevsChangeRow( PendingReview $item, $rowCount ) {
+		$changes = '<ul><li>' . wfMessage( 'pendingreviews-pending-approvedrev' )->parse() . '</li></ul>';
+
+		$buttonOne = '';
+
+		$historyButton = $this->getApproveButton( $item );
+
+		$approvedRevID = ApprovedRevs::getApprovedRevID( $item->title );
+
+		$displayTitle = '<strong>' .
+			'<span style="color:#00b050;">★</span> ' .
+			$item->title->getFullText() .
+			'</strong>';
+
+		return $this->getApproveRowHTML( $item, $rowCount, $displayTitle, $buttonOne, $historyButton, $changes );
 	}
 
 	/**
@@ -330,10 +410,11 @@ class SpecialPendingReviews extends SpecialPage {
 	 * @param string $displayTitle
 	 * @param string $buttonOne
 	 * @param string $buttonTwo
+	 * @param string $acceptButton
 	 * @param string $changes
 	 * @return string HTML for pending review of a given page
 	 */
-	public function getRowHTML( PendingReview $item, $rowCount, $displayTitle, $buttonOne, $buttonTwo, $changes ) {
+	public function getReviewRowHTML( PendingReview $item, $rowCount, $displayTitle, $buttonOne, $buttonTwo, $acceptButton, $changes ) {
 		// FIXME: wow this is ugly
 		$rowClass = ( $rowCount % 2 === 0 ) ? 'pendingreviews-even-row' : 'pendingreviews-odd-row';
 
@@ -350,6 +431,24 @@ class SpecialPendingReviews extends SpecialPage {
 
 		$classAndAttr = "class='pendingreviews-row $rowClass " .
 			"$reviewCriticalityClass pendingreviews-row-$rowCount' " .
+			"pendingreviews-row-count='$rowCount'";
+
+		$html = "<tr $classAndAttr><td class='pendingreviews-page-title pendingreviews-top-cell'>" .
+			"$displayTitle</td>" .
+			"<td class='pendingreviews-review-links pendingreviews-bottom-cell pendingreviews-top-cell'>" .
+			"$acceptButton $buttonOne $buttonTwo</td></tr>";
+
+		$html .= "<tr $classAndAttr><td colspan='2' class='pendingreviews-bottom-cell'>$changes</td></tr>";
+
+		return $html;
+	}
+
+	public function getApproveRowHTML( PendingReview $item, $rowCount, $displayTitle, $buttonOne, $buttonTwo, $changes ) {
+		// FIXME: wow this is ugly
+		$rowClass = ( $rowCount % 2 === 0 ) ? 'pendingreviews-even-row' : 'pendingreviews-odd-row';
+
+		$classAndAttr = "class='pendingreviews-row $rowClass " .
+			"ext-watchanalytics-approvable-page pendingreviews-row-$rowCount' " .
 			"pendingreviews-row-count='$rowCount'";
 
 		$html = "<tr $classAndAttr><td class='pendingreviews-page-title pendingreviews-top-cell'>" .
@@ -408,6 +507,28 @@ class SpecialPendingReviews extends SpecialPage {
 	}
 
 	/**
+	 * Creates a button bringing user to view diff since last approved version
+	 *
+	 * @param PendingReview $item
+	 * @return string HTML for button
+	 */
+	public function getApproveButton( $item ) {
+		$diffURL = $item->title->getLocalURL( [
+			'diff' => '',
+			'oldid' => ApprovedRevs::getApprovedRevID( $item->title )
+		] );
+
+		$diffLink = Xml::element( 'a',
+			[ 'href' => $diffURL, 'class' => 'pendingreviews-green-button', 'target' => "_blank" ],
+			wfMessage(
+				'watchanalytics-view-and-approve'
+			)->text()
+		);
+
+		return $diffLink;
+	}
+
+	/**
 	 * Creates a button bringing user to the history page.
 	 *
 	 * @param PendingReview $item
@@ -446,7 +567,7 @@ class SpecialPendingReviews extends SpecialPage {
 	public function getClearNotificationButton( $titleText, $namespace, $buttonMsg, $buttonClass ) {
 		return Xml::element( 'a',
 			[
-				'href' => $this->getTitle()->getLocalURL( [
+				'href' => $this->getPageTitle()->getLocalURL( [
 					'clearNotificationTitle' => $titleText,
 					'clearNotificationNS' => $namespace,
 				] ),
@@ -510,6 +631,24 @@ class SpecialPendingReviews extends SpecialPage {
 	}
 
 	/**
+	 * Creates a button which marks page as reviews. Displayed when diff is
+	 * small enough to display in Special:PendingReviews.
+	 *
+	 * @param PendingReview $item
+	 *
+	 * @return string HTML for button
+	 */
+	public function getAcceptChangeButton( $item ) {
+		$titleText = $item->title->getDBkey();
+		$namespace = $item->title->getNamespace();
+
+		return $this->getClearNotificationButton(
+			$titleText, $namespace, 'pendingreviews-accept-change',
+			'pendingreviews-green-button pendingreviews-accept-change'
+		);
+	}
+
+	/**
 	 * Creates a button bringing user to the talk page of the user who deleted
 	 * the page, allowing them to ask questions about why the page was deleted.
 	 *
@@ -545,9 +684,10 @@ class SpecialPendingReviews extends SpecialPage {
 	 * Creates simple header stating how many pending reviews the user has.
 	 *
 	 * @param User $user
+	 * @param bool $useApprovedRevs
 	 * @return string HTML for header
 	 */
-	public function getPageHeader( User $user ) {
+	public function getPageHeader( User $user, $useApprovedRevs ) {
 		$userWatch = new UserWatchesQuery();
 		$watchStats = $userWatch->getUserWatchStats( $user );
 		$numPendingReviews = $watchStats['num_pending'];
@@ -558,20 +698,11 @@ class SpecialPendingReviews extends SpecialPage {
 			$html .= $this->getPendingReviewsLegend();
 		}
 
-		// message like "You have X pending reviews"
-		$html .= '<p>' . wfMessage( 'pendingreviews-num-reviews', $numPendingReviews, $this->reviewLimit )->text();
-
-		// close out header
-		$html .= '</p>';
-
 		$nextReviewSet = $this->reviewOffset + $this->reviewLimit;
 		$prevReviewSet = max( [ 0, $this->reviewOffset - $this->reviewLimit ] );
 		$currentURL = $this->getPageTitle()->getLocalUrl();
 
-		$viewingUser = '';
-		// if ( $this->mUser ) {
-		// $viewingUser = '&user='.$this->mUser;
-		// }
+		$viewingUser = '&user=' . $this->mUser;
 
 		$linkClass = "pendingreviews-nav-link";
 		if ( $this->reviewOffset == 0 ) {
@@ -603,6 +734,22 @@ class SpecialPendingReviews extends SpecialPage {
 			wfMessage( 'watchanalytics-pendingreviews-next-revisions' )->text()
 		);
 
+		$html .= '<h3>';
+
+		if ( !( $this->getRequest()->getVal( 'user' ) ) ) {
+			if ( $numPendingReviews != 0 ) {
+				// message like "You have X pending reviews"
+				$html .= wfMessage( 'pendingreviews-num-reviews', $numPendingReviews )->text();
+			} else {
+				// message like "Congrats you finished your reviews!"
+				$html .= wfMessage( 'pendingreviews-num-reviews-complete' )->text();
+			}
+		} else {
+			$html .= wfMessage( 'pendingreviews-num-other-user-reviews', $user, $numPendingReviews )->text();
+		}
+
+		$html .= '</h3>';
+
 		return $html;
 	}
 
@@ -623,7 +770,7 @@ class SpecialPendingReviews extends SpecialPage {
 				$scoreThreshold
 				)->text();
 
-			$html .= "<tr class='ext-watchanalytics-criticality-$style'><td>$msg</td></tr>";
+			$html .= "<tr><td class='ext-watchanalytics-criticality-$style'>$msg</td></tr>";
 		}
 
 		// bottom threshold will always be "danger" class
@@ -637,7 +784,7 @@ class SpecialPendingReviews extends SpecialPage {
 			$msg = $this->msg( "pendingreviews-reviewer-criticality-danger", $smallestThreshold - 1 )->text();
 		}
 
-		$html .= "<tr class='ext-watchanalytics-criticality-danger'><td>$msg</td></tr>";
+		$html .= "<tr><td class='ext-watchanalytics-criticality-danger'>$msg</td></tr>";
 
 		$html .= '</table>';
 

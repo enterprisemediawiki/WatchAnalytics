@@ -268,7 +268,7 @@ class WatchStateRecorder {
 	 * @param WikiPage $wikipage
 	 * @return bool
 	 */
-	public static function recordPageChange( WikiPage $wikipage ) {
+	public static function recordPageChange( $wikipage ) {
 		$timestamp = date( "YmdHis", time() );
 		$title = $wikipage->getTitle();
 

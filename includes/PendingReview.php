@@ -1,5 +1,7 @@
 <?php
 
+use MediaWiki\MediaWikiServices;
+
 class PendingReview {
 
 	/**
@@ -47,35 +49,43 @@ class PendingReview {
 	 */
 	public $log;
 
-	public function __construct( $row ) {
-		$pageID = $row['page_id'];
+	public function __construct( $row, Title $title = null ) {
 		$notificationTimestamp = $row['notificationtimestamp'];
 
-		if ( $pageID ) {
-			$title = Title::newFromID( $pageID );
+		$this->notificationTimestamp = $notificationTimestamp;
+		$this->numReviewers = intval( $row['num_reviewed'] );
+
+		if ( $title ) {
+			$pageID = $title->getArticleID();
+			$namespace = $title->getNamespace();
+			$titleDBkey = $title->getDBkey();
 		} else {
-			$title = false;
+			$pageID = $row['page_id'];
+			$namespace = $row['namespace'];
+			$titleDBkey = $row['title'];
+
+			if ( $pageID ) {
+				$title = Title::newFromID( $pageID );
+			} else {
+				$title = false;
+			}
 		}
 
 		if ( $pageID && $title->exists() ) {
 
 			$dbr = wfGetDB( DB_REPLICA );
 
+			$revisionStore = MediaWikiServices::getInstance()->getRevisionStore();
+
+			$revQueryInfo = $revisionStore->getQueryInfo();
+
 			$revResults = $dbr->select(
-				[ 'r' => 'revision' ],
-				Revision::getQueryInfo()['fields'],
-				// array(
-				// 'r.rev_id AS rev_id',
-				// 'r.rev_comment AS rev_comment',
-				// 'r.rev_user AS rev_user_id',
-				// 'r.rev_user_text AS rev_user_name',
-				// 'r.rev_timestamp AS rev_timestamp',
-				// 'r.rev_len AS rev_len',
-				// ),
-				"r.rev_page=$pageID AND r.rev_timestamp>=$notificationTimestamp",
+				$revQueryInfo['tables'],
+				$revQueryInfo['fields'],
+				"rev_page=$pageID AND rev_timestamp>=$notificationTimestamp",
 				__METHOD__,
 				[ 'ORDER BY' => 'rev_timestamp ASC' ],
-				null
+				$revQueryInfo['joins']
 			);
 			$revsPending = [];
 			while ( $rev = $revResults->fetchObject() ) {
@@ -85,14 +95,6 @@ class PendingReview {
 			$logResults = $dbr->select(
 				[ 'l' => 'logging' ],
 				[ '*' ],
-				// array(
-				// 'l.log_id AS log_id',
-				// 'l.log_type AS log_type',
-				// 'l.log_action AS log_action',
-				// 'l.log_timestamp AS log_timestamp',
-				// 'l.log_user AS log_user_id',
-				// 'l.log_user_text AS log_user_name',
-				// ),
 				"l.log_page=$pageID AND l.log_timestamp>=$notificationTimestamp
 					AND l.log_type NOT IN ('interwiki','newusers','patrol','rights','upload')",
 				__METHOD__,
@@ -109,21 +111,19 @@ class PendingReview {
 			$deletionLog = false;
 
 		} else {
-			$deletedNS = $row['namespace'];
-			$deletedTitle = $row['title'];
+			$deletedNS = $namespace;
+			$deletedTitle = $titleDBkey;
 			$deletionLog = $this->getDeletionLog( $deletedTitle, $deletedNS, $notificationTimestamp );
 			$logPending = false;
 			$revsPending = false;
 		}
 
-		$this->notificationTimestamp = $notificationTimestamp;
 		$this->title = $title;
 		$this->newRevisions = $revsPending;
 		$this->deletedTitle = $deletedTitle;
 		$this->deletedNS = $deletedNS;
 		$this->deletionLog = $deletionLog;
 		$this->log = $logPending;
-		$this->numReviewers = intval( $row['num_reviewed'] );
 	}
 
 	public static function getPendingReviewsList( User $user, $limit, $offset ) {
@@ -188,37 +188,104 @@ class PendingReview {
 
 		}
 
+		// If ApprovedRevs is installed, append any pages in need of approvals
+		// to the front of the Pending Reviews list
+		if ( class_exists( 'ApprovedRevs' ) ) {
+			$pending = array_merge( PendingApproval::getUserPendingApprovals( $user ), $pending );
+		}
+
+		return $pending;
+	}
+
+	public static function getPendingReview( User $user, Title $title ) {
+		$tables = [
+			'w' => 'watchlist',
+			'p' => 'page',
+			'log' => 'logging',
+		];
+
+		$fields = [
+			'p.page_id AS page_id',
+			'log.log_action AS log_action',
+			'w.wl_namespace AS namespace',
+			'w.wl_title AS title',
+			'w.wl_notificationtimestamp AS notificationtimestamp',
+			'(SELECT COUNT(*) FROM watchlist AS subwatch
+				WHERE
+				subwatch.wl_namespace = w.wl_namespace
+				AND subwatch.wl_title = w.wl_title
+				AND subwatch.wl_notificationtimestamp IS NULL
+			) AS num_reviewed',
+		];
+
+		$conds = [ 'w.wl_user' => $user->getId() , 'p.page_id' => $title->getArticleID() , 'w.wl_notificationtimestamp IS NOT NULL' ];
+
+		$options = [];
+
+		$join_conds = [
+			'p' => [
+				'LEFT JOIN', 'p.page_namespace=w.wl_namespace AND p.page_title=w.wl_title'
+			],
+			'log' => [
+				'LEFT JOIN',
+				'log.log_namespace = w.wl_namespace '
+				. ' AND log.log_title = w.wl_title'
+				. ' AND p.page_namespace IS NULL'
+				. ' AND p.page_title IS NULL'
+				. ' AND log.log_action IN ("delete","move")'
+			],
+		];
+
+		$dbr = wfGetDB( DB_REPLICA );
+
+		$watchResult = $dbr->select(
+			$tables,
+			$fields,
+			$conds,
+			__METHOD__,
+			$options,
+			$join_conds
+		);
+
+		$pending = [];
+
+		while ( $row = $dbr->fetchRow( $watchResult ) ) {
+
+			$pending[] = new self( $row );
+
+		}
 		return $pending;
 	}
 
 	public function getDeletionLog( $title, $ns, $notificationTimestamp ) {
 		$dbr = wfGetDB( DB_REPLICA );
-
 		$title = $dbr->addQuotes( $title );
 
 		// pages are deleted when (a) they are explicitly deleted or (b) they
 		// are moved without leaving a redirect behind.
 		$logResults = $dbr->select(
-			[ 'l' => 'logging' ],
+			[ 'l' => 'logging', 'c' => 'comment' ],
 			[
-				'log_id',
-				'log_type',
-				'log_action',
-				'log_timestamp',
-				'log_user',
-				'log_user_text',
-				'log_namespace',
-				'log_title',
-				'log_page',
-				'log_comment',
-				'log_params',
-				'log_deleted',
+				'l.log_id',
+				'l.log_type',
+				'l.log_action',
+				'l.log_timestamp',
+				'l.log_user',
+				'l.log_user_text',
+				'l.log_namespace',
+				'l.log_title',
+				'l.log_page',
+				'l.log_comment_id',
+				'l.log_params',
+				'l.log_deleted',
+				'c.comment_id',
+				'c.comment_text AS log_comment'
 			],
 			"l.log_title=$title AND l.log_namespace=$ns AND l.log_timestamp>=$notificationTimestamp
 				AND l.log_type IN ('delete','move')",
 			__METHOD__,
-			[ 'ORDER BY' => 'log_timestamp ASC' ],
-			null
+			[ 'ORDER BY' => 'l.log_timestamp ASC' ],
+			[ 'c' => [ 'INNER JOIN', [ 'l.log_comment_id=c.comment_id' ] ] ]
 		);
 		$logDeletes = [];
 		while ( $log = $logResults->fetchObject() ) {

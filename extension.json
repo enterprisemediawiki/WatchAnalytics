@@ -1,6 +1,6 @@
 {
 	"name": "WatchAnalytics",
-	"version": "2.0.1",
+	"version": "3.1.0",
 	"author": [
 		"[https://www.mediawiki.org/wiki/User:Jamesmontalvo3 James Montalvo]"
 	],
@@ -41,6 +41,7 @@
 		"WatchAnalyticsUser": "WatchAnalyticsUser.php",
 		"WatchAnalyticsUpdaterHooks": "schema/WatchAnalyticsUpdaterHooks.php",
 		"PendingReview": "includes/PendingReview.php",
+		"PendingApproval": "includes/PendingApproval.php",
 		"WatchSuggest": "includes/WatchSuggest.php",
 		"ReviewHandler": "includes/ReviewHandler.php",
 		"PageScore": "includes/PageScore.php",
@@ -205,6 +206,9 @@
 	"config": {
 		"_prefix": "eg",
 		"WatchAnalyticsPageCounter": false,
+		"WatchAnalyticsShowUnreviewDiff": true,
+		"PendingReviewMaxDiffChar": 3500,
+		"PendingReviewMaxDiffRows": 15,
 		"PendingReviewsEmphasizeDays": 7,
 		"PendingReviewsRedPagesThreshold": 2,
 		"PendingReviewsOrangePagesThreshold": 4,
