@@ -41,13 +41,6 @@
 				rowLines.remove();
 			});
 
-			rowLines.css("background-color", "#00af89");
-			rowLines.html("<strong>Page reviewed!</strong>");
-
-			rowLines.fadeOut( 700, function() {
-				rowLines.remove();
-			});
-
 		});
 
 	});

@@ -49,10 +49,6 @@ tr.pendingreviews-row-hover td {
 	background-color: #f9f9f9;
 }
 
-div.pending-review-diff td {
-	background-color: #fff;
-}
-
 .pendingreviews-legend {
 	float:right;
 	margin-bottom: 10px;

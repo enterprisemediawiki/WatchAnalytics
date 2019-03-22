@@ -300,33 +300,32 @@ class SpecialPendingReviews extends SpecialPage {
 		$changes = $this->getPendingReviewChangesList( $combinedList );
 		$acceptChangesButton = null;
 
+		if ( count( $item->newRevisions ) ) {
+			$previousViewedChange = Revision::newFromRow( $item->newRevisions[0] )->getPrevious();
+			if ( $previousViewedChange ) {
+				$prevId = $previousViewedChange->getId();
+				$context = new DerivativeContext( RequestContext::getMain() );
+				$context->setTitle( $item->title );
+				$diff = new DifferenceEngine( $context, $prevId, 0 );
+				$diff->showDiffStyle();
+				$theDiff = $diff->getDiff( '<b>Last seen</b>', '<b>Current</b>' );
+
+				$numChars = strlen( $theDiff );
+				$numRows = substr_count( $theDiff, '<tr' );
+
+				if ( $numRows < $egPendingReviewMaxDiffRows && $numChars < $egPendingReviewMaxDiffChar ) {
+					$changes .= "<div class='pending-review-diff'>";
+					$changes .= $theDiff;
+					$changes .= '</div>';
+					$acceptChangesButton = $this->getAcceptChangeButton( $item );
+				}
+
+			}
+		}
+
 		if ( $item->title->isRedirect() ) {
 			$reviewButton = $this->getAcceptRedirectButton( $item );
 		} else {
-
-			if ( count( $item->newRevisions ) ) {
-				$previousViewedChange = Revision::newFromRow( $item->newRevisions[0] )->getPrevious();
-				if ( $previousViewedChange ) {
-					$prevId = $previousViewedChange->getId();
-					$context = new DerivativeContext( RequestContext::getMain() );
-					$context->setTitle( $item->title );
-					$diff = new DifferenceEngine( $context, $prevId, 0 );
-					$diff->showDiffStyle();
-					$theDiff = $diff->getDiff( '<b>Last seen</b>', '<b>Current</b>' );
-
-					$numChars = strlen( $theDiff );
-					$numRows = substr_count( $theDiff, '<tr' );
-
-					if ( $numRows < $egPendingReviewMaxDiffRows && $numChars < $egPendingReviewMaxDiffChar ) {
-						$changes .= "<div class='pending-review-diff'>";
-						$changes .= $theDiff;
-						$changes .= '</div>';
-						$acceptChangesButton = $this->getAcceptChangeButton( $item );
-					}
-
-				}
-			}
-
 			$reviewButton = $this->getReviewButton( $item );
 		}
 
