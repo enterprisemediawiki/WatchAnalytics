@@ -169,10 +169,14 @@ class ReviewHandler {
 
 		$diff = new DifferenceEngine( null, $lastSeenId, 0 );
 
-		$template =
-			"<div id='watch-analytics-review-handler'>
-				$unReviewLink $reviewLink
-				<p>$bannerText</p>";
+		$template = "<div id='watch-analytics-review-handler'> $unReviewLink";
+
+		// Don't show "close banner" button when viewing full diff page
+		if ( !( $this->isDiff ) ) {
+			$template .= $reviewLink;
+		}
+
+		$template .= "<p>$bannerText</p>";
 
 		global $egWatchAnalyticsShowUnreviewDiff;
 		if ( $egWatchAnalyticsShowUnreviewDiff ) {
