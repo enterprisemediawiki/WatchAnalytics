@@ -191,7 +191,7 @@ class ReviewHandler {
 
 		$template .= "</div>";
 
-		//Add button to navigate to top of page when user passes review banner.
+		// Add button to navigate to top of page when user passes review banner.
 		if ( !( $this->isDiff ) ) {
 			$template .= "<button id='watch-analytics-go-to-top-button' title='See changes'>";
 			$template .= "<b>Reviewing page!</b> Click here to see changes.";
