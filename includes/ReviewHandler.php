@@ -115,7 +115,6 @@ class ReviewHandler {
 	}
 
 	public function getTemplate() {
-
 		$reviewLink = Xml::element(
 			'a',
 			[
