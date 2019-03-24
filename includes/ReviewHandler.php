@@ -115,7 +115,6 @@ class ReviewHandler {
 	}
 
 	public function getTemplate() {
-		// $msg = wfMessage( 'watch-analytics-page-score-tooltip' )->text();
 
 		$reviewLink = Xml::element(
 			'a',
@@ -169,7 +168,7 @@ class ReviewHandler {
 
 		$diff = new DifferenceEngine( null, $lastSeenId, 0 );
 
-		$template = "<div id='watch-analytics-review-handler'> $unReviewLink";
+		$template = "<div id='watch-analytics-review-handler' style='display:none'> $unReviewLink";
 
 		// Don't show "close banner" button when viewing full diff page
 		if ( !( $this->isDiff ) ) {

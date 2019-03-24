@@ -3,18 +3,26 @@
 	'use strict';
 
 	$(document).ready( function () {
-
 		$("#content").prepend(
 			$("#ext-watchanalytics-review-handler-template")[0].innerHTML
 		);
+		if ( $(window).scrollTop() == 0 ) {
+			$('#watch-analytics-review-handler').css("display", "block");
+		} else {
+			// Show nav button to go to top of page
+			$("#watch-analytics-go-to-top-button").css("display", "block");
+		}
 
 		$(window).scroll( function () {
 			var bannerHeight = $('#watch-analytics-review-handler').height() + $('#mw-head').height();
 
 			if ( $(window).scrollTop() > bannerHeight ) {
+				// If scrolled past review banner, show nav button
 				$("#watch-analytics-go-to-top-button").css("display", "block");
 			} else {
+				// Don't show nav button when review banner is visible
 				$("#watch-analytics-go-to-top-button").css("display", "none");
+				$('#watch-analytics-review-handler').css("display", "block");
 			}
 
 		});
