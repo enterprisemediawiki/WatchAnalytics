@@ -8,7 +8,24 @@
 			$("#ext-watchanalytics-review-handler-template")[0].innerHTML
 		);
 
-		$('.watch-analytics-unreview').click( function( event ) {
+		$(window).scroll( function () {
+			var bannerHeight = $('#watch-analytics-review-handler').height() + $('#mw-head').height();
+
+			if ( $(window).scrollTop() > bannerHeight ) {
+				$("#watch-analytics-go-to-top-button").css("display", "block");
+			} else {
+				$("#watch-analytics-go-to-top-button").css("display", "none");
+			}
+
+		});
+
+		$("#watch-analytics-go-to-top-button").click( function( event ) {
+			event.preventDefault();
+			$(window).scrollTop(0);
+
+		});
+
+		$(".watch-analytics-unreview").click( function( event ) {
 			event.preventDefault();
 			var button = this;
 			var title = $( button ).attr( 'pending-title' );
@@ -20,7 +37,7 @@
 				titles: title
 			} ).done( function ( data ) {
 
-				var rowLines = $('#watch-analytics-review-handler' );
+				var rowLines = $("#watch-analytics-review-handler" );
 
 				rowLines.html("<strong>Review deferred!</strong>");
 
@@ -32,7 +49,7 @@
 
 		});
 
-		$('#watch-analytics-unreview.pendingreviews-green-button.pendingreviews-accept-change').click( function( event ) {
+		$("#watch-analytics-unreview.pendingreviews-green-button.pendingreviews-accept-change").click( function( event ) {
 			event.preventDefault();
 			var button = this;
 			var rowLines = $('#watch-analytics-review-handler' );

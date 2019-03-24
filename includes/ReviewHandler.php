@@ -191,6 +191,8 @@ class ReviewHandler {
 
 		$template .= "</div>";
 
+		$template .= "<button id='watch-analytics-go-to-top-button' title='See changes'><b>Reviewing page!</b> Click here to see changes.</button>";
+
 		return "<script type='text/template' id='ext-watchanalytics-review-handler-template'>$template</script>";
 	}
 
