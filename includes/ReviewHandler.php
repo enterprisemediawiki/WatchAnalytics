@@ -125,10 +125,16 @@ class ReviewHandler {
 			wfMessage( 'watchanalytics-accept-change-close-banner' )->text()
 		);
 
+		// used if user right-clicks link and opens in new tab
+		$unReviewURL = SpecialPage::getTitleFor( 'PageStatistics' )->getInternalURL( [
+			'page' => $this->title->getPrefixedText(),
+			'unreview' => $this->initial
+		] );
+
 		$unReviewLink = Xml::element(
 			'a',
 			[
-				'href' => null,
+				'href' => $unReviewURL,
 				'id' => 'watch-analytics-unreview',
 				'class' => 'watch-analytics-unreview',
 				'timestamp' => $this->initial,
