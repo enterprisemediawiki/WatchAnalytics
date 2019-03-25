@@ -104,10 +104,10 @@ class PageScore {
 		}
 
 		return "<div class='ext-watchanalytics-criticality-$color'>
-				<div class='ext-watchanalytics-pagescores-left'$leftStyle>
+				<div class='ext-watchanalytics-pagescores-left noprint'$leftStyle>
 					$label
 				</div>
-				<div class='ext-watchanalytics-pagescores-right'$rightStyle>
+				<div class='ext-watchanalytics-pagescores-right noprint'$rightStyle>
 					$score
 				</div>
 			</div>";

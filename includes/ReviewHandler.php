@@ -115,8 +115,6 @@ class ReviewHandler {
 	}
 
 	public function getTemplate() {
-		// $msg = wfMessage( 'watch-analytics-page-score-tooltip' )->text();
-
 		$reviewLink = Xml::element(
 			'a',
 			[
@@ -169,7 +167,7 @@ class ReviewHandler {
 
 		$diff = new DifferenceEngine( null, $lastSeenId, 0 );
 
-		$template = "<div id='watch-analytics-review-handler'> $unReviewLink";
+		$template = "<div id='watch-analytics-review-handler' style='display:none'> $unReviewLink";
 
 		// Don't show "close banner" button when viewing full diff page
 		if ( !( $this->isDiff ) ) {
@@ -190,6 +188,13 @@ class ReviewHandler {
 		}
 
 		$template .= "</div>";
+
+		// Add button to navigate to top of page when user passes review banner.
+		if ( !( $this->isDiff ) ) {
+			$template .= "<button id='watch-analytics-go-to-top-button' title='See changes'>";
+			$template .= "<b>Reviewing page!</b> Click here to see changes.";
+			$template .= "</button>";
+		}
 
 		return "<script type='text/template' id='ext-watchanalytics-review-handler-template'>$template</script>";
 	}
