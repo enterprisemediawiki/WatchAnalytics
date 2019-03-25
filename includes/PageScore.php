@@ -94,7 +94,6 @@ class PageScore {
 	}
 
 	public function getBadge( $label, $score, $color, $showLabel = false ) {
-		global $egWatchAnalyticsHidePrintScores;
 		// @todo FIXME: make the javascript apply a class to handle this, so this can just apply a class
 		if ( $showLabel ) {
 			$leftStyle = " style='display:inherit; border-radius: 4px 0 0 4px;'";
@@ -104,17 +103,11 @@ class PageScore {
 			$rightStyle = "";
 		}
 
-		if ( $egWatchAnalyticsHidePrintScores ) {
-			$printCSS = 'noprint';
-		} else {
-			$printCSS = null;
-		}
-
 		return "<div class='ext-watchanalytics-criticality-$color'>
-				<div class='ext-watchanalytics-pagescores-left $printCSS'$leftStyle>
+				<div class='ext-watchanalytics-pagescores-left noprint'$leftStyle>
 					$label
 				</div>
-				<div class='ext-watchanalytics-pagescores-right $printCSS'$rightStyle>
+				<div class='ext-watchanalytics-pagescores-right noprint'$rightStyle>
 					$score
 				</div>
 			</div>";
