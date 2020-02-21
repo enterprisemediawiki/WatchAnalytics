@@ -24,7 +24,12 @@ class SpecialWatchAnalytics extends SpecialPage {
 		$this->setHeaders();
 		$wgOut->addModuleStyles( 'ext.watchanalytics.specials' );
 
-		list( $this->limit, $this->offset ) = $wgRequest->getLimitOffset();
+		if ( method_exists( $wgRequest, 'getLimitOffsetForUser' ) ) {
+			// MW 1.35+
+			list( $this->limit, $this->offset ) = $wgRequest->getLimitOffsetForUser( $this->getUser() );
+		} else {
+			list( $this->limit, $this->offset ) = $wgRequest->getLimitOffset();
+		}
 
 		// $userTarget = isset( $parser ) ? $parser : $wgRequest->getVal( 'username' );
 		$this->mMode = $wgRequest->getVal( 'show' );
