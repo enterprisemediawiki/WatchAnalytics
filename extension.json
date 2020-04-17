@@ -180,7 +180,7 @@
 		"MagicWordwgVariableIDs": [
 			"WatchAnalyticsHooks::addMagicWordVariableIDs"
 		],
-		"ParserBeforeTidy": [
+		"ParserAfterTidy": [
 			"WatchAnalyticsHooks::handleMagicWords"
 		],
 		"LanguageGetMagic": [
