@@ -47,7 +47,7 @@ class WatchAnalyticsParserFunctions {
 		// $args = self::processArgs( $frame, $args, array(0) );
 		// $namespace  = $args[0];
 
-		$dbr = wfGetDB( DB_REPLICA );
+		$dbr = wfGetDB( DB_MASTER );
 
 		$query = "
 			SELECT * FROM (
@@ -121,7 +121,7 @@ class WatchAnalyticsParserFunctions {
 
 		$rangeTimestamp = date( 'YmdHis', time() - ( $numDays * 24 * 60 * 60 ) );
 
-		$dbr = wfGetDB( DB_REPLICA );
+		$dbr = wfGetDB( DB_MASTER );
 
 		if ( class_exists( 'Wiretap' ) && false ) {
 			$query =

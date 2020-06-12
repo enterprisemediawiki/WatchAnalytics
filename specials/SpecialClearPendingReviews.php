@@ -104,7 +104,7 @@ class SpecialClearPendingReviews extends SpecialPage {
 	 * @return $results
 	 */
 	public static function doSearchQuery( $data, $clearPages ) {
-		$dbw = wfGetDB( DB_REPLICA );
+		$dbw = wfGetDB( DB_MASTER );
 		$category = preg_replace( '/\s+/', '_', $data['category'] );
 		$page = preg_replace( '/\s+/', '_', $data['page'] );
 		$start = preg_replace( '/\s+/', '', $data['start'] );
@@ -133,7 +133,6 @@ class SpecialClearPendingReviews extends SpecialPage {
 		$results = $dbw->select( $tables, $vars, $conditions, __METHOD__, 'DISTINCT', $join_conds );
 
 		if ( $clearPages == true ) {
-			$dbw = wfGetDB( DB_MASTER );
 
 			foreach ( $results as $result ) {
 				$values = [ 'wl_notificationtimestamp' => null ];
