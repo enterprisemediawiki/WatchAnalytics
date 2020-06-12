@@ -300,9 +300,9 @@ class PendingReview {
 		// I couldn't find a cleaner way to do it.
 		// $logParams the content of the column log_params in the logging table
 
-		wfSuppressWarnings();
+		Wikimedia\AtEase\AtEase::suppressWarnings();
 		$unserializedParams = unserialize( $logParams );
-		wfRestoreWarnings();
+		Wikimedia\AtEase\AtEase::restoreWarnings();
 		if ( $unserializedParams !== false ) {
 			$moveLogParams = $unserializedParams;
 			// $this->legacy = false;
