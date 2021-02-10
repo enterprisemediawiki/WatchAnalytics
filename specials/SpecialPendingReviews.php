@@ -661,8 +661,8 @@ class SpecialPendingReviews extends SpecialPage {
 			return '';
 		}
 
-		$userId = $deletionLog[ count( $deletionLog ) - 1 ]->log_user;
-		$user = User::newFromId( $userId );
+		$userId = $deletionLog[ count( $deletionLog ) - 1 ]->log_actor;
+		$user = User::newFromActorId( $userId );
 
 		$userTalk = $user->getTalkPage();
 
@@ -874,7 +874,7 @@ class SpecialPendingReviews extends SpecialPage {
 		];
 
 		// get user page of user who created the log entry
-		$userPage = Title::makeTitle( NS_USER, $logEntry->log_user_text )->getFullText();
+		$userPage = User::newFromActorId( $logEntry->log_actor )->getUserPage()->getFullText();
 
 		// if a message exists for the particular log type, handle it as follows
 		if ( isset( $messages[ $logEntry->log_type ][ $logEntry->log_action ] ) ) {
