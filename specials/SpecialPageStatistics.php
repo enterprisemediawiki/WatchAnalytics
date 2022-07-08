@@ -108,14 +108,19 @@ class SpecialPageStatistics extends SpecialPage {
 		// Load the styles for the D3.js force directed graph
 		// $wgOut->addModuleStyles( 'ext.watchanalytics.forcegraph.styles' );
 
+
+		// Per https://www.mediawiki.org/wiki/Manual:Revision_table#rev_actor the
+		// table schema and which tables contain this data may change after MW1.35
+		//
 		// SELECT
-		// rev.rev_user,
-		// rev.rev_user_text,
+		// rev.revactor_actor,
+		// act.actor_name,
 		// COUNT( * ) AS num_revisions
-		// FROM revision AS rev
-		// LEFT JOIN page AS p ON p.page_id = rev.rev_page
-		// WHERE p.page_title = "US_EVA_29_(US_EVA_IDA1_Cables)" AND p.page_namespace = 0
-		// GROUP BY rev.rev_user
+		// FROM revision_actor_temp AS rev
+		// LEFT JOIN page AS p ON p.page_id = rev.revactor_page
+		// LEFT JOIN actor AS act on act.actor_id = rev.revactor_actor
+		// WHERE p.page_title = "Main_Page" AND p.page_namespace = 0
+		// GROUP BY rev.revactor_actor
 		// ORDER BY num_revisions DESC
 
 		#
@@ -123,12 +128,13 @@ class SpecialPageStatistics extends SpecialPage {
 		#
 		$res = $dbr->select(
 			[
-				'rev' => 'revision',
+				'rev' => 'revision_actor_temp',
 				'p' => 'page',
+				'act' => 'actor',
 			],
 			[
-				'rev.rev_user',
-				'rev.rev_user_text',
+				'rev.revactor_actor',
+				'act.actor_name',
 				'COUNT( * ) AS num_revisions',
 			],
 			[
@@ -137,12 +143,15 @@ class SpecialPageStatistics extends SpecialPage {
 			],
 			__METHOD__,
 			[
-				'GROUP BY' => 'rev.rev_user',
+				'GROUP BY' => 'rev.revactor_actor',
 				'ORDER BY' => 'num_revisions DESC',
 			],
 			[
 				'p' => [
-					'LEFT JOIN', 'p.page_id = rev.rev_page'
+					'LEFT JOIN', 'p.page_id = rev.revactor_page'
+				],
+				'act' => [
+					'LEFT JOIN', 'act.actor_id = rev.revactor_actor'
 				],
 			]
 		);
@@ -160,7 +169,7 @@ class SpecialPageStatistics extends SpecialPage {
 				Xml::openElement( 'li' )
 				. wfMessage(
 					'watchanalytics-pagestats-editors-list-item',
-					Linker::userLink( $row->rev_user, $row->rev_user_text ),
+					Linker::userLink( $row->revactor_actor, $row->actor_name ),
 					$row->num_revisions
 				)->text()
 				. Xml::closeElement( 'li' );
